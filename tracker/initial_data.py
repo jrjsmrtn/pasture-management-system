@@ -8,15 +8,12 @@ pri.create(name=''"bug", order="3")
 pri.create(name=''"feature", order="4")
 pri.create(name=''"wish", order="5")
 
+# ITIL-inspired workflow statuses
 stat = db.getclass('status')
-stat.create(name=''"unread", order="1")
-stat.create(name=''"deferred", order="2")
-stat.create(name=''"chatting", order="3")
-stat.create(name=''"need-eg", order="4")
-stat.create(name=''"in-progress", order="5")
-stat.create(name=''"testing", order="6")
-stat.create(name=''"done-cbb", order="7")
-stat.create(name=''"resolved", order="8")
+stat.create(name=''"new", order="1")         # Initial state for new issues
+stat.create(name=''"in-progress", order="2") # Work has started
+stat.create(name=''"resolved", order="3")    # Issue fixed, awaiting verification
+stat.create(name=''"closed", order="4")      # Issue verified and closed
 
 # create the two default users
 user = db.getclass('user')
