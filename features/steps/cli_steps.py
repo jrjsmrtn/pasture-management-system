@@ -104,10 +104,13 @@ def step_issue_exists_in_database(context):
     """Verify the issue exists in the database using roundup-admin."""
     issue_id = context.created_issue_id
 
+    # Get tracker_dir from context or use default
+    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+
     # Use roundup-admin to display the issue
     cmd = [
-        "roundup-admin", "-i", context.tracker_dir,
-        "display", f"issue{issue_id}"
+        "roundup-admin", "-i", tracker_dir,
+        "display", issue_id if issue_id.startswith('issue') else f"issue{issue_id}"
     ]
 
     result = subprocess.run(
