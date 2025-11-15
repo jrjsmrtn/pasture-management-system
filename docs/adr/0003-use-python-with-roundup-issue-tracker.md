@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # ADR-0003: Use Python with Roundup Issue Tracker Toolkit
 
 Date: 2025-11-15

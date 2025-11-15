@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Pasture Management System - AI Assistant Instructions
 
 ## Project Overview

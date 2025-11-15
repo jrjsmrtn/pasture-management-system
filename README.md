@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Pasture Management System (PMS)
 
 A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysadmins, built on the Roundup Issue Tracker toolkit.
@@ -78,7 +83,9 @@ Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for gui
 
 ## License
 
-[To be determined]
+MIT License - see [LICENSE](LICENSE) file for details
+
+Copyright (c) 2025 Georges Martin <jrjsmrtn@gmail.com>
 
 ## Contact
 

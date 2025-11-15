@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Pasture Management System Documentation
 
 This documentation follows the [Diátaxis](https://diataxis.fr/) framework, organizing content into four distinct categories based on user needs.

@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Changelog
 
 All notable changes to the Pasture Management System will be documented in this file.
@@ -6,6 +11,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.1.3] - 2025-11-15
+
+### Added
+- MIT License (LICENSE file)
+- ADR-0004: Adopt MIT License and SLSA Level 1
+- SPDX headers to all source and documentation files
+- Copyright and license information in README.md
+- SLSA Level 1 compliance plan
+
+### Changed
+- All documentation files now include SPDX-FileCopyrightText and SPDX-License-Identifier headers
 
 ## [0.1.2] - 2025-11-15
 
@@ -47,7 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation README following Diátaxis framework
 - Directory structure for features, docs, and sprints
 
-[Unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/jrjsmrtn/pasture-management-system/releases/tag/v0.1.0

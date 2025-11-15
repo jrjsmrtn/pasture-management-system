@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
+
 # Sprint Planning - Pasture Management System
 
 This directory contains sprint planning and tracking documents for the Pasture Management System development.
