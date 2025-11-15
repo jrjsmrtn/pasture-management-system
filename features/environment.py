@@ -96,8 +96,23 @@ def before_scenario(context, scenario):
     Run before each scenario.
 
     Set up a fresh browser context for each scenario to ensure isolation.
+    Only set up browser for web-ui scenarios.
     """
-    use_fixture(browser_context, context)
+    # Only set up browser for web UI scenarios (check tags)
+    # API and CLI scenarios don't need browser
+    has_web_ui_tag = "web-ui" in scenario.effective_tags
+    has_api_tag = "api" in scenario.effective_tags
+    has_cli_tag = "cli" in scenario.effective_tags
+
+    is_web_ui = has_web_ui_tag and not (has_api_tag or has_cli_tag)
+
+    if is_web_ui:
+        use_fixture(browser_context, context)
+    else:
+        # CLI or API scenario - just set tracker URL and directory
+        context.tracker_url = os.getenv("TRACKER_URL", DEFAULT_TRACKER_URL)
+        context.tracker_dir = "tracker"
+        context.page = None  # Explicitly set to None
 
     # Store scenario name for screenshot naming
     context.scenario_name = scenario.name.replace(" ", "_").lower()

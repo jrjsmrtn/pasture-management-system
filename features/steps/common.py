@@ -12,3 +12,12 @@ PRIORITY_MAP = {
     "feature": "4",
     "wish": "5",
 }
+
+# Status mapping (label -> Roundup ID)
+# ITIL-inspired workflow: new -> in-progress -> resolved -> closed
+STATUS_MAP = {
+    "new": "1",
+    "in-progress": "2",
+    "resolved": "3",
+    "closed": "4",
+}

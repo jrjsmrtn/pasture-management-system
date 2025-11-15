@@ -8,7 +8,7 @@ import subprocess
 from behave import given, then, when
 from playwright.sync_api import expect
 
-from features.steps.common import PRIORITY_MAP
+from features.steps.common import PRIORITY_MAP, STATUS_MAP
 
 
 @given("the following issues exist:")
@@ -45,14 +45,21 @@ def step_create_multiple_issues(context):
 
 
 @given('an issue exists with title "{title}"')
-def step_create_single_issue(context, title):
-    """Create a single issue for testing."""
+@given('an issue exists with title "{title}" and status "{status}"')
+def step_create_single_issue(context, title, status=None):
+    """Create a single issue for testing, optionally with specific status."""
     # Get tracker_dir from context or use default
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
     # Build command args
     cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "issue"]
     cmd_args.append(f"title={title}")
+
+    # Add status if provided
+    if status:
+        status_id = STATUS_MAP.get(status)
+        assert status_id, f"Unknown status: {status}"
+        cmd_args.append(f"status={status_id}")
 
     # Run the command
     result = subprocess.run(cmd_args, capture_output=True, text=True, timeout=30)
@@ -61,6 +68,9 @@ def step_create_single_issue(context, title):
 
     issue_id = result.stdout.strip()
     context.created_issue_id = f"issue{issue_id}"
+    context.current_issue_id = f"issue{issue_id}"
+    context.current_issue_title = title
+    context.current_issue_status = status or "new"
     context.test_issue_title = title
 
 

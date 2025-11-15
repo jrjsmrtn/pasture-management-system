@@ -8,14 +8,29 @@ from playwright.sync_api import expect
 
 
 @given("the Roundup tracker is running")
-def step_tracker_running(context):
+@given('the Roundup tracker is running at "{url}"')
+def step_tracker_running(context, url=None):
     """Verify the Roundup tracker is accessible."""
-    response = context.page.goto(context.tracker_url)
-    assert response.ok, f"Tracker not accessible at {context.tracker_url}"
+    # Use provided URL or default from context
+    tracker_url = url if url else getattr(context, 'tracker_url', 'http://localhost:8080/pms')
+
+    # Store the URL in context
+    context.tracker_url = tracker_url
+
+    # For Web UI scenarios, verify access; for CLI/API, just store URL
+    try:
+        page = getattr(context, 'page', None)
+        if page is not None:
+            response = page.goto(tracker_url)
+            assert response.ok, f"Tracker not accessible at {tracker_url}"
+    except AttributeError:
+        # No page available - CLI or API scenario
+        pass
 
 
 @given('I am logged in to the web UI as "{username}"')
-def step_login_as_user(context, username):
+@given('I am logged in to the web UI as "{username}" with password "{password}"')
+def step_login_as_user(context, username, password="admin"):
     """Log in to the Roundup tracker as the specified user."""
     # Navigate to the tracker
     context.page.goto(context.tracker_url)
@@ -29,8 +44,7 @@ def step_login_as_user(context, username):
     # Fill in login form
     # The login form fields in Roundup classic are: __login_name and __login_password
     context.page.fill('input[name="__login_name"]', username)
-    # Default admin password is "admin" for fresh installation
-    context.page.fill('input[name="__login_password"]', "admin")
+    context.page.fill('input[name="__login_password"]', password)
 
     # Submit login - use type=submit with value=Login
     context.page.click('input[type="submit"][value="Login"]')
