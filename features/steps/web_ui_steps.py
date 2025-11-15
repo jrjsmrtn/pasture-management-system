@@ -28,6 +28,12 @@ def step_tracker_running(context, url=None):
         pass
 
 
+@given('I am logged in to the web UI')
+def step_login_default(context):
+    """Log in to the Roundup tracker as admin (default user)."""
+    step_login_as_user(context, "admin", "admin")
+
+
 @given('I am logged in to the web UI as "{username}"')
 @given('I am logged in to the web UI as "{username}" with password "{password}"')
 def step_login_as_user(context, username, password="admin"):
