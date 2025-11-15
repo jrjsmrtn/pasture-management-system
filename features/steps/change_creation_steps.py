@@ -10,6 +10,7 @@ import requests
 from behave import given, then, when
 from requests.auth import HTTPBasicAuth
 
+
 # Map priority/category names to IDs
 CHANGEPRIORITY_MAP = {
     "low": "1",

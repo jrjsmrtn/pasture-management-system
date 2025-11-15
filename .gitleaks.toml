@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: MIT
+
+# Gitleaks configuration for Pasture Management System
+# Allowlists documentation examples that use demo credentials
+
+title = "gitleaks config for PMS"
+
+[allowlist]
+description = "Allowlist documentation examples with demo credentials"
+
+# Allow admin:admin in documentation examples
+# These are not real credentials, just documentation showing API usage
+paths = [
+  '''docs/tutorials/.*\.md''',
+  '''docs/reference/.*\.md''',
+  '''docs/howto/.*\.md''',
+]
+
+# Allow localhost URLs with basic auth examples
+regexes = [
+  '''admin:admin''',  # Demo credentials in docs
+  '''http://localhost:8080''',  # Local development examples
+]

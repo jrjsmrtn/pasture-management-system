@@ -12,6 +12,7 @@ from behave import given, then, when
 from playwright.sync_api import expect
 from requests.auth import HTTPBasicAuth
 
+
 # Map priority/category names to IDs (must match schema)
 CHANGEPRIORITY_MAP = {
     "low": "1",
