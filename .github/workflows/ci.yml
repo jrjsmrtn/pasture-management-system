@@ -71,7 +71,6 @@ jobs:
 
     - name: Initialize Roundup tracker
       run: |
-        uv run roundup-admin -i tracker install -t classic
         uv run roundup-admin -i tracker initialise admin
 
     - name: Start Roundup server
