@@ -95,6 +95,11 @@ def step_run_roundup_command(context, command):
     """Run a roundup-admin command."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Map status names to IDs in the command
+    # e.g., "set issue1 status=in-progress" -> "set issue1 status=2"
+    for status_name, status_id in STATUS_MAP.items():
+        command = command.replace(f"status={status_name}", f"status={status_id}")
+
     # Build full command
     cmd = ["roundup-admin", "-i", tracker_dir] + command.split()
 

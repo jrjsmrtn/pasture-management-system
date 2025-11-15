@@ -9,7 +9,7 @@ Feature: View Issue List
   Background:
     Given the Roundup tracker is running
 
-  @smoke
+  @smoke @web-ui
   Scenario: View list of issues
     Given I am logged in to the web UI as "admin"
     And the following issues exist:
@@ -23,7 +23,7 @@ Feature: View Issue List
     And I should see issue "Database backup failed"
     And I should see issue "Disk space warning"
 
-  @smoke
+  @smoke @web-ui
   Scenario: View issue details
     Given I am logged in to the web UI as "admin"
     And an issue exists with title "Test Issue Details"

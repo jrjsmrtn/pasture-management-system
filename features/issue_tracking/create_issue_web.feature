@@ -10,7 +10,7 @@ Feature: Create Issue via Web UI
     Given the Roundup tracker is running
     And I am logged in to the web UI as "admin"
 
-  @smoke
+  @smoke @web-ui
   Scenario: Create issue with required fields
     When I navigate to the "New Issue" page
     And I enter the following issue details:
@@ -23,7 +23,7 @@ Feature: Create Issue via Web UI
     And the issue title should be "Server backup failure"
     And the issue priority should be "urgent"
 
-  @validation
+  @validation @web-ui
   Scenario: Cannot create issue without title
     When I navigate to the "New Issue" page
     And I submit the issue without entering a title
