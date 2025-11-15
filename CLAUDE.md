@@ -26,8 +26,8 @@ See the [docs/adr/](docs/adr/) directory for complete decision history.
 - Generate JUnit XML reports with screenshots
 
 ### Semantic Versioning
-- During development: 0.1.x versions (patch level only)
-- Bump patch level after successful implementation and testing
+- During development: 0.x.0 versions (minor level bumps per sprint)
+- Bump minor version after each sprint completion
 - Main branch is the dogfooding/development environment
 - Version 1.0.0 will mark production-ready release
 
@@ -181,10 +181,10 @@ pasture-management-system/
 - ADRs required for significant decisions
 
 ### Version Management
-- Use semantic versioning (currently 0.1.x)
-- Increment patch version for completed features
+- Use semantic versioning (currently 0.1.0)
+- Increment minor version for each completed sprint
 - Update CHANGELOG.md with each version bump
-- Tag releases with `v0.1.x` format
+- Tag releases with `v0.x.0` format
 
 ## Sprint Organization
 
@@ -200,5 +200,6 @@ Sprint planning and tracking is maintained in `docs/sprints/`:
 - Foundational ADRs
 - Development tooling configuration
 - Documentation framework
+- Complete 6-sprint development plan (v0.2.0 → v1.0.0)
 
-Next steps will involve setting up Roundup tracker and implementing first ITIL workflows with BDD scenarios.
+Next steps: Sprint 1 (v0.2.0) - Set up Roundup tracker and implement basic issue tracking with BDD scenarios.

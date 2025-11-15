@@ -44,9 +44,9 @@ We will adopt comprehensive development best practices emphasizing BDD as a core
 
 ### Semantic Versioning Strategy
 
-**Initial Development**: 0.1.x on main branch (dogfooding environment)
+**Initial Development**: 0.x.0 on main branch (dogfooding environment)
 - **0.1.0**: Project foundation and structure
-- **0.1.1+**: Incremental feature development
+- **0.2.0+**: Incremental feature development (minor version bump per sprint)
 - **1.0.0**: Production-ready with complete ITIL functionality
 
 **Production Releases**: Following semantic versioning
