@@ -33,6 +33,26 @@ query = Class(db, "query",
                 url=String(),
                 private_for=Link('user'))
 
+# Change Management Classes
+
+# Change priorities (separate from issue priorities for flexibility)
+changepriority = Class(db, "changepriority",
+                name=String(),
+                order=Number())
+changepriority.setkey("name")
+
+# Change categories for classification
+changecategory = Class(db, "changecategory",
+                name=String(),
+                order=Number())
+changecategory.setkey("name")
+
+# Change statuses for ITIL workflow
+changestatus = Class(db, "changestatus",
+                name=String(),
+                order=Number())
+changestatus.setkey("name")
+
 # add any additional database schema configuration here
 
 user = Class(db, "user",
@@ -77,6 +97,19 @@ issue = IssueClass(db, "issue",
                 priority=Link("priority"),
                 status=Link("status"))
 
+# Change Request class - ITIL Change Management
+# Inherits: title, messages, files, nosy from IssueClass
+change = IssueClass(db, "change",
+                description=String(),           # Detailed description of the change
+                justification=String(),         # Business justification/reason
+                impact=String(),                # Impact assessment
+                risk=String(),                  # Risk assessment
+                assignedto=Link("user"),        # Change owner
+                priority=Link("changepriority"), # Change priority
+                category=Link("changecategory"), # Change category
+                status=Link("changestatus"),    # Change workflow status
+                related_issues=Multilink("issue")) # Issues this change addresses
+
 #
 # TRACKER SECURITY SETTINGS
 #
@@ -94,11 +127,11 @@ db.security.addPermissionToRole('User', 'Xmlrpc Access')
 
 # Assign the access and edit Permissions for issue, file and message
 # to regular users now
-for cl in 'issue', 'file', 'msg', 'keyword':
+for cl in 'issue', 'file', 'msg', 'keyword', 'change':
     db.security.addPermissionToRole('User', 'View', cl)
     db.security.addPermissionToRole('User', 'Edit', cl)
     db.security.addPermissionToRole('User', 'Create', cl)
-for cl in 'priority', 'status':
+for cl in 'priority', 'status', 'changepriority', 'changecategory', 'changestatus':
     db.security.addPermissionToRole('User', 'View', cl)
 
 # May users view other user information? Comment these lines out
@@ -180,7 +213,7 @@ db.security.addPermissionToRole('Anonymous', 'Register', 'user')
 
 # Allow anonymous users access to view issues (and the related, linked
 # information)
-for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status':
+for cl in 'issue', 'file', 'msg', 'keyword', 'priority', 'status', 'change', 'changepriority', 'changecategory', 'changestatus':
     db.security.addPermissionToRole('Anonymous', 'View', cl)
 
 # Allow the anonymous user to use the "Show Unassigned" search.
