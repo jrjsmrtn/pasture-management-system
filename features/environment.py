@@ -9,6 +9,7 @@ including Playwright browser setup, screenshot capture, and cleanup.
 """
 
 import os
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -138,13 +139,61 @@ def after_step(context, step):
             print(f"\nFailed to capture screenshot: {e}")
 
 
+def _cleanup_test_issues(context):
+    """
+    Clean up test issues created during the scenario.
+
+    This function deletes issues created during testing to prevent
+    database bloat and ensure test isolation.
+    """
+    # Get tracker directory
+    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+
+    # Collect issue IDs to delete
+    issue_ids = set()
+
+    # From single issue creation
+    if hasattr(context, 'created_issue_id'):
+        issue_id = context.created_issue_id
+        # Extract numeric ID
+        if issue_id.startswith('issue'):
+            issue_id = issue_id[5:]
+        issue_ids.add(issue_id)
+
+    # From multiple issue creation
+    if hasattr(context, 'test_issue_ids'):
+        issue_ids.update(context.test_issue_ids)
+
+    # From API creation
+    if hasattr(context, 'api_issue_id'):
+        issue_ids.add(context.api_issue_id)
+
+    # Delete each issue
+    cleanup_enabled = os.getenv("CLEANUP_TEST_ISSUES", "true").lower() == "true"
+
+    if cleanup_enabled and issue_ids:
+        for issue_id in issue_ids:
+            try:
+                cmd = [
+                    "roundup-admin", "-i", tracker_dir,
+                    "retire", f"issue{issue_id}"
+                ]
+                subprocess.run(cmd, capture_output=True, timeout=10, check=False)
+            except Exception as e:
+                # Don't fail the test if cleanup fails
+                print(f"\nWarning: Failed to cleanup issue{issue_id}: {e}")
+
+
 def after_scenario(context, scenario):
     """
     Run after each scenario.
 
     Capture final screenshot for passed scenarios (optional)
-    and perform cleanup.
+    and perform cleanup of test data.
     """
+    # Clean up test issues
+    _cleanup_test_issues(context)
+
     # Optionally capture screenshot for passed scenarios
     if scenario.status == "passed" and os.getenv("SCREENSHOT_ON_PASS", "false").lower() == "true":
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
