@@ -3,11 +3,11 @@
 
 """Step definitions for Web UI interactions with Roundup tracker."""
 
-from behave import given, when, then
+from behave import given, then, when
 from playwright.sync_api import expect
 
 
-@given('the Roundup tracker is running')
+@given("the Roundup tracker is running")
 def step_tracker_running(context):
     """Verify the Roundup tracker is accessible."""
     response = context.page.goto(context.tracker_url)
@@ -52,27 +52,27 @@ def step_navigate_to_page(context, page_name):
         context.page.wait_for_load_state("networkidle")
 
 
-@when('I enter the following issue details:')
+@when("I enter the following issue details:")
 def step_enter_issue_details(context):
     """Enter issue details from a table."""
     for row in context.table:
-        field_name = row['field']
-        field_value = row['value']
+        field_name = row["field"]
+        field_value = row["value"]
 
-        if field_name == 'title':
+        if field_name == "title":
             # In Roundup classic, the issue title field is named 'title'
             context.page.fill('input[name="title"]', field_value)
             # Store for later verification
             context.issue_title = field_value
 
-        elif field_name == 'priority':
+        elif field_name == "priority":
             # Priority is a select/dropdown in Roundup classic
             context.page.select_option('select[name="priority"]', label=field_value)
             # Store for later verification
             context.issue_priority = field_value
 
 
-@when('I submit the issue')
+@when("I submit the issue")
 def step_submit_issue(context):
     """Submit the issue creation form."""
     # In Roundup, there are multiple submit buttons on the page
@@ -84,7 +84,7 @@ def step_submit_issue(context):
     context.page.wait_for_load_state("networkidle")
 
 
-@when('I submit the issue without entering a title')
+@when("I submit the issue without entering a title")
 def step_submit_without_title(context):
     """Submit the issue form without filling in the title."""
     # Don't fill in the title field
@@ -93,7 +93,7 @@ def step_submit_without_title(context):
     submit_button.click()
 
 
-@then('I should see a success message')
+@then("I should see a success message")
 def step_see_success_message(context):
     """Verify a success message is displayed."""
     # Roundup redirects to the created issue page with @ok_message query param
@@ -103,21 +103,22 @@ def step_see_success_message(context):
 
     # Check if redirected to an issue page
     assert (
-        "issue" in page_url.lower() and "issue?" not in page_url.lower()  # issue1, issue2, not issue?@template
+        "issue" in page_url.lower()
+        and "issue?" not in page_url.lower()  # issue1, issue2, not issue?@template
     ), f"Not redirected to issue page. Current URL: {page_url}"
 
     # Extract the issue ID from the URL for later verification
     # URL format: http://localhost:8080/pms/issue1?@ok_message=...
     if "/issue" in page_url:
         # Extract issue ID from URL like /issue1 or /issue1?params
-        parts = page_url.split('/')
-        issue_part = [p for p in parts if p.startswith('issue') and p != 'issue'][0]
+        parts = page_url.split("/")
+        issue_part = [p for p in parts if p.startswith("issue") and p != "issue"][0]
         # Remove query string if present
-        issue_id = issue_part.split('?')[0]
+        issue_id = issue_part.split("?")[0]
         context.created_issue_id = issue_id
 
 
-@then('the issue should appear in the issue list')
+@then("the issue should appear in the issue list")
 def step_issue_in_list(context):
     """Verify the created issue appears in the issue list."""
     # Navigate to the issue list
@@ -125,7 +126,7 @@ def step_issue_in_list(context):
     context.page.wait_for_load_state("networkidle")
 
     # Look for the issue title in the list
-    issue_title = getattr(context, 'issue_title', None)
+    issue_title = getattr(context, "issue_title", None)
     if issue_title:
         # Use .first to handle cases where multiple issues have the same title
         title_locator = context.page.locator(f'a:has-text("{issue_title}")').first
@@ -136,7 +137,7 @@ def step_issue_in_list(context):
 # to avoid duplication and allow context-aware implementation
 
 
-@then('I should see a validation error')
+@then("I should see a validation error")
 def step_see_validation_error(context):
     """Verify a validation error is displayed."""
     # HTML5 validation or Roundup validation message
@@ -151,7 +152,7 @@ def step_see_validation_error(context):
         pass
 
 
-@then('the issue should not be created')
+@then("the issue should not be created")
 def step_issue_not_created(context):
     """Verify the issue was not created."""
     # Navigate to issue list and verify no new issue

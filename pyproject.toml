@@ -1,0 +1,82 @@
+# SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: MIT
+
+[project]
+name = "pasture-management-system"
+version = "0.2.0"
+description = "Issue tracking system based on Roundup"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Georges Martin", email = "jrjsmrtn@gmail.com"}
+]
+
+[tool.ruff]
+# Exclude generated and third-party code
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "tracker/db",
+    "tracker/sessions",
+    "tracker/html",  # Roundup templates
+    "tracker/extensions",  # Roundup extensions
+    "tracker/detectors",  # Roundup detector templates (third-party boilerplate)
+    "tracker/initial_data.py",  # Roundup initial data script
+    "tracker/schema.py",  # Roundup schema definition
+    "tracker/TEMPLATE-INFO.txt",
+]
+
+# Set line length to match common conventions
+line-length = 100
+
+# Target Python 3.9+ (minimum supported version)
+target-version = "py39"
+
+[tool.ruff.lint]
+# Enable these rule sets:
+# E/W: pycodestyle errors and warnings
+# F: Pyflakes (undefined names, unused imports, etc.)
+# I: isort (import sorting)
+# N: pep8-naming
+# UP: pyupgrade (modernize Python syntax)
+select = ["E", "W", "F", "I", "N", "UP"]
+
+# Ignore specific rules:
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+]
+
+# Allow auto-fixing for these rules
+fixable = ["ALL"]
+unfixable = []
+
+# Per-file rule ignores
+[tool.ruff.lint.per-file-ignores]
+# Roundup template code - ignore all linting issues (third-party boilerplate)
+"tracker/detectors/*.py" = ["ALL"]
+"tracker/initial_data.py" = ["ALL"]
+"tracker/schema.py" = ["ALL"]
+
+# Test files can have unused imports/variables (for fixtures, test utilities, etc.)
+"tests/**/*.py" = ["F401", "F841"]
+"features/**/*.py" = ["F401", "F841"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["features", "tests"]
+force-single-line = false
+lines-after-imports = 2
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+# Exclude directories
+exclude = [
+    "^tracker/",  # Roundup template code
+    "^venv/",
+]

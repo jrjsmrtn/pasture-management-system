@@ -9,7 +9,7 @@ testing across web UI scenarios. All screenshots are captured at 1024x768
 resolution with English locale.
 """
 
-from typing import Dict, Any
+from typing import Any
 
 
 # Viewport configuration for consistent screenshots
@@ -19,13 +19,13 @@ VIEWPORT = {
 }
 
 # Browser configuration
-BROWSER_CONFIG: Dict[str, Any] = {
+BROWSER_CONFIG: dict[str, Any] = {
     "headless": True,  # Run headless in CI, can override for debugging
     "slow_mo": 0,  # Milliseconds to slow down operations (useful for debugging)
 }
 
 # Context configuration
-CONTEXT_CONFIG: Dict[str, Any] = {
+CONTEXT_CONFIG: dict[str, Any] = {
     "viewport": VIEWPORT,
     "locale": "en-US",  # English locale
     "timezone_id": "America/New_York",
@@ -35,7 +35,7 @@ CONTEXT_CONFIG: Dict[str, Any] = {
 }
 
 # Screenshot configuration
-SCREENSHOT_CONFIG: Dict[str, Any] = {
+SCREENSHOT_CONFIG: dict[str, Any] = {
     "path": None,  # Set dynamically in environment.py
     "full_page": False,  # Capture viewport only for consistent sizing
     "type": "png",
@@ -67,7 +67,7 @@ def get_browser_args() -> list[str]:
     ]
 
 
-def get_launch_options(headless: bool = True) -> Dict[str, Any]:
+def get_launch_options(headless: bool = True) -> dict[str, Any]:
     """
     Get complete browser launch options.
 
@@ -84,7 +84,7 @@ def get_launch_options(headless: bool = True) -> Dict[str, Any]:
     }
 
 
-def get_context_options() -> Dict[str, Any]:
+def get_context_options() -> dict[str, Any]:
     """
     Get browser context options.
 

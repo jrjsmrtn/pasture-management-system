@@ -14,12 +14,12 @@ from datetime import datetime
 from pathlib import Path
 
 from behave import fixture, use_fixture
-from playwright.sync_api import sync_playwright, Browser, BrowserContext, Page
+from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from tests.config.playwright_config import (
-    get_launch_options,
-    get_context_options,
     DEFAULT_TRACKER_URL,
+    get_context_options,
+    get_launch_options,
 )
 
 
@@ -43,9 +43,7 @@ def playwright_browser(context):
     headless = os.getenv("HEADLESS", "true").lower() == "true"
 
     # Launch browser
-    context.browser = context.playwright.chromium.launch(
-        **get_launch_options(headless=headless)
-    )
+    context.browser = context.playwright.chromium.launch(**get_launch_options(headless=headless))
 
     yield context.browser
 
@@ -147,25 +145,25 @@ def _cleanup_test_issues(context):
     database bloat and ensure test isolation.
     """
     # Get tracker directory
-    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
 
     # Collect issue IDs to delete
     issue_ids = set()
 
     # From single issue creation
-    if hasattr(context, 'created_issue_id'):
+    if hasattr(context, "created_issue_id"):
         issue_id = context.created_issue_id
         # Extract numeric ID
-        if issue_id.startswith('issue'):
+        if issue_id.startswith("issue"):
             issue_id = issue_id[5:]
         issue_ids.add(issue_id)
 
     # From multiple issue creation
-    if hasattr(context, 'test_issue_ids'):
+    if hasattr(context, "test_issue_ids"):
         issue_ids.update(context.test_issue_ids)
 
     # From API creation
-    if hasattr(context, 'api_issue_id'):
+    if hasattr(context, "api_issue_id"):
         issue_ids.add(context.api_issue_id)
 
     # Delete each issue
@@ -174,10 +172,7 @@ def _cleanup_test_issues(context):
     if cleanup_enabled and issue_ids:
         for issue_id in issue_ids:
             try:
-                cmd = [
-                    "roundup-admin", "-i", tracker_dir,
-                    "retire", f"issue{issue_id}"
-                ]
+                cmd = ["roundup-admin", "-i", tracker_dir, "retire", f"issue{issue_id}"]
                 subprocess.run(cmd, capture_output=True, timeout=10, check=False)
             except Exception as e:
                 # Don't fail the test if cleanup fails
