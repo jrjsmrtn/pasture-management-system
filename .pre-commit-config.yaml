@@ -3,6 +3,13 @@
 #
 # Multi-stage pre-commit configuration
 # See https://pre-commit.com for more information
+#
+# Installation:
+#   uv run pre-commit install         # Install pre-commit hooks
+#   uv run pre-commit install --hook-type pre-push  # Install pre-push hooks
+#
+# Manual run:
+#   uv run pre-commit run --all-files # Run on all files
 
 repos:
   # Stage 1: Fast feedback on pre-commit (<30s target)

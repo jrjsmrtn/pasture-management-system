@@ -20,25 +20,27 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      run: uv sync --no-install-project --dev
 
     - name: Run ruff check
-      run: ruff check .
+      run: uv run ruff check .
 
     - name: Run ruff format check
-      run: ruff format --check .
+      run: uv run ruff format --check .
 
     - name: Run mypy
-      run: mypy features/steps/ --ignore-missing-imports || true
+      run: uv run mypy features/steps/ --ignore-missing-imports || true
 
   test:
     name: BDD Tests (Python ${{ matrix.python-version }})
@@ -51,37 +53,39 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-        cache: 'pip'
 
     - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      run: uv sync --no-install-project
 
     - name: Install Playwright browsers
-      run: playwright install --with-deps chromium
+      run: uv run playwright install --with-deps chromium
 
     - name: Initialize Roundup tracker
       run: |
-        roundup-admin install -t classic tracker
-        roundup-admin -i tracker initialise <<EOF
+        uv run roundup-admin install -t classic tracker
+        uv run roundup-admin -i tracker initialise <<EOF
         admin
         admin
         EOF
 
     - name: Start Roundup server
       run: |
-        roundup-server -p 8080 pms=tracker &
+        uv run roundup-server -p 8080 pms=tracker &
         echo $! > roundup.pid
         sleep 5
 
     - name: Run BDD tests
       run: |
-        behave features/issue_tracking/ \
+        uv run behave features/issue_tracking/ \
           --junit \
           --junit-directory reports \
           --format=pretty \
