@@ -1,0 +1,45 @@
+# Multi-stage pre-commit configuration
+# See https://pre-commit.com for more information
+
+repos:
+  # Stage 1: Fast feedback on pre-commit (<30s target)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: detect-private-key  # CRITICAL - prevents credential leaks
+
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks  # Secret scanning on every commit
+        stages: [pre-commit]
+
+  # Python formatting and linting with ruff
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff-format  # Formatting (fast - pre-commit)
+      - id: ruff  # Fast linting checks (pre-commit)
+        args: [--fix]
+
+  # Stage 2: Comprehensive checks on pre-push (1-3min acceptable)
+  # Python security checks (pre-push)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--select, S, --fix]  # Security rules
+        stages: [pre-push]
+
+  # Python type checking (pre-push)
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        stages: [pre-push]
