@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: MIT
+#
+# Pasture Management System - Python Dependencies
+
+# Core Issue Tracker
+roundup>=2.4.0
+
+# BDD Testing Framework
+behave>=1.2.6
+playwright>=1.40.0
+
+# Unit Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.5.0
+
+# Code Quality
+ruff>=0.8.4
+mypy>=1.11.0
+
+# Documentation
+sphinx>=7.2.0
+sphinx-rtd-theme>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+requests>=2.31.0
