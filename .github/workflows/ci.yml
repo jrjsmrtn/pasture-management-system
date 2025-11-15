@@ -72,10 +72,7 @@ jobs:
     - name: Initialize Roundup tracker
       run: |
         uv run roundup-admin install -t classic tracker
-        uv run roundup-admin -i tracker initialise <<EOF
-        admin
-        admin
-        EOF
+        uv run roundup-admin -i tracker initialise admin
 
     - name: Start Roundup server
       run: |
