@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
 **Sprint Duration**: 2 weeks
 **Sprint Goal**: Implement issue lifecycle workflow and introduce change management foundation
 **Target Version**: v0.3.0
-**Start Date**: TBD
-**End Date**: TBD
+**Start Date**: 2025-11-15
+**End Date**: 2025-11-29
 
 ## Sprint Objective
 
