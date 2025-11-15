@@ -65,7 +65,9 @@ def step_issue_status_changed_at(context, status, timestamp):
 def step_view_issue_details(context):
     """Navigate to the issue detail page."""
     issue_id = context.current_issue_id
-    context.page.goto(f"{context.tracker_url}{issue_id}")
+    # Ensure proper URL formation
+    tracker_url = context.tracker_url.rstrip('/')
+    context.page.goto(f"{tracker_url}/{issue_id}")
     context.page.wait_for_load_state("networkidle")
 
 
@@ -108,35 +110,46 @@ def step_run_roundup_command(context, command):
     context.cli_stderr = result.stderr.strip()
 
 
-# Use regex matcher for this step to handle literal braces
-use_step_matcher('re')
-
-
-@when(r'I PATCH "(?P<endpoint>.*)" with JSON')
-def step_patch_api_with_json(context, endpoint):
-    """Send a PATCH request to the API with JSON body."""
-    # Get the issue ID from context and replace {issue_id} placeholder
-    if "{issue_id}" in endpoint:
-        issue_id = context.current_issue_id.replace("issue", "")
-        endpoint = endpoint.replace("{issue_id}", issue_id)
+@when('I PATCH the current issue via API with JSON:')
+def step_patch_api_with_json(context):
+    """Send a PATCH request to the API to update the current issue."""
+    # Get the issue ID from context
+    issue_id = context.current_issue_id.replace("issue", "")
 
     # Build full URL
     api_url = "http://localhost:8080/pms/rest/data"
+    endpoint = f"/issue/{issue_id}"
     full_url = f"{api_url}{endpoint}"
+
+    # Get auth
+    auth = HTTPBasicAuth("admin", "admin")
+
+    # First, GET the issue to retrieve its etag
+    get_response = requests.get(full_url, auth=auth, timeout=30)
+    assert get_response.status_code == 200, f"Failed to GET issue for etag: {get_response.status_code}"
+
+    issue_data = get_response.json()
+    etag = issue_data.get("data", {}).get("@etag")
+    assert etag, "No @etag found in issue data"
 
     # Parse JSON from docstring
     payload = json.loads(context.text)
 
-    # Prepare headers
+    # Map status name to ID if status field is present
+    if "status" in payload:
+        status_name = payload["status"]
+        status_id = STATUS_MAP.get(status_name)
+        if status_id:
+            payload["status"] = status_id
+
+    # Prepare headers with If-Match
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
         "Origin": "http://localhost:8080",
         "Referer": "http://localhost:8080/pms/",
+        "If-Match": etag,
     }
-
-    # Get auth
-    auth = HTTPBasicAuth("admin", "admin")
 
     # Make PATCH request
     response = requests.patch(
@@ -152,10 +165,6 @@ def step_patch_api_with_json(context, endpoint):
     except json.JSONDecodeError:
         context.api_response_data = None
         context.api_response_text = response.text
-
-
-# Switch back to parse matcher for other steps
-use_step_matcher('parse')
 
 
 @then('the issue status should be "{expected_status}"')

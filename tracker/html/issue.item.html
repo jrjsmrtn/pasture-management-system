@@ -128,6 +128,50 @@
 </table>
 </form>
 
+<!-- Workflow Action Buttons -->
+<div tal:condition="context/id" style="margin: 20px 0; padding: 10px; background: #f5f5f5; border: 1px solid #ddd;">
+ <strong i18n:translate="">Workflow Actions:</strong>
+
+ <!-- Start Work button: shown when status is "new" -->
+ <form tal:condition="python:context.status.id == '1'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="2">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Start Work" i18n:attributes="value">
+ </form>
+
+ <!-- Mark Resolved button: shown when status is "in-progress" -->
+ <form tal:condition="python:context.status.id == '2'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="3">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Mark Resolved" i18n:attributes="value">
+ </form>
+
+ <!-- Close Issue button: shown when status is "resolved" -->
+ <form tal:condition="python:context.status.id == '3'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="4">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Close Issue" i18n:attributes="value">
+ </form>
+
+ <!-- No workflow actions available -->
+ <span tal:condition="python:context.status.id not in ['1', '2', '3']"
+       style="margin-left: 10px; font-style: italic;" i18n:translate="">
+  No workflow actions available for current status.
+ </span>
+</div>
+
 <tal:block tal:condition="not:context/id" i18n:translate="">
 <table class="form">
 <tr>
