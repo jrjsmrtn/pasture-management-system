@@ -22,18 +22,20 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-
-    - name: Install dependencies
+    - name: Create source archive
       run: |
-        python -m pip install --upgrade pip
-        pip install build
-
-    - name: Build distribution
-      run: python -m build
+        mkdir -p dist
+        tar -czf dist/pasture-management-system-${{ github.ref_name }}.tar.gz \
+          --exclude='.git' \
+          --exclude='venv' \
+          --exclude='tracker/db' \
+          --exclude='tracker/sessions' \
+          --exclude='__pycache__' \
+          --exclude='*.pyc' \
+          --exclude='screenshots' \
+          --exclude='reports' \
+          --exclude='pretty.output' \
+          .
 
     - name: Generate artifact hash
       id: hash
