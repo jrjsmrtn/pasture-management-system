@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 **Sprint**: 1 (Foundation & Basic Issue Tracking)
 **Target Version**: v0.2.0
-**Status**: In Progress
+**Status**: ✅ Complete
 **Start Date**: 2025-11-15
-**End Date**: TBD
+**End Date**: 2025-11-15
 
 ## Sprint Goal
 
@@ -392,7 +392,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Task 4.1: GitHub Actions Workflow
 **Priority**: High
 **Estimate**: 3 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
 - [ ] Create `.github/workflows/ci.yml`
@@ -417,7 +417,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Task 4.2: SLSA Provenance Generation
 **Priority**: Medium
 **Estimate**: 2 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
 - [ ] Install slsa-github-generator action
@@ -441,7 +441,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Task 5.1: Tutorial - Getting Started with PMS
 **Priority**: High
 **Estimate**: 4 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
 - [ ] Create tutorial structure
@@ -465,7 +465,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Task 5.2: Update CHANGELOG for v0.2.0
 **Priority**: Medium
 **Estimate**: 30 minutes
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
 - [ ] Document all changes in CHANGELOG.md
@@ -486,7 +486,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Task 6.1: Sprint 1 Retrospective
 **Priority**: Medium
 **Estimate**: 1 hour
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
 - [ ] Create retrospective document
@@ -526,17 +526,17 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 ## Definition of Done Checklist
 
-- [ ] All user stories completed with acceptance criteria met
-- [ ] All BDD scenarios implemented and passing
-- [ ] Playwright screenshots at 1024x768 resolution
-- [ ] JUnit XML reports generated with screenshots
-- [ ] Code passes pre-commit hooks (ruff, mypy, gitleaks)
-- [ ] "Getting Started" tutorial published
-- [ ] Test coverage >85% for new code
-- [ ] CHANGELOG.md updated for v0.2.0
-- [ ] Sprint retrospective completed
-- [ ] GitHub Actions CI/CD functional
-- [ ] SLSA provenance generation configured
+- [x] All user stories completed with acceptance criteria met
+- [x] All BDD scenarios implemented and passing
+- [x] Playwright screenshots at 1024x768 resolution
+- [x] JUnit XML reports generated with screenshots
+- [x] Code passes pre-commit hooks (ruff, mypy, gitleaks)
+- [x] "Getting Started" tutorial published
+- [ ] Test coverage >85% for new code (deferred to Sprint 2)
+- [x] CHANGELOG.md updated for v0.2.0
+- [x] Sprint retrospective completed
+- [x] GitHub Actions CI/CD functional
+- [x] SLSA provenance generation configured
 
 ---
 
