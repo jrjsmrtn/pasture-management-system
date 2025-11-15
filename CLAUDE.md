@@ -105,9 +105,12 @@ behave --tags=@web-ui
 behave --tags=@cli
 behave --tags=@api
 
-# Generate reports
+# Generate reports with screenshots
 behave --format json --outfile reports/behave-report.json
 behave --junit --junit-directory reports/
+
+# Note: Playwright screenshots are captured at 1024x768 resolution
+# Web UI is English only
 ```
 
 ### Architecture Validation

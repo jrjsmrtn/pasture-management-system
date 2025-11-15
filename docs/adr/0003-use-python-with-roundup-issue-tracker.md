@@ -51,11 +51,17 @@ We will use **Python 3.x with Roundup Issue Tracker Toolkit** as the foundation 
 ### Testing Interface Coverage
 
 The project will demonstrate BDD testing across three interfaces:
-- **Web UI**: Playwright-based browser automation
+- **Web UI**: Playwright-based browser automation (English only, 1024x768 resolution)
 - **CLI**: Command-line interface testing
 - **API**: REST/XML-RPC API testing
 
 This multi-interface approach provides comprehensive BDD demonstration value.
+
+### Web UI Configuration
+
+- **Language**: English only (simplifies BDD scenarios and reduces complexity)
+- **Screenshot Resolution**: 1024x768 (standard for consistent test reports and documentation)
+- **Browser**: Modern browsers via Playwright (Chromium, Firefox, WebKit)
 
 ## Consequences
 
