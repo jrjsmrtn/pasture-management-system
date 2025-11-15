@@ -22,6 +22,7 @@ def step_create_multiple_issues(context):
     for row in context.table:
         title = row["title"]
         priority = row.get("priority", "bug")
+        assignedto = row.get("assignedto", "")
 
         # Build command args
         cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "issue"]
@@ -31,6 +32,12 @@ def step_create_multiple_issues(context):
         priority_id = PRIORITY_MAP.get(priority.lower())
         if priority_id:
             cmd_args.append(f"priority={priority_id}")
+
+        # Add assignedto if specified (and not empty)
+        if assignedto:
+            # Map username to user ID (for now, assume admin=1)
+            user_id = "1" if assignedto == "admin" else assignedto
+            cmd_args.append(f"assignedto={user_id}")
 
         # Run the command
         result = subprocess.run(cmd_args, capture_output=True, text=True, timeout=30)

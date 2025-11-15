@@ -18,9 +18,9 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 8 (Story 1)
+- **Completed**: 11 (Stories 1-2)
 - **In Progress**: 0
-- **Remaining**: 19
+- **Remaining**: 16
 
 ## Backlog Items
 
@@ -87,39 +87,50 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 #### Story 2: Assign Issues to Owner
 **Story Points**: 3
 **Priority**: High
-**Status**: ⏸️ Not Started
+**Status**: ✅ Complete
 **Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want to assign issues to specific people so that responsibilities are clear.
 
 **Acceptance Criteria**:
-- [ ] Issue has assignee field
-- [ ] User list available for assignment
-- [ ] Assignee can be set during creation or later
-- [ ] Assignee can be changed
-- [ ] Filter issues by assignee
+- [x] Issue has assignee field
+- [x] User list available for assignment
+- [x] Assignee can be set during creation or later
+- [x] Assignee can be changed
+- [x] Filter issues by assignee
 
-**BDD Scenarios**: 2 scenarios
-1. Assign issue to user (@web-ui)
-2. Filter issues by assignee (@web-ui)
+**BDD Scenarios**: 4 scenarios - **ALL PASSING** ✅
+1. ✅ Assign issue to user during creation (@web-ui @smoke)
+2. ✅ Change issue assignee (@web-ui)
+3. ✅ Filter issues by assignee (@web-ui)
+4. ✅ View unassigned issues (@web-ui)
 
 **Technical Tasks**:
-- [ ] Add assignee field to issue schema
-- [ ] Create user selection dropdown in UI
-- [ ] Implement assignment form functionality
-- [ ] Add assignee filter to issue list
-- [ ] Create feature file: `features/issue_tracking/assign_issues.feature`
-- [ ] Implement step definitions
-- [ ] Write BDD scenarios (2 scenarios)
-- [ ] Verify all scenarios passing
+- [x] Assignee field already exists in schema (Link to user)
+- [x] Assignee dropdown already in UI (issue.item.html line 88-89)
+- [x] Filter functionality already exists (issue.index.html sort/group)
+- [x] Create feature file: `features/issue_tracking/assign_issues.feature`
+- [x] Implement step definitions: `features/steps/assignment_steps.py`
+- [x] Update view_steps.py to support assignedto field
+- [x] Write BDD scenarios (4 scenarios)
+- [x] Verify all scenarios passing
+
+**Completion Notes**:
+- 2025-11-15: Created BDD feature file with 4 scenarios
+- 2025-11-15: Implemented assignment step definitions (103 lines)
+- 2025-11-15: Updated view_steps.py to support assignedto in issue creation
+- 2025-11-15: Fixed priority validation issue (Roundup requires priority)
+- 2025-11-15: Simplified scenario 1 to use CLI creation + Web UI assignment
+- 2025-11-15: **All 4 scenarios passing** (32 steps, 0 failures)
 
 **Files to Create/Modify**:
-- `features/issue_tracking/assign_issues.feature`
-- `features/steps/assignment_steps.py`
-- `tracker/schema.py` (add assignee field)
-- `tracker/html/issue.item.html` (assignee dropdown)
-- `tracker/html/issue.index.html` (assignee filter)
+- `features/issue_tracking/assign_issues.feature` ✅
+- `features/steps/assignment_steps.py` ✅
+- `features/steps/view_steps.py` ✅ (updated)
+- `tracker/schema.py` (assignee field already exists)
+- `tracker/html/issue.item.html` (assignee dropdown already exists)
+- `tracker/html/issue.index.html` (filter already exists)
 
 **Dependencies**: None
 
@@ -319,15 +330,15 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 
 ### Story Points Progress
 ```
-[########____________________] 8/27 (30%)
+[###########_________________] 11/27 (41%)
 ```
 
 ### BDD Scenarios Progress
-**Target**: 13+ scenarios
-**Current**: 7 passing (54% of minimum target)
+**Target**: 16+ scenarios
+**Current**: 11 passing (69% of minimum target)
 
 - [x] Issue workflow: 7 scenarios **ALL PASSING** ✅
-- [ ] Assign issues: 2 scenarios
+- [x] Assign issues: 4 scenarios **ALL PASSING** ✅
 - [ ] Change schema: 1 scenario
 - [ ] Create change: 4 scenarios
 - [ ] View changes: 2 scenarios
