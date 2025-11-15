@@ -18,9 +18,9 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 3
+- **Completed**: 8
 - **In Progress**: 0
-- **Remaining**: 24
+- **Remaining**: 19
 
 ## Backlog Items
 
@@ -218,29 +218,29 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Story 2: Create Issue via Web UI
 **Story Points**: 5
 **Priority**: High
-**Status**: Not Started
-**Assignee**: TBD
+**Status**: ✅ Completed
+**Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want to create issues through the web interface so that I can track problems in my homelab.
 
 **BDD Scenarios**:
-1. Create issue with required fields (@smoke)
-2. Cannot create issue without title (@validation)
+1. Create issue with required fields (@smoke) ✅
+2. Cannot create issue without title (@validation) ✅
 
 **Subtasks**:
-- [ ] Write feature file: `features/issue_tracking/create_issue_web.feature`
-- [ ] Implement step definitions for web UI
-- [ ] Customize Roundup issue creation form
-- [ ] Add required field validation
-- [ ] Create issue list page
-- [ ] Implement step: "I am logged in to the web UI"
-- [ ] Implement step: "I navigate to New Issue"
-- [ ] Implement step: "I enter title/description/priority"
-- [ ] Implement step: "I click Submit"
-- [ ] Implement step: "I should see success message"
-- [ ] Implement step: "Issue should appear in list"
-- [ ] Verify screenshots captured at 1024x768
+- [x] Write feature file: `features/issue_tracking/create_issue_web.feature`
+- [x] Implement step definitions for web UI
+- [x] Customize Roundup issue creation form
+- [x] Add required field validation
+- [x] Create issue list page
+- [x] Implement step: "I am logged in to the web UI"
+- [x] Implement step: "I navigate to New Issue"
+- [x] Implement step: "I enter title/description/priority"
+- [x] Implement step: "I click Submit"
+- [x] Implement step: "I should see success message"
+- [x] Implement step: "Issue should appear in list"
+- [x] Verify screenshots captured at 1024x768
 
 **Acceptance Criteria**:
 - Web UI displays issue creation form
@@ -506,14 +506,14 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 ### Story Points Progress
 ```
-[###________________________] 3/27 (11%)
+[########___________________] 8/27 (30%)
 ```
 
 ### BDD Scenarios Progress
 **Target**: 10+ scenarios
-**Current**: 0
+**Current**: 2
 
-- [ ] Create issue via Web UI: 2 scenarios
+- [x] Create issue via Web UI: 2 scenarios ✅
 - [ ] Create issue via CLI: 2 scenarios
 - [ ] Create issue via API: 2 scenarios
 - [ ] View issues: 2 scenarios
