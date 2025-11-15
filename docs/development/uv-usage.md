@@ -25,11 +25,15 @@ sudo port install uv
 
 ```bash
 # Create virtual environment and install dependencies
-uv sync
+# Note: Use --no-install-project since this is not a distributable package
+uv sync --no-install-project
 
 # Install with dev dependencies
-uv sync --dev
+uv sync --no-install-project --dev
 ```
+
+**Note**: This project is a Roundup configuration project, not a distributable Python package.
+Always use `--no-install-project` with `uv sync` to skip installing the project itself.
 
 ### Adding Dependencies
 

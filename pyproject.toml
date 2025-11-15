@@ -1,5 +1,8 @@
 # SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
 # SPDX-License-Identifier: MIT
+#
+# NOTE: This is a Roundup configuration project, not a distributable Python package.
+# When using uv, always run: uv sync --no-install-project
 
 [project]
 name = "pasture-management-system"
@@ -27,9 +30,8 @@ dev = [
     "pre-commit>=3.6.0",
 ]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+# No build system - this is not a distributable package
+# It's a Roundup configuration project with dependencies only
 
 [tool.uv]
 dev-dependencies = [
