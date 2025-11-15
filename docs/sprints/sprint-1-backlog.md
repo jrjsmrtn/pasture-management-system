@@ -18,9 +18,9 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 8
+- **Completed**: 16
 - **In Progress**: 0
-- **Remaining**: 19
+- **Remaining**: 11
 
 ## Backlog Items
 
@@ -264,26 +264,26 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Story 3: Create Issue via CLI
 **Story Points**: 3
 **Priority**: High
-**Status**: Not Started
-**Assignee**: TBD
+**Status**: ✅ Completed
+**Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want to create issues from the command line so that I can quickly report issues during troubleshooting.
 
 **BDD Scenarios**:
-1. Create issue via command line (@smoke)
-2. Create issue with minimal fields
+1. Create issue via command line (@smoke) ✅
+2. Create issue with minimal fields ✅
 
 **Subtasks**:
-- [ ] Write feature file: `features/issue_tracking/create_issue_cli.feature`
-- [ ] Implement step definitions for CLI
-- [ ] Configure Roundup CLI client
-- [ ] Test CLI authentication
-- [ ] Implement step: "I have valid Roundup credentials"
-- [ ] Implement step: "I run roundup-client command"
-- [ ] Implement step: "Command should succeed"
-- [ ] Implement step: "Issue should exist in database"
-- [ ] Verify default values applied
+- [x] Write feature file: `features/issue_tracking/create_issue_cli.feature`
+- [x] Implement step definitions for CLI
+- [x] Configure Roundup CLI client
+- [x] Test CLI authentication
+- [x] Implement step: "I have valid Roundup credentials"
+- [x] Implement step: "I run roundup-client command"
+- [x] Implement step: "Command should succeed"
+- [x] Implement step: "Issue should exist in database"
+- [x] Verify default values applied
 
 **Acceptance Criteria**:
 - CLI command accepts title, description, priority
@@ -304,28 +304,28 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Story 4: Create Issue via API
 **Story Points**: 5
 **Priority**: High
-**Status**: Not Started
-**Assignee**: TBD
+**Status**: ✅ Completed
+**Assignee**: Claude
 
 **User Story**:
 > As an automation script, I want to create issues via REST API so that I can integrate issue tracking with monitoring tools.
 
 **BDD Scenarios**:
-1. Create issue via REST API (@smoke)
-2. Cannot create issue without authentication (@security)
+1. Create issue via REST API (@smoke) ✅
+2. Cannot create issue without authentication (@security) ✅
 
 **Subtasks**:
-- [ ] Write feature file: `features/issue_tracking/create_issue_api.feature`
-- [ ] Implement step definitions for API
-- [ ] Configure Roundup API endpoint
-- [ ] Implement API authentication
-- [ ] Test API token generation
-- [ ] Implement step: "I have a valid API token"
-- [ ] Implement step: "I POST to /api/issues with JSON"
-- [ ] Implement step: "Response status should be 201"
-- [ ] Implement step: "Response should contain ID"
-- [ ] Implement step: "Issue should exist in database"
-- [ ] Test authentication failure scenarios
+- [x] Write feature file: `features/issue_tracking/create_issue_api.feature`
+- [x] Implement step definitions for API
+- [x] Configure Roundup API endpoint
+- [x] Implement API authentication
+- [x] Test API token generation
+- [x] Implement step: "I have a valid API token"
+- [x] Implement step: "I POST to /api/issues with JSON"
+- [x] Implement step: "Response status should be 201"
+- [x] Implement step: "Response should contain ID"
+- [x] Implement step: "Issue should exist in database"
+- [x] Test authentication failure scenarios
 
 **Acceptance Criteria**:
 - API endpoint accepts JSON payload
@@ -506,16 +506,16 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 ### Story Points Progress
 ```
-[########___________________] 8/27 (30%)
+[################___________] 16/27 (59%)
 ```
 
 ### BDD Scenarios Progress
 **Target**: 10+ scenarios
-**Current**: 2
+**Current**: 6
 
 - [x] Create issue via Web UI: 2 scenarios ✅
-- [ ] Create issue via CLI: 2 scenarios
-- [ ] Create issue via API: 2 scenarios
+- [x] Create issue via CLI: 2 scenarios ✅
+- [x] Create issue via API: 2 scenarios ✅
 - [ ] View issues: 2 scenarios
 
 ### Test Coverage
