@@ -12,30 +12,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added (v0.3.0 - Sprint 2 In Progress)
-- **ITIL Workflow Statuses**: Replaced generic statuses with ITIL-inspired workflow (Story 1 - 40% complete)
-  - New: Initial state for new issues
-  - In Progress: Work has started
-  - Resolved: Issue fixed, awaiting verification
-  - Closed: Issue verified and closed
-- **Issue Workflow BDD Scenarios**: 7 comprehensive scenarios for status transitions
-  - Transition from New to In Progress (Web UI)
-  - Prevent invalid transitions (e.g., New to Closed)
-  - CLI status updates
-  - REST API status transitions
-  - View status history
-  - Complete workflow lifecycle
-  - Invalid transition rejection with error messages
+## [0.3.0] - 2025-11-16
 
-### In Progress (Sprint 2: Issue Lifecycle & Change Management)
-- Story 1: Issue Status Workflow (8 story points, 40% complete)
-  - BDD feature file created with 7 scenarios
-  - Status values updated to ITIL workflow
-  - Remaining: Step definitions, validation detector, UI templates
-- Story 2: Assign Issues to Owner (3 story points, not started)
-- Story 3: Define Change Request Schema (3 story points, not started)
-- Story 4: Create Change Request (5 story points, not started)
-- Story 5: View Change List (3 story points, not started)
+### Added
+- **ITIL Workflow Implementation**: Complete issue lifecycle management with status transitions (Story 1)
+  - Four statuses: New, In Progress, Resolved, Closed
+  - Status transition validation detector enforcing ITIL workflow rules
+  - Context-sensitive workflow buttons in Web UI
+  - Complete status history tracking with audit trail
+  - 7 BDD scenarios covering all interfaces (Web UI, CLI, API)
+- **Issue Assignment**: Assign issues to specific users for accountability (Story 2)
+  - Assignee field with user dropdown selection
+  - Filter and sort issues by assignee
+  - "Unassigned" filter for finding work
+  - 4 BDD scenarios for assignment workflows
+- **Change Management Schema**: Dedicated change request tracking (Story 3)
+  - Change class with ITIL-inspired fields (description, justification, impact, risk)
+  - Change priorities: Low, Medium, High, Critical
+  - Change categories: Software, Hardware, Configuration, Network
+  - Change statuses: Planning, Approved, Implementing, Completed, Cancelled
+  - Link changes to related issues
+  - 4 BDD scenarios for schema validation
+- **Change Request Creation**: Create and manage infrastructure changes (Story 4)
+  - Web UI form with required fields (title, justification, priority, category)
+  - Field validation for data quality
+  - CLI and API support for change creation
+  - 4 BDD scenarios across all interfaces
+- **Change List View**: Browse and filter change requests (Story 5)
+  - Change index template with sorting and filtering
+  - Filter by status, priority, and category
+  - Sort by priority and creation date
+  - Empty state messaging and "Create New Change" button
+  - 12 BDD scenarios (7 Web UI, 2 CLI, 3 API)
+- **Documentation**: Comprehensive tutorials and reference guides
+  - Tutorial: "Understanding ITIL Workflows" - Learn issue lifecycle concepts
+  - Reference: "Issue Status Transitions" - Complete transition matrix and implementation details
+  - Reference: "Change Request Schema" - Full field specifications and examples
+- **Enhanced Testing**: Expanded BDD test coverage
+  - 31 total BDD scenarios (155% of 20+ target)
+  - Coverage across Web UI (Playwright), CLI (roundup-admin), and API (REST)
+  - Default login step for simplified test scenarios
+
+### Changed
+- Status workflow enforces valid transitions (prevents invalid jumps like New → Closed)
+- Issue creation now requires priority field for data quality
+- Web UI displays context-sensitive workflow buttons based on current status
+- Project version bumped to 0.3.0 (Sprint 2 complete)
+
+### Technical Details
+- **Story Points**: 22/27 completed (81% of Sprint 2, 5 points documentation)
+- **BDD Scenarios**: 31 scenarios, all passing or dry-run validated
+  - Issue workflow: 7 scenarios ✅
+  - Assign issues: 4 scenarios ✅
+  - Change schema: 4 scenarios ✅
+  - Create change: 4 scenarios ✅
+  - View changes: 12 scenarios ✅
+- **New Files**:
+  - `tracker/detectors/status_workflow.py` - Status transition validation
+  - `tracker/html/change.item.html` - Change creation form
+  - `tracker/html/change.index.html` - Change list view
+  - `features/steps/workflow_steps.py` - Issue workflow step definitions
+  - `features/steps/assignment_steps.py` - Assignment step definitions
+  - `features/steps/change_schema_steps.py` - Change schema step definitions
+  - `features/steps/change_creation_steps.py` - Change creation step definitions
+  - `features/steps/change_list_steps.py` - Change list step definitions
+  - `docs/tutorials/understanding-itil-workflows.md`
+  - `docs/reference/status-transitions.md`
+  - `docs/reference/change-schema.md`
+- **Database Schema**: Extended with change management classes
+- **ITIL Alignment**: Issue and change workflows follow ITIL best practices
 
 ## [0.2.0] - 2025-11-15
 
@@ -148,7 +193,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation README following Diátaxis framework
 - Directory structure for features, docs, and sprints
 
-[Unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.3...v0.2.0
 [0.1.3]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.1...v0.1.2
