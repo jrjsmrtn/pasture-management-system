@@ -18,9 +18,9 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 14 (Stories 1-3)
+- **Completed**: 19 (Stories 1-4)
 - **In Progress**: 0
-- **Remaining**: 13
+- **Remaining**: 8
 
 ## Backlog Items
 
@@ -193,41 +193,49 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 #### Story 4: Create Change Request
 **Story Points**: 5
 **Priority**: High
-**Status**: ⏸️ Not Started
+**Status**: ✅ Complete
 **Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want to create change requests so that I can plan and track infrastructure changes.
 
 **Acceptance Criteria**:
-- [ ] Web UI form for change creation
-- [ ] Required fields validated
-- [ ] Change saved to database
-- [ ] Success confirmation displayed
-- [ ] Change viewable in change list
+- [x] Web UI form for change creation
+- [x] Required fields validated
+- [x] Change saved to database
+- [x] Success confirmation displayed
+- [x] Change viewable in change list
 
-**BDD Scenarios**: 4 scenarios
-1. Create change request with required fields (@web-ui @smoke)
-2. Cannot create change without justification (@web-ui @validation)
-3. Create change via CLI (@cli)
-4. Create change via API (@api)
+**BDD Scenarios**: 4 scenarios - **ALL PASSING** ✅
+1. ✅ Create change request with required fields (@web-ui @smoke)
+2. ✅ Cannot create change without justification (@web-ui @validation)
+3. ✅ Create change via CLI (@cli)
+4. ✅ Create change via API (@api)
 
 **Technical Tasks**:
-- [ ] Create change creation form template
-- [ ] Implement field validation
-- [ ] Add CLI support for change creation
-- [ ] Add API POST endpoint for changes
-- [ ] Create feature file: `features/change_mgmt/create_change.feature`
-- [ ] Implement step definitions
-- [ ] Write BDD scenarios (4 scenarios)
-- [ ] Verify all scenarios passing
+- [x] Create change creation form template
+- [x] Implement field validation (required: title, justification, priority, category)
+- [x] Add CLI support for change creation
+- [x] Add API POST endpoint for changes
+- [x] Create feature file: `features/change_mgmt/create_change.feature`
+- [x] Implement step definitions: `features/steps/change_creation_steps.py`
+- [x] Write BDD scenarios (4 scenarios)
+- [x] Verify all scenarios passing
+
+**Completion Notes**:
+- 2025-11-15: Created BDD feature file with 4 scenarios (Web UI, validation, CLI, API)
+- 2025-11-15: Created change.item.html TAL template with required fields
+- 2025-11-15: Implemented change creation step definitions (190 lines)
+- 2025-11-15: Fixed success message step to accept both issue and change URLs
+- 2025-11-15: Added X-Requested-With, Origin, Referer headers for API POST (Roundup CSRF protection)
+- 2025-11-15: **All 4 scenarios passing** (23 steps, 0 failures)
 
 **Files to Create/Modify**:
-- `features/change_mgmt/create_change.feature`
-- `features/steps/change_creation_steps.py`
-- `tracker/html/change.item.html`
-- `tracker/html/change.index.html`
-- `tracker/detectors/change_validation.py`
+- `features/change_mgmt/create_change.feature` ✅
+- `features/steps/change_creation_steps.py` ✅
+- `features/steps/web_ui_steps.py` ✅ (updated for change URLs)
+- `tracker/html/change.item.html` ✅
+- `tracker/detectors/change_validation.py` (not needed - using @required)
 
 **Dependencies**: Story 3 (Change Schema)
 
@@ -342,17 +350,17 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 
 ### Story Points Progress
 ```
-[##############______________] 14/27 (52%)
+[###################_________] 19/27 (70%)
 ```
 
 ### BDD Scenarios Progress
 **Target**: 20+ scenarios
-**Current**: 15 passing (75% of minimum target)
+**Current**: 19 passing (95% of minimum target)
 
 - [x] Issue workflow: 7 scenarios **ALL PASSING** ✅
 - [x] Assign issues: 4 scenarios **ALL PASSING** ✅
 - [x] Change schema: 4 scenarios **ALL PASSING** ✅
-- [ ] Create change: 4 scenarios
+- [x] Create change: 4 scenarios **ALL PASSING** ✅
 - [ ] View changes: 2 scenarios
 
 ### Test Coverage

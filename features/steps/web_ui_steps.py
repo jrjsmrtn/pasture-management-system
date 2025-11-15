@@ -115,11 +115,12 @@ def step_see_success_message(context):
     page_url = context.page.url
     page_content = context.page.content()
 
-    # Check if redirected to an issue page
+    # Check if redirected to an issue or change page
     assert (
-        "issue" in page_url.lower()
+        ("issue" in page_url.lower() or "change" in page_url.lower())
         and "issue?" not in page_url.lower()  # issue1, issue2, not issue?@template
-    ), f"Not redirected to issue page. Current URL: {page_url}"
+        and "change?" not in page_url.lower()  # change1, change2, not change?@template
+    ), f"Not redirected to item page. Current URL: {page_url}"
 
     # Extract the issue ID from the URL for later verification
     # URL format: http://localhost:8080/pms/issue1?@ok_message=...
