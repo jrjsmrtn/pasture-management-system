@@ -33,8 +33,8 @@ dev = [
 # No build system - this is not a distributable package
 # It's a Roundup configuration project with dependencies only
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "ruff>=0.8.4",
     "mypy>=1.11.2",
     "pre-commit>=3.6.0",
