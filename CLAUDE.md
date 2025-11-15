@@ -174,11 +174,18 @@ pasture-management-system/
 6. Bump version and update CHANGELOG when features complete
 
 ### Quality Gates
-- All code must pass pre-commit hooks
+- All code must pass pre-commit hooks (local validation)
+- GitHub Actions CI/CD must pass (mirrors pre-commit checks + extended validation)
 - BDD scenarios must pass before completion
 - Test coverage must be >85%
 - Documentation must be updated for new features
 - ADRs required for significant decisions
+
+### CI/CD Strategy
+- **Pre-commit hooks**: Fast local validation (<30s)
+- **GitHub Actions**: Extended validation on push/PR
+- **Consistency**: Same tools and versions in both environments
+- **Principle**: "What passes locally will pass in CI"
 
 ### Version Management
 - Use semantic versioning (currently 0.1.0)

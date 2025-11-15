@@ -137,6 +137,31 @@ features/
 - Topics: BDD introduction, Gherkin syntax, Behave usage, Playwright integration
 - Stored alongside documentation for easy maintenance
 
+### CI/CD and Quality Automation
+
+**Approach**: Multi-layered quality automation starting with pre-commit hooks, extended to GitHub Actions
+
+#### Pre-commit Hooks (Local Development)
+- **Fast feedback**: <30 seconds execution time
+- **Security-first**: Credential detection, secret scanning (gitleaks)
+- **Code quality**: ruff formatting and linting
+- **Type checking**: mypy (pre-push stage)
+- **Multi-stage**: Fast checks on commit, comprehensive on push
+
+#### GitHub Actions CI/CD
+- **Consistency**: Mirror pre-commit hook checks for reliability
+- **Extended validation**: Full test suite, cross-platform testing
+- **Automated reporting**: Test coverage, BDD scenario results with screenshots
+- **Security scanning**: Dependency vulnerability checks
+- **Build validation**: Ensure deployability
+
+**Consistency Strategy**:
+- Pre-commit hooks define the baseline quality gates
+- GitHub Actions run identical checks plus extended validation
+- Same tool versions in both environments (pinned in configs)
+- Failures in either environment block progression
+- This ensures "what passes locally will pass in CI"
+
 ## Consequences
 
 **Positive:**
@@ -149,6 +174,8 @@ features/
 - Comprehensive Documentation: Diátaxis serves all user types
 - Dogfooding: Development environment is production-like
 - Professional Standards: Industry best practices increase adoption
+- CI/CD Consistency: Pre-commit and GitHub Actions alignment prevents surprises
+- Fast Feedback: Local validation catches issues before push
 
 **Negative:**
 
@@ -176,6 +203,8 @@ features/
 - Integrate practices into development workflow
 - Document contribution guidelines
 - Set up automated validation (pre-commit hooks, CI/CD)
+- Configure GitHub Actions workflows mirroring pre-commit checks
+- Establish CI/CD pipeline for automated testing and deployment
 
 ## Validation Criteria
 
@@ -187,6 +216,8 @@ These practices will be validated through:
 4. **Change Documentation**: All releases documented in changelog
 5. **Architecture Currency**: C4 DSL models updated with implementation
 6. **Documentation Completeness**: All four Diátaxis types populated
+7. **CI/CD Consistency**: Pre-commit hooks and GitHub Actions produce identical results
+8. **Quality Gate Performance**: Pre-commit checks complete in <30 seconds
 
 ## Related Decisions
 
