@@ -161,7 +161,10 @@ Temporary Items
 .apdisk
 
 # Project-specific
-tracker_data/
+# Exclude tracker database and sessions
+tracker/db/
+tracker/sessions/
+tracker/__pycache__/
 *.db
 *.bak
 
