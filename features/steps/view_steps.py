@@ -7,15 +7,7 @@ import subprocess
 from behave import given, when, then
 from playwright.sync_api import expect
 
-
-# Priority mapping (label -> ID)
-PRIORITY_MAP = {
-    "critical": "1",
-    "urgent": "2",
-    "bug": "3",
-    "feature": "4",
-    "wish": "5",
-}
+from features.steps.common import PRIORITY_MAP
 
 
 @given('the following issues exist:')

@@ -7,15 +7,7 @@ import subprocess
 import os
 from behave import given, when, then
 
-
-# Priority mapping (label -> ID)
-PRIORITY_MAP = {
-    "critical": "1",
-    "urgent": "2",
-    "bug": "3",
-    "feature": "4",
-    "wish": "5",
-}
+from features.steps.common import PRIORITY_MAP
 
 
 @given('the Roundup tracker database is accessible')
