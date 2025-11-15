@@ -83,7 +83,7 @@ jobs:
       run: |
         behave features/issue_tracking/ \
           --junit \
-          --junit-directory test-results \
+          --junit-directory reports \
           --format=pretty \
           --no-capture
 
@@ -101,7 +101,7 @@ jobs:
       with:
         name: test-results-py${{ matrix.python-version }}
         path: |
-          test-results/
+          reports/
           screenshots/
         retention-days: 30
 
