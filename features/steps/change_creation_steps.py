@@ -180,7 +180,9 @@ def step_post_to_endpoint_with_json(context, endpoint):
     response = requests.post(full_url, json=payload, headers=headers, auth=auth, timeout=30)
     context.api_response = response
     context.api_status_code = response.status_code
-    context.api_response_data = response.json() if response.status_code in [200, 201] else response.text
+    context.api_response_data = (
+        response.json() if response.status_code in [200, 201] else response.text
+    )
 
 
 @then("the response should contain the created change ID")

@@ -37,9 +37,7 @@ def step_create_issue_with_id_status(context, issue_id, status):
 
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
-    assert result.returncode == 0, (
-        f"Failed to create issue. Stderr: {result.stderr}"
-    )
+    assert result.returncode == 0, f"Failed to create issue. Stderr: {result.stderr}"
 
     # Store the issue ID
     created_id = result.stdout.strip()
@@ -47,9 +45,7 @@ def step_create_issue_with_id_status(context, issue_id, status):
     context.current_issue_numeric_id = created_id
 
 
-@given(
-    'the issue status was changed to "{status}" at "{timestamp}"'
-)
+@given('the issue status was changed to "{status}" at "{timestamp}"')
 def step_issue_status_changed_at(context, status, timestamp):
     """Record that an issue status was changed at a specific time (for history testing)."""
     # For now, this is a placeholder - actual implementation would require
@@ -66,7 +62,7 @@ def step_view_issue_details(context):
     """Navigate to the issue detail page."""
     issue_id = context.current_issue_id
     # Ensure proper URL formation
-    tracker_url = context.tracker_url.rstrip('/')
+    tracker_url = context.tracker_url.rstrip("/")
     context.page.goto(f"{tracker_url}/{issue_id}")
     context.page.wait_for_load_state("networkidle")
 
@@ -110,7 +106,7 @@ def step_run_roundup_command(context, command):
     context.cli_stderr = result.stderr.strip()
 
 
-@when('I PATCH the current issue via API with JSON:')
+@when("I PATCH the current issue via API with JSON:")
 def step_patch_api_with_json(context):
     """Send a PATCH request to the API to update the current issue."""
     # Get the issue ID from context
@@ -126,7 +122,9 @@ def step_patch_api_with_json(context):
 
     # First, GET the issue to retrieve its etag
     get_response = requests.get(full_url, auth=auth, timeout=30)
-    assert get_response.status_code == 200, f"Failed to GET issue for etag: {get_response.status_code}"
+    assert get_response.status_code == 200, (
+        f"Failed to GET issue for etag: {get_response.status_code}"
+    )
 
     issue_data = get_response.json()
     etag = issue_data.get("data", {}).get("@etag")
@@ -152,9 +150,7 @@ def step_patch_api_with_json(context):
     }
 
     # Make PATCH request
-    response = requests.patch(
-        full_url, json=payload, headers=headers, auth=auth, timeout=30
-    )
+    response = requests.patch(full_url, json=payload, headers=headers, auth=auth, timeout=30)
 
     # Store response
     context.api_response = response
@@ -286,9 +282,7 @@ def step_verify_response_status(context, expected_status):
     )
 
 
-@then(
-    'I should see status change from "{old_status}" to "{new_status}" at "{timestamp}"'
-)
+@then('I should see status change from "{old_status}" to "{new_status}" at "{timestamp}"')
 def step_verify_status_change_history(context, old_status, new_status, timestamp):
     """Verify a specific status change appears in the history."""
     # Placeholder - requires implementation of status history display
@@ -304,9 +298,8 @@ def step_response_contains_error(context, error_message):
     response_data = getattr(context, "api_response_data", {})
 
     # Check both text and JSON response
-    error_found = (
-        error_message in response_text
-        or (isinstance(response_data, dict) and error_message in str(response_data))
+    error_found = error_message in response_text or (
+        isinstance(response_data, dict) and error_message in str(response_data)
     )
 
     assert error_found, (

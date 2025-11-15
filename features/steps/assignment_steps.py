@@ -17,13 +17,13 @@ def step_assign_issue_to_user(context, username):
     assignee_dropdown = context.page.locator('select[name="assignedto"]')
 
     # Get all options to find the one matching the username
-    options = assignee_dropdown.locator('option').all()
+    options = assignee_dropdown.locator("option").all()
 
     user_value = None
     for option in options:
         option_text = option.inner_text().strip()
         if username in option_text:
-            user_value = option.get_attribute('value')
+            user_value = option.get_attribute("value")
             break
 
     assert user_value, f"User '{username}' not found in assignee dropdown"
@@ -72,14 +72,16 @@ def step_verify_issue_assigned_to(context, username):
     # Look for "assignedto: N" in output (where N is the user ID)
     # We'll check for the username presence as well
     assert "assignedto:" in output.lower(), f"No assignedto field found in issue. Output: {output}"
-    assert username in output or "1" in output, f"Issue not assigned to '{username}'. Output: {output}"
+    assert username in output or "1" in output, (
+        f"Issue not assigned to '{username}'. Output: {output}"
+    )
 
 
 @when('I filter issues by assignee "{assignee}"')
 def step_filter_by_assignee(context, assignee):
     """Filter the issue list by a specific assignee."""
     # Build the URL with assignee filter
-    tracker_url = context.tracker_url.rstrip('/')
+    tracker_url = context.tracker_url.rstrip("/")
 
     if assignee == "(unassigned)":
         # Filter for unassigned issues (assignedto is empty/null)

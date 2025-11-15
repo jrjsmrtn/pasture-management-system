@@ -12,14 +12,14 @@ from playwright.sync_api import expect
 def step_tracker_running(context, url=None):
     """Verify the Roundup tracker is accessible."""
     # Use provided URL or default from context
-    tracker_url = url if url else getattr(context, 'tracker_url', 'http://localhost:8080/pms')
+    tracker_url = url if url else getattr(context, "tracker_url", "http://localhost:8080/pms")
 
     # Store the URL in context
     context.tracker_url = tracker_url
 
     # For Web UI scenarios, verify access; for CLI/API, just store URL
     try:
-        page = getattr(context, 'page', None)
+        page = getattr(context, "page", None)
         if page is not None:
             response = page.goto(tracker_url)
             assert response.ok, f"Tracker not accessible at {tracker_url}"
@@ -28,7 +28,7 @@ def step_tracker_running(context, url=None):
         pass
 
 
-@given('I am logged in to the web UI')
+@given("I am logged in to the web UI")
 def step_login_default(context):
     """Log in to the Roundup tracker as admin (default user)."""
     step_login_as_user(context, "admin", "admin")

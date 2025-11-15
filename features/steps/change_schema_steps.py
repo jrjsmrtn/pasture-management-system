@@ -25,8 +25,12 @@ def step_get_via_api(context, endpoint):
 def step_response_contains_collection(context, collection_name):
     """Verify the response contains a collection with the given name."""
     response_data = context.api_response.json()
-    assert collection_name in response_data, f"Collection '{collection_name}' not found in response. Keys: {response_data.keys()}"
-    assert isinstance(response_data[collection_name], dict), f"Collection '{collection_name}' is not a dict"
+    assert collection_name in response_data, (
+        f"Collection '{collection_name}' not found in response. Keys: {response_data.keys()}"
+    )
+    assert isinstance(response_data[collection_name], dict), (
+        f"Collection '{collection_name}' is not a dict"
+    )
 
 
 @then('the response should contain changepriority "{name}"')

@@ -53,7 +53,7 @@ def step_create_multiple_changes(context):
         # Build command args
         cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "change"]
         cmd_args.append(f"title={title}")
-        cmd_args.append(f'justification=Test change for {title}')
+        cmd_args.append(f"justification=Test change for {title}")
 
         # Map priority label to ID
         priority_id = CHANGEPRIORITY_MAP.get(priority.lower())
@@ -72,14 +72,12 @@ def step_create_multiple_changes(context):
 
         # Add description if provided
         description = row.get("description", f"Description for {title}")
-        cmd_args.append(f'description={description}')
+        cmd_args.append(f"description={description}")
 
         # Run the command
         result = subprocess.run(cmd_args, capture_output=True, text=True, timeout=30)
 
-        assert result.returncode == 0, (
-            f"Failed to create change '{title}'. Stderr: {result.stderr}"
-        )
+        assert result.returncode == 0, f"Failed to create change '{title}'. Stderr: {result.stderr}"
 
         change_id = result.stdout.strip()
         created_change_ids.append(change_id)
@@ -172,9 +170,7 @@ def step_verify_change_count(context, count):
         if row.locator('a[href*="change"]').count() > 0:
             actual_count += 1
 
-    assert actual_count == count, (
-        f"Expected {count} changes, found {actual_count}"
-    )
+    assert actual_count == count, f"Expected {count} changes, found {actual_count}"
 
 
 @then('"{title1}" should appear before "{title2}"')
@@ -188,9 +184,7 @@ def step_verify_change_order(context, title1, title2):
 
     assert pos1 != -1, f"Change '{title1}' not found in list"
     assert pos2 != -1, f"Change '{title2}' not found in list"
-    assert pos1 < pos2, (
-        f"Expected '{title1}' to appear before '{title2}', but found opposite order"
-    )
+    assert pos1 < pos2, f"Expected '{title1}' to appear before '{title2}', but found opposite order"
 
 
 @then("the changes should appear in order:")
@@ -227,8 +221,6 @@ def step_verify_on_change_details_page(context):
     # Check URL contains 'change' and a number
     url = context.page.url
     assert "/change" in url.lower(), f"Not on change details page. URL: {url}"
-
-
 
 
 @then('I should see a "Create New Change" button')
@@ -309,9 +301,7 @@ def step_verify_api_change_count(context, count):
     else:
         changes = []
 
-    assert len(changes) == count, (
-        f"Expected {count} changes in API response, found {len(changes)}"
-    )
+    assert len(changes) == count, f"Expected {count} changes in API response, found {len(changes)}"
 
 
 @then('the response should include "{title}"')
@@ -321,9 +311,7 @@ def step_verify_api_includes_title(context, title):
 
     # Convert to string for simple search
     response_str = json.dumps(response_data)
-    assert title in response_str, (
-        f"Expected to find '{title}' in API response"
-    )
+    assert title in response_str, f"Expected to find '{title}' in API response"
 
 
 @then('the first change should be "{title}"')
