@@ -12,6 +12,32 @@ authors = [
     {name = "Georges Martin", email = "jrjsmrtn@gmail.com"}
 ]
 
+# Dependencies from requirements.txt
+dependencies = [
+    "roundup>=2.4.0",
+    "behave>=1.2.6",
+    "playwright>=1.40.0",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.8.4",
+    "mypy>=1.11.2",
+    "pre-commit>=3.6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.8.4",
+    "mypy>=1.11.2",
+    "pre-commit>=3.6.0",
+]
+
 [tool.ruff]
 # Exclude generated and third-party code
 exclude = [

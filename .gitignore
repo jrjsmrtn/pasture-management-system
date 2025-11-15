@@ -141,6 +141,10 @@ cython_debug/
 # ruff
 .ruff_cache/
 
+# uv
+.uv_cache/
+.python-version
+
 # macOS
 .DS_Store
 .AppleDouble
@@ -192,3 +196,4 @@ secrets.yaml
 *.pem
 *.key
 id_rsa*
+pretty.output
