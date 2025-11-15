@@ -123,30 +123,13 @@ def step_issue_in_list(context):
     # Look for the issue title in the list
     issue_title = getattr(context, 'issue_title', None)
     if issue_title:
-        title_locator = context.page.locator(f'a:has-text("{issue_title}")')
+        # Use .first to handle cases where multiple issues have the same title
+        title_locator = context.page.locator(f'a:has-text("{issue_title}")').first
         expect(title_locator).to_be_visible()
 
 
-@then('the issue title should be "{expected_title}"')
-def step_verify_issue_title(context, expected_title):
-    """Verify the issue has the expected title."""
-    # Navigate to the created issue if we have its ID
-    issue_id = getattr(context, 'created_issue_id', None)
-    if issue_id:
-        context.page.goto(f"{context.tracker_url}{issue_id}")
-        context.page.wait_for_load_state("networkidle")
-
-    # Check the title is displayed
-    page_content = context.page.content()
-    assert expected_title in page_content, f"Expected title '{expected_title}' not found in page"
-
-
-@then('the issue priority should be "{expected_priority}"')
-def step_verify_issue_priority(context, expected_priority):
-    """Verify the issue has the expected priority."""
-    # The priority should be visible on the issue page
-    page_content = context.page.content()
-    assert expected_priority in page_content.lower(), f"Expected priority '{expected_priority}' not found"
+# Note: Generic title and priority verification steps are in cli_steps.py
+# to avoid duplication and allow context-aware implementation
 
 
 @then('I should see a validation error')
