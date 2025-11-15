@@ -46,6 +46,10 @@ def step_navigate_to_page(context, page_name):
         # In Roundup classic, new issue is at: /issue?@template=item
         context.page.goto(f"{context.tracker_url}issue?@template=item")
         context.page.wait_for_load_state("networkidle")
+    elif page_name == "Issues":
+        # In Roundup classic, issue list is at: /issue
+        context.page.goto(f"{context.tracker_url}issue")
+        context.page.wait_for_load_state("networkidle")
 
 
 @when('I enter the following issue details:')

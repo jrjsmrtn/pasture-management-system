@@ -1,0 +1,134 @@
+# SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+# SPDX-License-Identifier: MIT
+
+"""Step definitions for viewing issues in Roundup tracker."""
+
+import subprocess
+from behave import given, when, then
+from playwright.sync_api import expect
+
+
+# Priority mapping (label -> ID)
+PRIORITY_MAP = {
+    "critical": "1",
+    "urgent": "2",
+    "bug": "3",
+    "feature": "4",
+    "wish": "5",
+}
+
+
+@given('the following issues exist:')
+def step_create_multiple_issues(context):
+    """Create multiple issues for testing the issue list."""
+    # Get tracker_dir from context or use default
+    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+
+    created_issue_ids = []
+
+    for row in context.table:
+        title = row['title']
+        priority = row.get('priority', 'bug')
+
+        # Build command args
+        cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "issue"]
+        cmd_args.append(f"title={title}")
+
+        # Map priority label to ID
+        priority_id = PRIORITY_MAP.get(priority.lower())
+        if priority_id:
+            cmd_args.append(f"priority={priority_id}")
+
+        # Run the command
+        result = subprocess.run(
+            cmd_args,
+            capture_output=True,
+            text=True,
+            timeout=30
+        )
+
+        assert result.returncode == 0, \
+            f"Failed to create issue '{title}'. Stderr: {result.stderr}"
+
+        issue_id = result.stdout.strip()
+        created_issue_ids.append(issue_id)
+
+    # Store the created issue IDs for potential cleanup
+    context.test_issue_ids = created_issue_ids
+
+
+@given('an issue exists with title "{title}"')
+def step_create_single_issue(context, title):
+    """Create a single issue for testing."""
+    # Get tracker_dir from context or use default
+    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+
+    # Build command args
+    cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "issue"]
+    cmd_args.append(f"title={title}")
+
+    # Run the command
+    result = subprocess.run(
+        cmd_args,
+        capture_output=True,
+        text=True,
+        timeout=30
+    )
+
+    assert result.returncode == 0, \
+        f"Failed to create issue '{title}'. Stderr: {result.stderr}"
+
+    issue_id = result.stdout.strip()
+    context.created_issue_id = f"issue{issue_id}"
+    context.test_issue_title = title
+
+
+@then('I should see {count:d} issues in the list')
+def step_verify_issue_count(context, count):
+    """Verify the number of issues displayed in the list."""
+    # In Roundup, issues are typically displayed in a table
+    # Count the number of issue rows (skip header row)
+    issue_rows = context.page.locator('table.list tr.normal, table.list tr').all()
+
+    # Filter out header rows
+    actual_count = 0
+    for row in issue_rows:
+        # Check if row contains issue links
+        if row.locator('a[href*="issue"]').count() > 0:
+            actual_count += 1
+
+    assert actual_count >= count, \
+        f"Expected at least {count} issues, found {actual_count}"
+
+
+@then('I should see issue "{title}"')
+def step_verify_issue_in_list(context, title):
+    """Verify a specific issue appears in the list."""
+    # Look for a link containing the title
+    issue_link = context.page.locator(f'a:has-text("{title}")')
+    expect(issue_link.first).to_be_visible()
+
+
+@when('I click on the issue "{title}"')
+def step_click_issue(context, title):
+    """Click on an issue in the list to view details."""
+    issue_link = context.page.locator(f'a:has-text("{title}")').first
+    issue_link.click()
+    context.page.wait_for_load_state("networkidle")
+
+
+@then('I should be on the issue details page')
+def step_verify_on_details_page(context):
+    """Verify we're on an issue details page."""
+    # Check URL contains 'issue' and a number
+    url = context.page.url
+    assert '/issue' in url.lower(), \
+        f"Not on issue details page. URL: {url}"
+
+
+@then('I should see the issue title "{title}"')
+def step_verify_issue_title_on_page(context, title):
+    """Verify the issue title is displayed on the page."""
+    page_content = context.page.content()
+    assert title in page_content, \
+        f"Issue title '{title}' not found on page"
