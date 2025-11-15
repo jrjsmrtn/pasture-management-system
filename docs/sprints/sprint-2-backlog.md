@@ -19,8 +19,8 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 
 - **Total Story Points**: 27
 - **Completed**: 0
-- **In Progress**: 0
-- **Remaining**: 27
+- **In Progress**: 3 (Story 1 - 40% complete)
+- **Remaining**: 24
 
 ## Backlog Items
 
@@ -29,7 +29,7 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 #### Story 1: Issue Status Workflow
 **Story Points**: 8
 **Priority**: Critical
-**Status**: ⏸️ Not Started
+**Status**: 🔄 In Progress (40% complete)
 **Assignee**: Claude
 
 **User Story**:
@@ -42,23 +42,32 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 - [ ] Status history viewable
 - [ ] Invalid transitions rejected with error message
 
-**BDD Scenarios**: 4 scenarios
-1. Transition issue from New to In Progress (@web-ui @smoke)
-2. Cannot transition from New to Closed directly (@web-ui @validation)
-3. Update issue status via CLI (@cli)
-4. Transition issue via API (@api)
+**BDD Scenarios**: 7 scenarios (expanded from 4)
+1. ✅ Transition issue from New to In Progress (@web-ui @smoke)
+2. ✅ Cannot transition from New to Closed directly (@web-ui @validation)
+3. ✅ Update issue status via CLI (@cli)
+4. ✅ Transition issue via API (@api)
+5. ✅ View status history
+6. ✅ Complete workflow from New to Closed
+7. ✅ Invalid status transition is rejected (API validation)
 
 **Technical Tasks**:
-- [ ] Define status transition matrix in schema
+- [x] Define status values (new, in-progress, resolved, closed)
 - [ ] Implement status validation detector
 - [ ] Add status history tracking (audit trail)
 - [ ] Update web UI templates with workflow buttons
 - [ ] Add CLI commands for status updates
 - [ ] Add API PATCH endpoint for status transitions
-- [ ] Create feature file: `features/issue_tracking/issue_workflow.feature`
+- [x] Create feature file: `features/issue_tracking/issue_workflow.feature`
 - [ ] Implement step definitions: `features/steps/workflow_steps.py`
-- [ ] Write BDD scenarios (4 scenarios)
+- [x] Write BDD scenarios (7 scenarios)
 - [ ] Verify all scenarios passing
+
+**Progress Notes**:
+- 2025-11-15: Created comprehensive BDD feature file with 7 scenarios
+- 2025-11-15: Updated initial_data.py with ITIL workflow statuses
+- 2025-11-15: Reinitialized tracker database with new status values
+- Next: Implement step definitions and status validation detector
 
 **Files to Create/Modify**:
 - `features/issue_tracking/issue_workflow.feature`
@@ -306,14 +315,14 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 
 ### Story Points Progress
 ```
-[___________________________] 0/27 (0%)
+[###_________________________] 3/27 (11%)
 ```
 
 ### BDD Scenarios Progress
 **Target**: 13 scenarios
-**Current**: 0
+**Current**: 7 (54% of target)
 
-- [ ] Issue workflow: 4 scenarios
+- [x] Issue workflow: 7 scenarios (feature file created)
 - [ ] Assign issues: 2 scenarios
 - [ ] Change schema: 1 scenario
 - [ ] Create change: 4 scenarios

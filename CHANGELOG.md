@@ -12,6 +12,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (v0.3.0 - Sprint 2 In Progress)
+- **ITIL Workflow Statuses**: Replaced generic statuses with ITIL-inspired workflow (Story 1 - 40% complete)
+  - New: Initial state for new issues
+  - In Progress: Work has started
+  - Resolved: Issue fixed, awaiting verification
+  - Closed: Issue verified and closed
+- **Issue Workflow BDD Scenarios**: 7 comprehensive scenarios for status transitions
+  - Transition from New to In Progress (Web UI)
+  - Prevent invalid transitions (e.g., New to Closed)
+  - CLI status updates
+  - REST API status transitions
+  - View status history
+  - Complete workflow lifecycle
+  - Invalid transition rejection with error messages
+
+### In Progress (Sprint 2: Issue Lifecycle & Change Management)
+- Story 1: Issue Status Workflow (8 story points, 40% complete)
+  - BDD feature file created with 7 scenarios
+  - Status values updated to ITIL workflow
+  - Remaining: Step definitions, validation detector, UI templates
+- Story 2: Assign Issues to Owner (3 story points, not started)
+- Story 3: Define Change Request Schema (3 story points, not started)
+- Story 4: Create Change Request (5 story points, not started)
+- Story 5: View Change List (3 story points, not started)
+
 ## [0.2.0] - 2025-11-15
 
 ### Added
