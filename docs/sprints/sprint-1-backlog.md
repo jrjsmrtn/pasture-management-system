@@ -18,9 +18,9 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 16
+- **Completed**: 19
 - **In Progress**: 0
-- **Remaining**: 11
+- **Remaining**: 8
 
 ## Backlog Items
 
@@ -348,28 +348,28 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 #### Story 5: View Issue List
 **Story Points**: 3
 **Priority**: Medium
-**Status**: Not Started
-**Assignee**: TBD
+**Status**: ✅ Completed
+**Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want to see all my issues in a list so that I can track what needs attention.
 
 **BDD Scenarios**:
-1. View list of issues (@smoke)
-2. View issue details
+1. View list of issues (@smoke) ✅
+2. View issue details ✅
 
 **Subtasks**:
-- [ ] Write feature file: `features/issue_tracking/view_issues.feature`
-- [ ] Implement step definitions for viewing
-- [ ] Customize issue list template
-- [ ] Implement sorting (newest first)
-- [ ] Add pagination support
-- [ ] Implement step: "Following issues exist" (table)
-- [ ] Implement step: "I navigate to Issues"
-- [ ] Implement step: "I should see N issues"
-- [ ] Implement step: "Issue A should appear before Issue B"
-- [ ] Implement step: "I click on issue title"
-- [ ] Implement step: "I should see issue details page"
+- [x] Write feature file: `features/issue_tracking/view_issues.feature`
+- [x] Implement step definitions for viewing
+- [x] Customize issue list template
+- [x] Implement sorting (newest first)
+- [x] Add pagination support
+- [x] Implement step: "Following issues exist" (table)
+- [x] Implement step: "I navigate to Issues"
+- [x] Implement step: "I should see N issues"
+- [x] Implement step: "Issue A should appear before Issue B"
+- [x] Implement step: "I click on issue title"
+- [x] Implement step: "I should see issue details page"
 
 **Acceptance Criteria**:
 - Web UI displays issue list with title, priority, status
@@ -506,17 +506,17 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 ### Story Points Progress
 ```
-[################___________] 16/27 (59%)
+[###################________] 19/27 (70%)
 ```
 
 ### BDD Scenarios Progress
 **Target**: 10+ scenarios
-**Current**: 6
+**Current**: 8
 
 - [x] Create issue via Web UI: 2 scenarios ✅
 - [x] Create issue via CLI: 2 scenarios ✅
 - [x] Create issue via API: 2 scenarios ✅
-- [ ] View issues: 2 scenarios
+- [x] View issues: 2 scenarios ✅
 
 ### Test Coverage
 **Target**: >85%
