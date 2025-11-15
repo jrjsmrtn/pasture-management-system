@@ -7,8 +7,8 @@ SPDX-License-Identifier: MIT
 
 **Sprint**: 1 (Foundation & Basic Issue Tracking)
 **Target Version**: v0.2.0
-**Status**: Not Started
-**Start Date**: TBD
+**Status**: In Progress
+**Start Date**: 2025-11-15
 **End Date**: TBD
 
 ## Sprint Goal
@@ -18,9 +18,9 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 ## Story Points Summary
 
 - **Total Story Points**: 27
-- **Completed**: 0
+- **Completed**: 3
 - **In Progress**: 0
-- **Remaining**: 27
+- **Remaining**: 24
 
 ## Backlog Items
 
@@ -29,13 +29,13 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 #### Task 1.1: Python Development Environment
 **Priority**: Critical
 **Estimate**: 1 hour
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
-- [ ] Create Python virtual environment (`python3 -m venv venv`)
-- [ ] Activate virtual environment
-- [ ] Verify Python version (3.9+)
-- [ ] Document activation commands in README
+- [x] Create Python virtual environment (`python3 -m venv venv`)
+- [x] Activate virtual environment
+- [x] Verify Python version (3.9+)
+- [x] Document activation commands in README
 
 **Acceptance Criteria**:
 - Virtual environment created in project root
@@ -49,13 +49,13 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 #### Task 1.2: Install Roundup and Dependencies
 **Priority**: Critical
 **Estimate**: 2 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
-- [ ] Install Roundup via pip
-- [ ] Create requirements.txt with pinned versions
-- [ ] Install development dependencies
-- [ ] Test Roundup installation (`roundup-admin --version`)
+- [x] Install Roundup via pip
+- [x] Create requirements.txt with pinned versions
+- [x] Install development dependencies
+- [x] Test Roundup installation (`roundup-admin --version`)
 
 **Acceptance Criteria**:
 - Roundup installed successfully
@@ -90,13 +90,13 @@ sphinx>=7.0.0
 #### Task 1.3: Install BDD Testing Tools
 **Priority**: Critical
 **Estimate**: 2 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
-- [ ] Install Behave
-- [ ] Install Playwright
-- [ ] Install Playwright browsers (`playwright install`)
-- [ ] Verify installations
+- [x] Install Behave
+- [x] Install Playwright
+- [x] Install Playwright browsers (`playwright install`)
+- [x] Verify installations
 
 **Acceptance Criteria**:
 - Behave installed and functional
@@ -110,14 +110,14 @@ sphinx>=7.0.0
 #### Task 1.4: Configure Playwright
 **Priority**: High
 **Estimate**: 1 hour
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
-- [ ] Create Playwright configuration
-- [ ] Set viewport to 1024x768
-- [ ] Configure screenshot directory
-- [ ] Set English language/locale
-- [ ] Configure headless mode for CI
+- [x] Create Playwright configuration
+- [x] Set viewport to 1024x768
+- [x] Configure screenshot directory
+- [x] Set English language/locale
+- [x] Configure headless mode for CI
 
 **Acceptance Criteria**:
 - Playwright config created
@@ -133,14 +133,14 @@ sphinx>=7.0.0
 #### Task 1.5: Create Behave Environment
 **Priority**: High
 **Estimate**: 2 hours
-**Status**: Not Started
+**Status**: ✅ Completed
 
 **Subtasks**:
-- [ ] Create `features/` directory structure
-- [ ] Create `environment.py` with before/after hooks
-- [ ] Configure screenshot capture on failure
-- [ ] Set up JUnit XML report generation
-- [ ] Create base step definition classes
+- [x] Create `features/` directory structure
+- [x] Create `environment.py` with before/after hooks
+- [x] Configure screenshot capture on failure
+- [x] Set up JUnit XML report generation
+- [x] Create base step definition classes
 
 **Acceptance Criteria**:
 - Behave environment functional
@@ -160,19 +160,19 @@ sphinx>=7.0.0
 #### Story 1: Install and Configure Roundup Tracker
 **Story Points**: 3
 **Priority**: Critical
-**Status**: Not Started
-**Assignee**: TBD
+**Status**: ✅ Completed
+**Assignee**: Claude
 
 **User Story**:
 > As a homelab sysadmin, I want a working Roundup tracker instance so that I can start tracking issues in my homelab.
 
 **Subtasks**:
-- [ ] Initialize Roundup tracker with classic template
-- [ ] Configure database (SQLite for development)
-- [ ] Create admin user
-- [ ] Customize basic schema for issues
-- [ ] Verify web UI accessible
-- [ ] Store configuration in version control
+- [x] Initialize Roundup tracker with classic template
+- [x] Configure database (SQLite for development)
+- [x] Create admin user
+- [x] Customize basic schema for issues
+- [x] Verify web UI accessible
+- [x] Store configuration in version control
 
 **Acceptance Criteria**:
 - Roundup tracker initialized successfully
@@ -198,16 +198,16 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 ```
 
 **Files Created/Modified**:
-- `tracker_data/` (directory)
-- `tracker_data/config.ini`
-- `tracker_data/schema.py`
-- `.gitignore` (exclude tracker_data/db/)
+- `tracker/` (directory)
+- `tracker/config.ini`
+- `tracker/schema.py`
+- `.gitignore` (exclude tracker/db/, tracker/sessions/, tracker/__pycache__/)
 
 **Testing**:
-- [ ] Start tracker: `roundup-server tracker_data`
-- [ ] Access http://localhost:8080/
-- [ ] Login with admin credentials
-- [ ] Verify issue creation form
+- [x] Start tracker: `roundup-server tracker`
+- [x] Access http://localhost:8080/
+- [x] Login with admin credentials
+- [x] Verify issue creation form
 
 **Dependencies**: Task 1.2
 
@@ -506,7 +506,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 ### Story Points Progress
 ```
-[___________________________] 0/27 (0%)
+[###________________________] 3/27 (11%)
 ```
 
 ### BDD Scenarios Progress
