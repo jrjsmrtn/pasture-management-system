@@ -72,9 +72,16 @@ jobs:
     - name: Initialize Roundup tracker
       run: |
         # Tracker template already exists with custom schema and initial_data.py
-        # Just initialize the database with admin password
-        uv run python -c "import os; os.makedirs('tracker/db', exist_ok=True)"
-        uv run roundup-admin -i tracker initialise admin
+        # Create database and run the initialization
+        uv run roundup-admin -i tracker initialise << EOF
+admin
+EOF
+
+    - name: Verify tracker initialization
+      run: |
+        # Check that statuses were created correctly
+        echo "Checking tracker statuses..."
+        uv run roundup-admin -i tracker list status
 
     - name: Start Roundup server
       run: |
