@@ -78,17 +78,8 @@ def step_view_change_details(context):
     context.page.wait_for_load_state("networkidle")
 
 
-@when('I click "{button_text}"')
-def step_click_button(context, button_text):
-    """Click a button with specific text."""
-    # Try exact match first
-    button = context.page.get_by_role("button", name=button_text, exact=True)
-    if button.count() == 0:
-        # Try partial match
-        button = context.page.get_by_role("button", name=button_text)
-
-    button.first.click()
-    context.page.wait_for_load_state("networkidle")
+# Note: Step definition for 'I click "{button_text}"' is in workflow_steps.py
+# which handles multiple selector types (button, submit, link)
 
 
 @when('I add assessment notes "{notes}"')
@@ -190,11 +181,8 @@ def step_verify_change_status(context, status):
         assert status_id == expected_id, f"Expected status ID {expected_id}, got {status_id}"
 
 
-@then('I should see "{message}"')
-def step_verify_message(context, message):
-    """Verify a message is displayed."""
-    page_text = context.page.locator("body").text_content()
-    assert message in page_text, f"Expected message '{message}' not found on page"
+# Note: Step definition for 'I should see "{text}"' is in workflow_steps.py
+# which handles both CLI output and Web UI page content
 
 
 @then("the status change should be recorded in history")
@@ -205,11 +193,8 @@ def step_verify_status_history(context):
     assert history.count() > 0, "No history section found"
 
 
-@then('I should not see "{button_text}" button')
-def step_verify_button_not_visible(context, button_text):
-    """Verify a button is not visible."""
-    button = context.page.get_by_role("button", name=button_text)
-    assert button.count() == 0, f"Button '{button_text}' should not be visible"
+# Note: Step definition for 'I should not see "{button_text}" button' is in
+# workflow_steps.py which checks multiple selector types
 
 
 @then('I should only see "{button_text}" button')
@@ -229,10 +214,8 @@ def step_verify_rejection_recorded(context):
         )
 
 
-@then("the command should succeed")
-def step_verify_command_success(context):
-    """Verify CLI command succeeded."""
-    assert context.cli_returncode == 0, f"Command failed: {context.cli_stderr}"
+# Note: Step definition for 'the command should succeed' is in workflow_steps.py
+# which provides more detailed error messages with exit code, stdout, and stderr
 
 
 @then('change "{change_id}" should have status "{status}"')
@@ -262,12 +245,8 @@ def step_verify_change_message(context, text):
     assert text in messages or len(messages) > 0, f"Expected message containing '{text}'"
 
 
-@then("the response status should be {status_code:d}")
-def step_verify_response_status(context, status_code):
-    """Verify API response status code."""
-    assert context.api_status_code == status_code, (
-        f"Expected status {status_code}, got {context.api_status_code}"
-    )
+# Note: Step definition for 'the response status should be {status_code}' is in
+# workflow_steps.py which provides more detailed error messages
 
 
 @then('the response should contain "{text}"')

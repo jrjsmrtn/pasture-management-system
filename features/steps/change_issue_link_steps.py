@@ -11,32 +11,9 @@ from behave import given, then, use_step_matcher, when
 from requests.auth import HTTPBasicAuth
 
 
-@given('an issue exists with title "{title}"')
-def step_create_issue_with_title(context, title):
-    """Create an issue with specific title."""
-    tracker_dir = getattr(context, "tracker_dir", "tracker")
-
-    # Create issue via CLI
-    cmd = [
-        "roundup-admin",
-        "-i",
-        tracker_dir,
-        "create",
-        "issue",
-        f"title={title}",
-        "priority=2",  # medium
-        "status=1",  # unread
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
-
-    # Extract issue ID from output
-    issue_id = result.stdout.strip()
-
-    # Store issue information
-    if not hasattr(context, "created_issues"):
-        context.created_issues = {}
-    context.created_issues[title] = issue_id
+# Note: Step definitions for 'an issue exists with title "{title}"' and
+# 'an issue exists with title "{title}" and status "{status}"' are in view_steps.py
+# which handles optional status parameter
 
 
 # Note: Step definition for 'a change exists with title "{title}"' and
@@ -111,32 +88,8 @@ def step_change_is_linked_to_issue(context):
     subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
 
 
-@given("the following issues exist:")
-def step_create_multiple_issues(context):
-    """Create multiple issues from a table."""
-    tracker_dir = getattr(context, "tracker_dir", "tracker")
-
-    if not hasattr(context, "created_issues"):
-        context.created_issues = {}
-
-    for row in context.table:
-        title = row["title"]
-
-        cmd = [
-            "roundup-admin",
-            "-i",
-            tracker_dir,
-            "create",
-            "issue",
-            f"title={title}",
-            "priority=2",
-            "status=1",
-        ]
-
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
-
-        issue_id = result.stdout.strip()
-        context.created_issues[title] = issue_id
+# Note: Step definition for 'the following issues exist:' is in view_steps.py
+# which handles priority, assignedto, and other issue fields
 
 
 @given('a change exists with ID "{change_id:d}"')
@@ -283,16 +236,8 @@ def step_add_related_issue(context, issue_title):
     related_issues_field.fill(new_value)
 
 
-@when("I view the issue details")
-def step_view_issue_details(context):
-    """Navigate to issue details page."""
-    # Get the first created issue
-    if not hasattr(context, "created_issues") or not context.created_issues:
-        raise ValueError("No issues created to view")
-
-    issue_id = list(context.created_issues.values())[0]
-    context.page.goto(f"{context.tracker_url}/issue{issue_id}")
-    context.page.wait_for_load_state("networkidle")
+# Note: Step definition for 'I view the issue details' is in workflow_steps.py
+# which uses context.current_issue_id (more robust than relying on created_issues dict)
 
 
 @when('I remove the related issue "{issue_title}"')

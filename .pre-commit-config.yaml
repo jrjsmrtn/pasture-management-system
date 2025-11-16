@@ -80,3 +80,9 @@ repos:
         types: [python]
         pass_filenames: false
         stages: [pre-push]
+      - id: behave-tests
+        name: BDD step definition validation
+        entry: bash -c 'output=$(uv run behave features/ --dry-run --no-capture 2>&1); echo "$output"; if echo "$output" | grep -q "AmbiguousStep"; then exit 1; fi'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]

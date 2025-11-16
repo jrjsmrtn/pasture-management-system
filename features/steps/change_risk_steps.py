@@ -299,26 +299,8 @@ def step_verify_change_updated_risk(context):
     assert "Updated risk" in risk or risk, "Risk should be updated"
 
 
-@then('the response should include "impact"')
-def step_verify_response_includes_impact(context):
-    """Verify API response includes impact field."""
-    try:
-        response_data = context.api_response.json()
-        response_str = str(response_data)
-        assert "impact" in response_str.lower(), "Response should include impact field"
-    except Exception as e:
-        raise AssertionError(f"Failed to verify impact in response: {e}")
-
-
-@then('the response should include "risk"')
-def step_verify_response_includes_risk(context):
-    """Verify API response includes risk field."""
-    try:
-        response_data = context.api_response.json()
-        response_str = str(response_data)
-        assert "risk" in response_str.lower(), "Response should include risk field"
-    except Exception as e:
-        raise AssertionError(f"Failed to verify risk in response: {e}")
+# Note: Step definition for 'the response should include "{text}"' is in
+# change_list_steps.py and handles "impact", "risk", and other text verification
 
 
 @then('the impact should be "{impact_text}"')

@@ -230,13 +230,8 @@ def step_should_see_text(context, text):
         assert text in page_content, f"Text '{text}' not found on page"
 
 
-@then("the status change should be recorded in history")
-def step_status_change_in_history(context):
-    """Verify status change was recorded in issue history."""
-    # For now, this is a placeholder - actual implementation requires
-    # checking the Roundup journal/history
-    # We'll verify this works when we implement status history tracking
-    pass
+# Note: Step definition for 'the status change should be recorded in history' is
+# in change_workflow_steps.py which has the actual implementation
 
 
 @then('I should not see "{button_text}" button')
