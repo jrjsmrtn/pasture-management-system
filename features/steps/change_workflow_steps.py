@@ -165,22 +165,8 @@ def step_patch_with_json(context, endpoint):
     context.api_status_code = response.status_code
 
 
-@when('I GET "{endpoint}"')
-def step_get_endpoint(context, endpoint):
-    """Send a GET request."""
-    import requests
-
-    url = f"{context.tracker_url}{endpoint}"
-
-    headers = {
-        "Authorization": "Basic YWRtaW46YWRtaW4=",  # admin:admin
-        "Accept": "application/json",
-    }
-
-    response = requests.get(url, headers=headers, timeout=10)
-
-    context.api_response = response
-    context.api_status_code = response.status_code
+# Note: Step definition for 'I GET "{endpoint}"' is in change_list_steps.py
+# to avoid duplication and handle API requests with proper authentication
 
 
 @then('the change status should be "{status}"')
