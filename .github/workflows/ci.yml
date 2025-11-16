@@ -71,9 +71,9 @@ jobs:
 
     - name: Initialize Roundup tracker
       run: |
-        # Remove db directory if it exists (tracker already configured, just needs fresh db)
-        rm -rf tracker/db
-        # Initialize the tracker database
+        # Tracker template already exists with custom schema and initial_data.py
+        # Just initialize the database with admin password
+        uv run python -c "import os; os.makedirs('tracker/db', exist_ok=True)"
         uv run roundup-admin -i tracker initialise admin
 
     - name: Start Roundup server
