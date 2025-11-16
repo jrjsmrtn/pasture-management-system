@@ -31,6 +31,9 @@ def step_tracker_running(context, url=None):
 @given("I am logged in to the web UI")
 def step_login_default(context):
     """Log in to the Roundup tracker as admin (default user)."""
+    # Skip for non-web-UI scenarios (CLI/API)
+    if not hasattr(context, "page") or context.page is None:
+        return
     step_login_as_user(context, "admin", "admin")
 
 

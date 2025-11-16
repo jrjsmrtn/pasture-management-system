@@ -238,9 +238,13 @@ def step_verify_create_change_button(context):
 def step_run_cli_list_changes(context):
     """List all changes via CLI."""
     tracker_dir = context.tracker_dir
+    # roundup-admin list already outputs titles, not just IDs
     cmd = ["roundup-admin", "-i", tracker_dir, "list", "change"]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
     context.cli_result = result
+    context.cli_exit_code = result.returncode
+    context.cli_stdout = result.stdout.strip()
+    context.cli_stderr = result.stderr.strip()
     context.cli_output = result.stdout
 
 
@@ -249,10 +253,34 @@ def step_run_cli_list_changes_filtered(context, category):
     """List changes filtered by category via CLI."""
     tracker_dir = context.tracker_dir
     category_id = CHANGECATEGORY_MAP.get(category.lower())
-    cmd = ["roundup-admin", "-i", tracker_dir, "filter", "change", f"category={category_id}"]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-    context.cli_result = result
-    context.cli_output = result.stdout
+
+    # Use find to get the IDs, then display each change's title
+    find_cmd = ["roundup-admin", "-i", tracker_dir, "find", "change", f"category={category_id}"]
+    find_result = subprocess.run(find_cmd, capture_output=True, text=True, timeout=30)
+
+    if find_result.returncode == 0 and find_result.stdout.strip():
+        # Get change IDs (output is like "['1', '3', '5']")
+        change_ids = find_result.stdout.strip().strip("[]'").split("', '")
+
+        # Display each change's title
+        output_lines = []
+        for change_id in change_ids:
+            # Correct syntax: get title change1 (property first, then designator)
+            display_cmd = ["roundup-admin", "-i", tracker_dir, "get", "title", f"change{change_id}"]
+            display_result = subprocess.run(display_cmd, capture_output=True, text=True, timeout=30)
+            if display_result.returncode == 0:
+                output_lines.append(display_result.stdout.strip())
+
+        cli_output = "\n".join(output_lines)
+        context.cli_exit_code = 0
+    else:
+        cli_output = find_result.stdout
+        context.cli_exit_code = find_result.returncode
+
+    context.cli_result = find_result
+    context.cli_stdout = cli_output
+    context.cli_stderr = find_result.stderr.strip()
+    context.cli_output = cli_output
 
 
 @then('I should not see "{text}" in CLI output')
@@ -346,3 +374,43 @@ def step_verify_last_change(context, title):
     assert last_change.get("title") == title, (
         f"Expected last change to be '{title}', found '{last_change.get('title')}'"
     )
+
+
+# ============================================================================
+# CLI Step Definitions
+# ============================================================================
+
+
+@when('I run "{command}"')
+def step_run_cli_command(context, command):
+    """Run a CLI command (roundup-client or roundup-admin)."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # For roundup-client commands, we need to parse and execute
+    # Note: roundup-client may not exist in all Roundup installations
+    # so we'll use roundup-admin list instead
+    if command.startswith("roundup-client list"):
+        # Convert to roundup-admin list command
+        # e.g., "roundup-client list change" -> "roundup-admin -i tracker list change"
+        parts = command.split()
+        classname = parts[2] if len(parts) > 2 else "issue"
+        filters = " ".join(parts[3:]) if len(parts) > 3 else ""
+
+        cmd = ["roundup-admin", "-i", tracker_dir, "list", classname]
+        if filters:
+            cmd.append(filters)
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    else:
+        # Generic command execution
+        result = subprocess.run(
+            command.split(), capture_output=True, text=True, timeout=30
+        )
+
+    # Store result for later assertions
+    context.cli_result = result
+    context.cli_exit_code = result.returncode
+    context.cli_stdout = result.stdout.strip()
+    context.cli_stderr = result.stderr.strip()
+    # Also store as cli_output for consistency with other steps
+    context.cli_output = result.stdout

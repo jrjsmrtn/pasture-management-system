@@ -195,9 +195,15 @@ def step_verify_issue_status(context, expected_status):
 
 @then('I should see "{text}"')
 def step_should_see_text(context, text):
-    """Verify specific text is visible on the page."""
-    page_content = context.page.content()
-    assert text in page_content, f"Text '{text}' not found on page"
+    """Verify specific text is visible (on page for web-ui, in CLI output for cli)."""
+    # Check if this is a CLI scenario
+    if hasattr(context, "cli_stdout"):
+        cli_output = context.cli_stdout
+        assert text in cli_output, f"Text '{text}' not found in CLI output. Output: {cli_output}"
+    else:
+        # Web UI scenario
+        page_content = context.page.content()
+        assert text in page_content, f"Text '{text}' not found on page"
 
 
 @then("the status change should be recorded in history")
