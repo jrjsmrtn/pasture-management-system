@@ -71,6 +71,9 @@ jobs:
 
     - name: Initialize Roundup tracker
       run: |
+        # Remove db directory if it exists (tracker already configured, just needs fresh db)
+        rm -rf tracker/db
+        # Initialize the tracker database
         uv run roundup-admin -i tracker initialise admin
 
     - name: Start Roundup server
