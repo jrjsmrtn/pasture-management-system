@@ -151,6 +151,85 @@
 </table>
 </form>
 
+<!-- Workflow Action Buttons -->
+<div tal:condition="python:context.id and context.is_view_ok()" style="margin: 20px 0; padding: 10px; background-color: #f5f5f5; border: 1px solid #ddd;">
+ <strong i18n:translate="">Workflow Actions:</strong>
+
+ <!-- Approve button: shown when status is "planning" -->
+ <form tal:condition="python:context.status.id == '1'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="2">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Approve" i18n:attributes="value">
+ </form>
+
+ <!-- Cancel button: shown when status is "planning" -->
+ <form tal:condition="python:context.status.id == '1'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="5">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Reject" i18n:attributes="value"
+         onclick="return confirm('Are you sure you want to reject this change?');">
+ </form>
+
+ <!-- Start Implementation button: shown when status is "approved" -->
+ <form tal:condition="python:context.status.id == '2'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="3">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Start Implementation" i18n:attributes="value">
+ </form>
+
+ <!-- Cancel button: shown when status is "approved" -->
+ <form tal:condition="python:context.status.id == '2'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="5">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Cancel" i18n:attributes="value"
+         onclick="return confirm('Are you sure you want to cancel this change?');">
+ </form>
+
+ <!-- Mark Complete button: shown when status is "implementing" -->
+ <form tal:condition="python:context.status.id == '3'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="4">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Mark Complete" i18n:attributes="value">
+ </form>
+
+ <!-- Rollback button: shown when status is "implementing" -->
+ <form tal:condition="python:context.status.id == '3'"
+       method="POST" style="display:inline; margin-left: 10px;"
+       tal:attributes="action context/designator">
+  <input type="hidden" name="status" value="5">
+  <input type="hidden" name="@action" value="edit">
+  <input type="hidden" name="@template" value="item">
+  <input name="@csrf" type="hidden" tal:attributes="value python:utils.anti_csrf_nonce()">
+  <input type="submit" value="Rollback" i18n:attributes="value"
+         onclick="return confirm('Are you sure you want to rollback this change?');">
+ </form>
+
+ <!-- No actions for completed or cancelled -->
+ <span tal:condition="python:context.status.id in ['4', '5']" i18n:translate="">
+  No workflow actions available (change is in terminal state)
+ </span>
+</div>
+
 <!-- Display history for existing changes -->
 <div tal:condition="context/id">
  <h2 i18n:translate="">Messages</h2>
