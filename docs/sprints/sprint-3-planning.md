@@ -387,18 +387,18 @@ ______________________________________________________________________
 
 ## Sprint Backlog
 
-| Task                                    | Story Points | Status         |
-| --------------------------------------- | ------------ | -------------- |
-| Story 1: Change Approval Workflow       | 8            | ✅ Complete    |
-| Story 2: Link Changes to Issues         | 5            | ✅ Complete    |
-| Story 3: Change Risk Assessment         | 5            | 🔄 In Progress |
-| Story 4: Change Scheduling              | 5            | Not Started    |
-| Story 5: Change Implementation Tracking | 5            | Not Started    |
-| Documentation and Presentation          | 5            | Not Started    |
+| Task                                    | Story Points | Status      |
+| --------------------------------------- | ------------ | ----------- |
+| Story 1: Change Approval Workflow       | 8            | ✅ Complete |
+| Story 2: Link Changes to Issues         | 5            | ✅ Complete |
+| Story 3: Change Risk Assessment         | 5            | ✅ Complete |
+| Story 4: Change Scheduling              | 5            | Not Started |
+| Story 5: Change Implementation Tracking | 5            | Not Started |
+| Documentation and Presentation          | 5            | Not Started |
 
 **Total Story Points**: 33
-**Completed**: 13 points (39%)
-**In Progress**: 5 points
+**Completed**: 18 points (55%)
+**In Progress**: 0 points
 **Remaining**: 15 points
 
 ## Risks and Dependencies
