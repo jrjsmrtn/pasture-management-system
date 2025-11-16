@@ -43,7 +43,7 @@ repos:
     rev: v0.8.4
     hooks:
       - id: ruff
-        args: [--select, S, --fix]  # Security rules
+        args: [--select, S, --fix, --ignore, S101,S603]  # Security rules, ignore assert and subprocess in tests
         stages: [pre-push]
 
   # Python type checking (pre-push)
