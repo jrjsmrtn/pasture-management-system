@@ -152,17 +152,21 @@ def after_step(context, step):
             print(f"\nFailed to capture screenshot: {e}")
 
 
-def _cleanup_test_issues(context):
+def _cleanup_test_data(context):
     """
-    Clean up test issues created during the scenario.
+    Clean up test issues and changes created during the scenario.
 
-    This function deletes issues created during testing to prevent
+    This function deletes issues and changes created during testing to prevent
     database bloat and ensure test isolation.
     """
     # Get tracker directory
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
-    # Collect issue IDs to delete
+    cleanup_enabled = os.getenv("CLEANUP_TEST_DATA", "true").lower() == "true"
+    if not cleanup_enabled:
+        return
+
+    # Clean up issues
     issue_ids = set()
 
     # From single issue creation
@@ -182,9 +186,7 @@ def _cleanup_test_issues(context):
         issue_ids.add(context.api_issue_id)
 
     # Delete each issue
-    cleanup_enabled = os.getenv("CLEANUP_TEST_ISSUES", "true").lower() == "true"
-
-    if cleanup_enabled and issue_ids:
+    if issue_ids:
         for issue_id in issue_ids:
             try:
                 cmd = ["roundup-admin", "-i", tracker_dir, "retire", f"issue{issue_id}"]
@@ -192,6 +194,39 @@ def _cleanup_test_issues(context):
             except Exception as e:
                 # Don't fail the test if cleanup fails
                 print(f"\nWarning: Failed to cleanup issue{issue_id}: {e}")
+
+    # Clean up changes
+    change_ids = set()
+
+    # From single change creation
+    if hasattr(context, "created_change_id"):
+        change_id = context.created_change_id
+        # Extract numeric ID
+        if change_id.startswith("change"):
+            change_id = change_id[6:]
+        change_ids.add(change_id)
+
+    # From multiple change creation
+    if hasattr(context, "test_change_ids"):
+        change_ids.update(context.test_change_ids)
+
+    # From API creation
+    if hasattr(context, "api_change_id"):
+        change_ids.add(context.api_change_id)
+
+    # From change list scenarios
+    if hasattr(context, "change_ids"):
+        change_ids.update(context.change_ids)
+
+    # Delete each change
+    if change_ids:
+        for change_id in change_ids:
+            try:
+                cmd = ["roundup-admin", "-i", tracker_dir, "retire", f"change{change_id}"]
+                subprocess.run(cmd, capture_output=True, timeout=10, check=False)
+            except Exception as e:
+                # Don't fail the test if cleanup fails
+                print(f"\nWarning: Failed to cleanup change{change_id}: {e}")
 
 
 def after_scenario(context, scenario):
@@ -201,8 +236,8 @@ def after_scenario(context, scenario):
     Capture final screenshot for passed scenarios (optional)
     and perform cleanup of test data.
     """
-    # Clean up test issues
-    _cleanup_test_issues(context)
+    # Clean up test data (issues and changes)
+    _cleanup_test_data(context)
 
     # Optionally capture screenshot for passed scenarios
     if scenario.status == "passed" and os.getenv("SCREENSHOT_ON_PASS", "false").lower() == "true":
