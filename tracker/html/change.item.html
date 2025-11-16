@@ -108,6 +108,55 @@
  </td>
 </tr>
 
+<tr>
+ <th i18n:translate="">Target CIs</th>
+ <td colspan=3>
+  <span tal:replace="structure context/target_cis/field" />
+  <roundup-classhelper data-search-with="name,type[],status[],criticality[]">
+    <span tal:condition="context/is_edit_ok"
+          tal:replace="structure python:db.ci.classhelp('id,name,type,criticality',
+                       property='target_cis', width='600')" />
+  </roundup-classhelper>
+  <tal:block tal:condition="context/target_cis">
+   <br><span i18n:translate="">View:</span>
+   <ul style="margin: 0; padding-left: 20px;">
+    <li tal:repeat="ci context/target_cis">
+     <a tal:attributes="href string:ci${ci/id}"
+        tal:content="python:f'{ci.name} ({db.citype.get(ci.type, \"name\")})'">CI link</a>
+     <tal:block tal:condition="python:hasattr(ci, 'criticality') and ci.criticality">
+      - Criticality: <strong tal:content="python:db.cicriticality.get(ci.criticality, 'name')">criticality</strong>
+      <tal:block tal:define="crit_name python:db.cicriticality.get(ci.criticality, 'name')">
+       <tal:block tal:condition="python:crit_name in ['High', 'Very High']">
+        <br><span style="color: #d32f2f; font-weight: bold;">
+         ⚠ WARNING: This change affects a <tal:x tal:replace="python:crit_name.lower()">criticality</tal:x> criticality component
+        </span>
+       </tal:block>
+      </tal:block>
+     </tal:block>
+     <!-- Show dependent CIs if any -->
+     <tal:block tal:define="dependents python:db.cirelationship.filter(None, {'target_ci': ci.id})">
+      <tal:block tal:condition="dependents">
+       <br><span style="color: #f57c00;">
+        <em>Impact: This CI supports <tal:x tal:replace="python:len(dependents)">count</tal:x> dependent CI<tal:x tal:condition="python:len(dependents) > 1">s</tal:x></em>
+       </span>
+       <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9em;">
+        <li tal:repeat="rel_id dependents">
+         <tal:block tal:define="rel python:db.cirelationship.getnode(rel_id);
+                                source_ci python:db.ci.getnode(rel.source_ci)">
+          <a tal:attributes="href string:ci${source_ci.id}"
+             tal:content="source_ci/name">dependent CI</a>
+          (<tal:x tal:replace="python:db.cirelationshiptype.get(rel.relationship_type, 'name')">relationship</tal:x>)
+         </tal:block>
+        </li>
+       </ul>
+      </tal:block>
+     </tal:block>
+    </li>
+   </ul>
+  </tal:block>
+ </td>
+</tr>
+
 <tr tal:condition="context/is_edit_ok">
  <th i18n:translate="">Nosy List</th>
  <td colspan=3>

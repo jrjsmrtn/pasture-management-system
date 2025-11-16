@@ -99,6 +99,30 @@
  </td>
 </tr>
 
+<tr>
+ <th i18n:translate="">Affected CIs</th>
+ <td colspan=3>
+  <span tal:replace="structure context/affected_cis/field" />
+  <roundup-classhelper data-search-with="name,type[],status[]">
+    <span tal:condition="context/is_edit_ok"
+	  tal:replace="structure python:db.ci.classhelp('id,name,type,status',
+		       property='affected_cis', width='600')" />
+  </roundup-classhelper>
+  <tal:block tal:condition="context/affected_cis">
+   <br><span i18n:translate="">View:</span>
+   <ul style="margin: 0; padding-left: 20px;">
+    <li tal:repeat="ci context/affected_cis">
+     <a tal:attributes="href string:ci${ci/id}"
+        tal:content="python:f'{ci.name} ({db.citype.get(ci.type, \"name\")})'">CI link</a>
+     <tal:block tal:condition="python:hasattr(ci, 'criticality') and ci.criticality">
+      - Criticality: <strong tal:content="python:db.cicriticality.get(ci.criticality, 'name')">criticality</strong>
+     </tal:block>
+    </li>
+   </ul>
+  </tal:block>
+ </td>
+</tr>
+
 <tr tal:condition="context/id">
  <th i18n:translate="">Related Changes</th>
  <td colspan=3>

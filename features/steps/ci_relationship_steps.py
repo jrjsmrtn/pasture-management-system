@@ -99,7 +99,12 @@ def step_select_target_ci(context, target_name):
     if not target_id:
         raise ValueError(f"Target CI '{target_name}' not found")
 
-    context.page.select_option("select[name='target_ci']", target_id)
+    # Try both field names - singular for relationships, plural for changes
+    try:
+        context.page.select_option("select[name='target_ci']", target_id)
+    except Exception:
+        # If singular doesn't work, try plural (for changes)
+        context.page.select_option("select[name='target_cis']", target_id)
 
 
 @when('I click "Save"')

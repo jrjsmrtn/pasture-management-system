@@ -106,6 +106,7 @@ issue = IssueClass(
     keyword=Multilink("keyword"),
     priority=Link("priority"),
     status=Link("status"),
+    affected_cis=Multilink("ci"),  # CIs affected by this issue
 )
 
 # Change Request class - ITIL Change Management
