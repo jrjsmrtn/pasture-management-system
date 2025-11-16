@@ -1,0 +1,173 @@
+<!-- SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title">
+<tal:block condition="context/id" i18n:translate=""
+ >CI <tal:x tal:content="context/id" i18n:name="id"
+ />: <tal:x content="context/name" i18n:name="name"
+ /> - <tal:x content="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:block>
+<tal:block condition="not:context/id" i18n:translate=""
+ >New Configuration Item - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:block>
+</title>
+<tal:block metal:fill-slot="body_title">
+ <span tal:condition="python: not (context.id or context.is_edit_ok())"
+  tal:omit-tag="python:1" i18n:translate="">New Configuration Item</span>
+ <span tal:condition="python: not context.id and context.is_edit_ok()"
+  tal:omit-tag="python:1" i18n:translate="">New Configuration Item Editing</span>
+ <span tal:condition="python: context.id and not context.is_edit_ok()"
+  tal:omit-tag="python:1" i18n:translate="">CI<tal:x
+  replace="context/id" i18n:name="id" /></span>
+ <span tal:condition="python: context.id and context.is_edit_ok()"
+  tal:omit-tag="python:1" i18n:translate="">CI<tal:x
+  replace="context/id" i18n:name="id" /> Editing</span>
+</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="context/is_view_ok">
+
+<form method="POST" name="ciForm"
+      onSubmit="return submit_once()" enctype="multipart/form-data"
+      tal:attributes="action context/designator">
+
+<table class="form">
+<tr>
+ <th class="required" i18n:translate="">Name</th>
+ <td colspan=3 tal:content="structure python:context.name.field(size=60)">name</td>
+</tr>
+
+<tr>
+ <th class="required" i18n:translate="">Type</th>
+ <td tal:content="structure context/type/menu">type</td>
+ <th class="required" i18n:translate="">Status</th>
+ <td tal:content="structure context/status/menu">status</td>
+</tr>
+
+<tr>
+ <th i18n:translate="">Location</th>
+ <td colspan=3 tal:content="structure python:context.location.field(size=60)">location</td>
+</tr>
+
+<tr>
+ <th i18n:translate="">Owner</th>
+ <td tal:content="structure context/owner/menu">owner</td>
+ <th i18n:translate="">Criticality</th>
+ <td tal:content="structure context/criticality/menu">criticality</td>
+</tr>
+
+<tr>
+ <th i18n:translate="">Description</th>
+ <td colspan=3>
+  <textarea name="description" rows="3" cols="60"
+            tal:content="python:context.description.plain()"
+  ></textarea>
+ </td>
+</tr>
+
+<!-- Server/VM specific fields -->
+<tr tal:condition="python:context.type.plain() in ['1', '6']">
+ <th i18n:translate="">CPU Cores</th>
+ <td tal:content="structure python:context.cpu_cores.field(size=10)">cpu_cores</td>
+ <th i18n:translate="">RAM (GB)</th>
+ <td tal:content="structure python:context.ram_gb.field(size=10)">ram_gb</td>
+</tr>
+
+<tr tal:condition="python:context.type.plain() in ['1', '6']">
+ <th i18n:translate="">Operating System</th>
+ <td colspan=3 tal:content="structure python:context.os.field(size=60)">os</td>
+</tr>
+
+<!-- IP Address (Server, Network Device, VM) -->
+<tr tal:condition="python:context.type.plain() in ['1', '2', '6']">
+ <th i18n:translate="">IP Address</th>
+ <td tal:content="structure python:context.ip_address.field(size=20)">ip_address</td>
+
+ <!-- Ports (Network Device only) -->
+ <tal:block condition="python:context.type.plain() == '2'">
+  <th i18n:translate="">Ports</th>
+  <td tal:content="structure python:context.ports.field(size=10)">ports</td>
+ </tal:block>
+</tr>
+
+<!-- Storage specific -->
+<tr tal:condition="python:context.type.plain() == '3'">
+ <th i18n:translate="">Capacity (GB)</th>
+ <td tal:content="structure python:context.capacity_gb.field(size=10)">capacity_gb</td>
+</tr>
+
+<!-- Software/Service specific -->
+<tr tal:condition="python:context.type.plain() in ['4', '5']">
+ <th i18n:translate="">Version</th>
+ <td tal:content="structure python:context.version.field(size=30)">version</td>
+</tr>
+
+<!-- Vendor (all types except VMs) -->
+<tr tal:condition="python:context.type.plain() in ['2', '3', '4', '5']">
+ <th i18n:translate="">Vendor</th>
+ <td colspan=3 tal:content="structure python:context.vendor.field(size=60)">vendor</td>
+</tr>
+
+<!-- Relationships -->
+<tr tal:condition="context/id">
+ <th i18n:translate="">Related Issues</th>
+ <td colspan=3 tal:content="structure context/related_issues/field">related_issues</td>
+</tr>
+
+<tr tal:condition="context/id">
+ <th i18n:translate="">Related Changes</th>
+ <td colspan=3 tal:content="structure context/related_changes/field">related_changes</td>
+</tr>
+
+<tr>
+ <td>&nbsp;</td>
+ <td colspan=3>
+  <table class="form">
+   <tr>
+    <th i18n:translate="">Created</th>
+    <td tal:content="context/creation">creation</td>
+    <th i18n:translate="">Creator</th>
+    <td tal:content="structure context/creator/field">creator</td>
+   </tr>
+   <tr tal:condition="context/id">
+    <th i18n:translate="">Last Activity</th>
+    <td tal:content="context/activity">activity</td>
+    <th i18n:translate="">Last Actor</th>
+    <td tal:content="structure context/actor/field">actor</td>
+   </tr>
+  </table>
+ </td>
+</tr>
+
+<tr>
+ <td>&nbsp;</td>
+ <td colspan=3 tal:content="structure context/submit">
+  submit button will go here
+ </td>
+</tr>
+
+</table>
+
+</form>
+
+<!-- History section for existing CIs -->
+<tal:block condition="context/id">
+ <h3 i18n:translate="">History</h3>
+ <table class="history" tal:content="structure context/history">
+  history goes here
+ </table>
+</tal:block>
+
+</div>
+
+</td>
+</tal:block>

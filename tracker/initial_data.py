@@ -37,6 +37,43 @@ changestat.create(name="implementing", order="3")  # Change implementation in pr
 changestat.create(name="completed", order="4")  # Change successfully completed
 changestat.create(name="cancelled", order="5")  # Change cancelled/rejected
 
+# CMDB - CI Types
+citype_class = db.getclass("citype")
+citype_class.create(name="Server", order="1")
+citype_class.create(name="Network Device", order="2")
+citype_class.create(name="Storage", order="3")
+citype_class.create(name="Software", order="4")
+citype_class.create(name="Service", order="5")
+citype_class.create(name="Virtual Machine", order="6")
+
+# CMDB - CI Lifecycle Statuses
+cistatus_class = db.getclass("cistatus")
+cistatus_class.create(name="Planning", order="1")
+cistatus_class.create(name="Ordered", order="2")
+cistatus_class.create(name="In Stock", order="3")
+cistatus_class.create(name="Deployed", order="4")
+cistatus_class.create(name="Active", order="5")
+cistatus_class.create(name="Maintenance", order="6")
+cistatus_class.create(name="Retired", order="7")
+
+# CMDB - CI Criticality Levels
+cicrit_class = db.getclass("cicriticality")
+cicrit_class.create(name="Very Low", order="1")
+cicrit_class.create(name="Low", order="2")
+cicrit_class.create(name="Medium", order="3")
+cicrit_class.create(name="High", order="4")
+cicrit_class.create(name="Very High", order="5")
+
+# CMDB - CI Relationship Types
+cirel_class = db.getclass("cirelationshiptype")
+cirel_class.create(name="Runs On", order="1")  # VM runs on server
+cirel_class.create(name="Hosts", order="2")  # Server hosts VM (inverse of Runs On)
+cirel_class.create(name="Depends On", order="3")  # Service depends on another CI
+cirel_class.create(name="Required By", order="4")  # Inverse of Depends On
+cirel_class.create(name="Connects To", order="5")  # Network connection
+cirel_class.create(name="Contains", order="6")  # Physical containment
+cirel_class.create(name="Contained By", order="7")  # Inverse of Contains
+
 # create the two default users
 user = db.getclass("user")
 user.create(username="admin", password=adminpw, address=admin_email, roles="Admin")

@@ -114,6 +114,24 @@ status_notresolved string:-1,1,2,3,4,5,6,7;
   </p>
 
   <p class="classblock"
+       tal:condition="python:request.user.hasPermission('View', 'change')">
+   <b i18n:translate="">Change Management</b><br>
+   <span tal:condition="python:request.user.hasPermission('Create', 'change')">
+    <a href="change?@template=item" i18n:translate="">Create New</a><br>
+   </span>
+   <a href="change" i18n:translate="">View All Changes</a><br>
+  </p>
+
+  <p class="classblock"
+       tal:condition="python:request.user.hasPermission('View', 'ci')">
+   <b i18n:translate="">CMDB</b><br>
+   <span tal:condition="python:request.user.hasPermission('Create', 'ci')">
+    <a href="ci?@template=item" i18n:translate="">New Configuration Item</a><br>
+   </span>
+   <a href="ci" i18n:translate="">View Configuration Items</a><br>
+  </p>
+
+  <p class="classblock"
        tal:condition="python:request.user.hasPermission('View', 'user')">
    <b i18n:translate="">Administration</b><br>
    <span tal:condition="python:request.user.hasPermission('Edit', None)">

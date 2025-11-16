@@ -37,6 +37,24 @@ changecategory.setkey("name")
 changestatus = Class(db, "changestatus", name=String(), order=Number())
 changestatus.setkey("name")
 
+# CMDB (Configuration Management Database) Classes
+
+# CI types for classification
+citype = Class(db, "citype", name=String(), order=Number())
+citype.setkey("name")
+
+# CI statuses for lifecycle management
+cistatus = Class(db, "cistatus", name=String(), order=Number())
+cistatus.setkey("name")
+
+# CI criticality levels
+cicriticality = Class(db, "cicriticality", name=String(), order=Number())
+cicriticality.setkey("name")
+
+# CI relationship types
+cirelationshiptype = Class(db, "cirelationshiptype", name=String(), order=Number())
+cirelationshiptype.setkey("name")
+
 # add any additional database schema configuration here
 
 user = Class(
@@ -103,8 +121,48 @@ change = IssueClass(
     priority=Link("changepriority"),  # Change priority
     category=Link("changecategory"),  # Change category
     status=Link("changestatus"),  # Change workflow status
-    related_issues=Multilink("issue"),
-)  # Issues this change addresses
+    related_issues=Multilink("issue"),  # Issues this change addresses
+    target_cis=Multilink("ci"),  # CIs affected by this change
+)
+
+# Configuration Item class - CMDB
+# Base CI with common attributes
+ci = Class(
+    db,
+    "ci",
+    name=String(),  # CI name (required)
+    type=Link("citype"),  # CI type (server, network, storage, etc.)
+    status=Link("cistatus"),  # Lifecycle status
+    location=String(),  # Physical/logical location
+    owner=Link("user"),  # CI owner/responsible person
+    criticality=Link("cicriticality"),  # Business criticality
+    description=String(),  # CI description
+    # Server-specific attributes
+    cpu_cores=Number(),  # Number of CPU cores
+    ram_gb=Number(),  # RAM in GB
+    os=String(),  # Operating system
+    ip_address=String(),  # IP address
+    # Network device attributes
+    ports=Number(),  # Number of ports
+    # Storage attributes
+    capacity_gb=Number(),  # Storage capacity in GB
+    # Software/Service attributes
+    version=String(),  # Software version
+    vendor=String(),  # Vendor/manufacturer
+    # Relationships
+    related_issues=Multilink("issue"),  # Issues affecting this CI
+    related_changes=Multilink("change"),  # Changes targeting this CI
+)
+
+# CI Relationship class - for modeling dependencies
+cirelationship = Class(
+    db,
+    "cirelationship",
+    source_ci=Link("ci"),  # Source CI
+    relationship_type=Link("cirelationshiptype"),  # Type of relationship
+    target_ci=Link("ci"),  # Target CI
+    description=String(),  # Optional description
+)
 
 #
 # TRACKER SECURITY SETTINGS
@@ -123,11 +181,21 @@ db.security.addPermissionToRole("User", "Xmlrpc Access")
 
 # Assign the access and edit Permissions for issue, file and message
 # to regular users now
-for cl in "issue", "file", "msg", "keyword", "change":
+for cl in "issue", "file", "msg", "keyword", "change", "ci", "cirelationship":
     db.security.addPermissionToRole("User", "View", cl)
     db.security.addPermissionToRole("User", "Edit", cl)
     db.security.addPermissionToRole("User", "Create", cl)
-for cl in "priority", "status", "changepriority", "changecategory", "changestatus":
+for cl in (
+    "priority",
+    "status",
+    "changepriority",
+    "changecategory",
+    "changestatus",
+    "citype",
+    "cistatus",
+    "cicriticality",
+    "cirelationshiptype",
+):
     db.security.addPermissionToRole("User", "View", cl)
 
 # May users view other user information? Comment these lines out
@@ -257,6 +325,12 @@ for cl in (
     "changepriority",
     "changecategory",
     "changestatus",
+    "ci",
+    "cirelationship",
+    "citype",
+    "cistatus",
+    "cicriticality",
+    "cirelationshiptype",
 ):
     db.security.addPermissionToRole("Anonymous", "View", cl)
 

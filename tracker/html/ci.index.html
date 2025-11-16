@@ -1,0 +1,177 @@
+<!-- SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title" >
+  <span tal:omit-tag="true" i18n:translate="" >CMDB - Configuration Items</span>
+  <span tal:condition="request/dispname"
+   tal:replace="python:' - %s '%request.dispname"
+  /> - <span tal:replace="config/TRACKER_NAME" />
+</title>
+<span metal:fill-slot="body_title" tal:omit-tag="true">
+  <span tal:omit-tag="true" i18n:translate="" >CMDB - Configuration Items</span>
+  <span tal:condition="request/dispname"
+   tal:replace="python:' - %s' % request.dispname" />
+</span>
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<tal:block tal:define="batch request/batch" tal:condition="context/is_view_ok">
+
+ <!-- Display "New Configuration Item" button -->
+ <div class="action-buttons">
+  <a tal:attributes="href string:ci?@template=item"
+     class="btn btn-primary" i18n:translate="">New Configuration Item</a>
+ </div>
+
+ <!-- Display empty message if no CIs exist -->
+ <p tal:condition="python:batch and batch.sequence_length == 0"
+    class="empty-list-message" i18n:translate="">
+   No configuration items found. Click "New Configuration Item" to create one.
+ </p>
+
+ <!-- Display CI list table -->
+ <table class="list" tal:condition="python:batch and batch.sequence_length > 0">
+  <tr>
+   <th tal:condition="request/show/id" i18n:translate="">ID</th>
+   <th tal:condition="request/show/name" i18n:translate="">Name</th>
+   <th tal:condition="request/show/type" i18n:translate="">Type</th>
+   <th tal:condition="request/show/status" i18n:translate="">Status</th>
+   <th tal:condition="request/show/location" i18n:translate="">Location</th>
+   <th tal:condition="request/show/criticality" i18n:translate="">Criticality</th>
+   <th tal:condition="request/show/owner" i18n:translate="">Owner</th>
+   <th tal:condition="request/show/creation" i18n:translate="">Created</th>
+  </tr>
+ <tal:block tal:repeat="ci batch" condition=true>
+  <tr tal:define="group python:[r[1] for r in request.group]"
+      tal:condition="python:group and batch.propchanged(*group)">
+   <th tal:attributes="colspan python:len(request.columns) or 100" class="group">
+    <tal:block tal:repeat="g group">
+     <tal:block i18n:translate="" tal:content="python:str(ci[g]) or '(no %s set)'%g"/>
+    </tal:block>
+   </th>
+  </tr>
+
+  <tr>
+   <td tal:condition="request/show/id" tal:content="ci/id">&nbsp;</td>
+   <td tal:condition="request/show/name">
+    <a tal:attributes="href string:ci${ci/id}"
+		tal:content="python:str(ci.name.plain(hyperlink=0)) or '[no name]'">name</a>
+   </td>
+   <td tal:condition="request/show/type"
+       tal:content="python:ci.type.plain() or default">&nbsp;</td>
+   <td tal:condition="request/show/status"
+       i18n:translate=""
+       tal:content="python:ci.status.plain() or default">&nbsp;</td>
+   <td tal:condition="request/show/location"
+       tal:content="python:ci.location.plain() or default">&nbsp;</td>
+   <td tal:condition="request/show/criticality"
+       tal:content="python:ci.criticality.plain() or default">&nbsp;</td>
+   <td tal:condition="request/show/owner"
+       tal:content="python:ci.owner.plain() or default">&nbsp;</td>
+   <td class="date" tal:condition="request/show/creation"
+       tal:content="ci/creation/reldate">&nbsp;</td>
+  </tr>
+
+ </tal:block>
+
+ <metal:index define-macro="batch-footer">
+ <tr tal:condition="batch">
+  <th tal:attributes="colspan python:len(request.columns) or 100">
+   <table width="100%">
+    <tr class="navigation">
+     <th>
+      <a tal:define="prev batch/previous" tal:condition="prev"
+         tal:attributes="href python:request.indexargs_url(request.classname,
+         {'@startwith':prev.first, '@pagesize':prev.size})"
+         i18n:translate="">&lt;&lt; previous</a>
+      &nbsp;
+     </th>
+     <th i18n:translate=""><span tal:replace="batch/start" i18n:name="start"
+     />..<span tal:replace="python: batch.start + batch.length -1" i18n:name="end"
+     /> out of <span tal:replace="batch/sequence_length" i18n:name="total"
+     /></th>
+     <th>
+      <a tal:define="next batch/next" tal:condition="next"
+         tal:attributes="href python:request.indexargs_url(request.classname,
+         {'@startwith':next.first, '@pagesize':next.size})"
+         i18n:translate="">next &gt;&gt;</a>
+      &nbsp;
+     </th>
+    </tr>
+   </table>
+  </th>
+ </tr>
+ </metal:index>
+</table>
+
+<a tal:condition="python:batch and batch.sequence_length > 0"
+   tal:attributes="href python:request.indexargs_url('ci',
+            {'@action':'export_csv'})" i18n:translate="">Download as CSV</a>
+
+<!-- Filtering and sorting controls -->
+<form method="GET" class="index-controls"
+    tal:attributes="action request/classname"
+    tal:condition="python:batch and batch.sequence_length > 0">
+
+ <table class="form" tal:define="n_sort python:2">
+  <tal:block tal:repeat="n python:list(range(n_sort))" tal:condition="batch">
+  <tr tal:define="key python:len(request.sort)>n and request.sort[n]">
+   <th>
+    <tal:block tal:condition="not:n" i18n:translate="">Sort on:</tal:block>
+   </th>
+   <td>
+    <select tal:attributes="name python:'@sort%d'%n">
+     <option value="" i18n:translate="">- nothing -</option>
+     <option tal:repeat="col context/properties"
+             tal:attributes="value col/_name;
+                             selected python:key and col._name == key[1]"
+             tal:content="col/_name"
+             i18n:translate="">column</option>
+    </select>
+   </td>
+   <th i18n:translate="">Descending:</th>
+   <td><input type="checkbox" tal:attributes="name python:'@sortdir%d'%n;
+              checked python:key and key[0] == '-'">
+   </td>
+  </tr>
+  </tal:block>
+  <tal:block tal:repeat="n python:list(range(n_sort))" tal:condition="batch">
+  <tr tal:define="key python:len(request.group)>n and request.group[n]">
+   <th>
+    <tal:block tal:condition="not:n" i18n:translate="">Group on:</tal:block>
+   </th>
+   <td>
+    <select tal:attributes="name python:'@group%d'%n">
+     <option value="" i18n:translate="">- nothing -</option>
+     <option tal:repeat="col context/properties"
+             tal:attributes="value col/_name;
+                             selected python:key and col._name == key[1]"
+             tal:content="col/_name"
+             i18n:translate="">column</option>
+    </select>
+   </td>
+   <th i18n:trailing="">Descending:</th>
+   <td><input type="checkbox" tal:attributes="name python:'@groupdir%d'%n;
+              checked python:key and key[0] == '-'">
+   </td>
+  </tr>
+  </tal:block>
+  <tr><td colspan="4">
+              <input type="submit" value="Redisplay" i18n:attributes="value">
+              <tal:block tal:replace="structure
+                python:request.indexargs_form(sort=0, group=0)" />
+  </td></tr>
+ </table>
+</form>
+
+</tal:block>
+
+</td>
+</tal:block>

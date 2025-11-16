@@ -8,8 +8,8 @@ SPDX-License-Identifier: MIT
 **Sprint Duration**: 2 weeks
 **Sprint Goal**: Implement Configuration Management Database (CMDB) foundation
 **Target Version**: v0.5.0
-**Start Date**: TBD
-**End Date**: TBD
+**Start Date**: 2025-11-16
+**End Date**: 2025-11-30
 
 ## Sprint Objective
 
