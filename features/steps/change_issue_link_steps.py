@@ -7,7 +7,7 @@ import json
 import subprocess
 
 import requests
-from behave import given, then, when
+from behave import given, then, use_step_matcher, when
 from requests.auth import HTTPBasicAuth
 
 
@@ -192,32 +192,6 @@ def step_create_change_with_id(context, change_id):
     context.expected_change_id = change_id
 
 
-@given('an issue exists with ID "{issue_id}"')
-def step_create_issue_with_id(context, issue_id):
-    """Create an issue (ID will be auto-assigned)."""
-    tracker_dir = getattr(context, "tracker_dir", "tracker")
-
-    cmd = [
-        "roundup-admin",
-        "-i",
-        tracker_dir,
-        "create",
-        "issue",
-        f"title=Test issue {issue_id}",
-        "priority=2",
-        "status=1",
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
-
-    actual_id = result.stdout.strip()
-
-    if not hasattr(context, "created_issues"):
-        context.created_issues = {}
-    context.created_issues[f"issue_{issue_id}"] = actual_id
-    context.current_issue_id = actual_id
-
-
 @given('the following issues exist with IDs "{issue_ids}"')
 def step_create_issues_with_ids(context, issue_ids):
     """Create multiple issues."""
@@ -250,9 +224,13 @@ def step_create_issues_with_ids(context, issue_ids):
     context.created_issue_ids = actual_ids
 
 
-@given('an issue exists with ID "{issue_id}" and title "{title}"')
-def step_create_issue_with_id_and_title(context, issue_id, title):
-    """Create an issue with specific title."""
+# Use parse matcher with optional parameter
+use_step_matcher("parse")
+
+
+@given('an issue exists with ID "{issue_id:d}" and title "{title}"')
+def step_create_issue_with_numeric_id_and_title(context, issue_id, title):
+    """Create an issue with specific numeric ID and title."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
     cmd = [
@@ -272,8 +250,39 @@ def step_create_issue_with_id_and_title(context, issue_id, title):
 
     if not hasattr(context, "created_issues"):
         context.created_issues = {}
+
     context.created_issues[title] = actual_id
     context.current_issue_id = actual_id
+
+
+@given('an issue exists with ID "{issue_id:d}"')
+def step_create_issue_with_numeric_id(context, issue_id):
+    """Create an issue with specific numeric ID (ID will be auto-assigned)."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "issue",
+        f"title=Test issue {issue_id}",
+        "priority=2",
+        "status=1",
+    ]
+
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
+
+    actual_id = result.stdout.strip()
+
+    if not hasattr(context, "created_issues"):
+        context.created_issues = {}
+    context.created_issues[f"issue_{issue_id}"] = actual_id
+    context.current_issue_id = actual_id
+
+
+# Reset to default matcher
+use_step_matcher("parse")
 
 
 @when('I add related issue "{issue_title}"')
