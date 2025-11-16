@@ -40,7 +40,7 @@ jobs:
       run: uv run ruff format --check .
 
     - name: Run mypy
-      run: uv run mypy features/steps/ --ignore-missing-imports || true
+      run: uv run mypy features/steps/ --ignore-missing-imports --explicit-package-bases || true
 
   test:
     name: BDD Tests (Python ${{ matrix.python-version }})
