@@ -97,7 +97,7 @@ jobs:
 
     - name: Start Roundup server
       run: |
-        uv run roundup-server -p 8080 pms=tracker &
+        uv run roundup-server -p 9080 pms=tracker &
         echo $! > roundup.pid
         sleep 5
 

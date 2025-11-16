@@ -50,7 +50,8 @@ TIMEOUTS = {
 
 # Base URL for the tracker
 # Override with TRACKER_URL environment variable
-DEFAULT_TRACKER_URL = "http://localhost:8080/pms/"
+# Using port 9080 to avoid conflicts with other services (e.g., Docker/Podman on 8080)
+DEFAULT_TRACKER_URL = "http://localhost:9080/pms/"
 
 
 def get_browser_args() -> list[str]:
