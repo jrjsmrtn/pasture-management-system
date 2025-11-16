@@ -43,6 +43,8 @@ def step_create_multiple_changes(context):
         category = row.get("category", "configuration")
         status = row.get("status", "planning")
         created_date = row.get("created_date", None)
+        scheduled_start = row.get("scheduled_start", None)
+        scheduled_end = row.get("scheduled_end", None)
 
         # Build command args
         cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "change"]
@@ -67,6 +69,16 @@ def step_create_multiple_changes(context):
         # Add description if provided
         description = row.get("description", f"Description for {title}")
         cmd_args.append(f"description={description}")
+
+        # Add scheduled times if provided (for Story 4)
+        if scheduled_start:
+            # Convert to Roundup format: "YYYY-MM-DD HH:MM" -> "YYYY-MM-DD.HH:MM:SS"
+            scheduled_start_formatted = scheduled_start.replace(" ", ".") + ":00"
+            cmd_args.append(f"scheduled_start={scheduled_start_formatted}")
+
+        if scheduled_end:
+            scheduled_end_formatted = scheduled_end.replace(" ", ".") + ":00"
+            cmd_args.append(f"scheduled_end={scheduled_end_formatted}")
 
         # Run the command
         result = subprocess.run(cmd_args, capture_output=True, text=True, timeout=30)
