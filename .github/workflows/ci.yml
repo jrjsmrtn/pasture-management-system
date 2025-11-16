@@ -72,8 +72,8 @@ jobs:
     - name: Initialize Roundup tracker
       run: |
         # Tracker template already exists with custom schema and initial_data.py
-        # Create database and run the initialization (provide password via echo)
-        echo "admin" | uv run roundup-admin -i tracker initialise
+        # Create database and run the initialization (provide password twice for confirmation)
+        printf "admin\nadmin\n" | uv run roundup-admin -i tracker initialise
 
     - name: Verify tracker initialization
       run: |
