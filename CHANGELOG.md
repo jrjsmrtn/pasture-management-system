@@ -12,6 +12,60 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-11-16
+
+### Added
+
+- **CMDB BDD Specification**: Complete BDD scenario coverage for CMDB integration (125 total scenarios)
+  - CI Schema: BDD scenarios for configuration item data model
+  - CI Creation: BDD scenarios for creating configuration items (Web UI, CLI, API)
+  - CI Relationships: BDD scenarios for dependencies and impact analysis
+  - CI-Issue-Change Links: BDD scenarios for linking CIs to issues and changes
+  - CI Search and Filtering: BDD scenarios for finding and filtering configuration items
+  - 19 feature files covering full system specification
+  - Coverage across Web UI (~40 scenarios), CLI (~40 scenarios), API (~45 scenarios)
+- **Sprint 4 Retrospective**: Comprehensive 777-line documentation of sprint outcomes
+  - Configuration drift discovery and resolution
+  - Test infrastructure improvements
+  - BDD-first approach validation
+  - Key learnings and action items for Sprint 5
+
+### Fixed
+
+- **Configuration Drift**: Critical port mismatch in tracker configuration
+  - Updated `tracker/config.ini` port from 8080 to 9080
+  - Fixed login redirects failing to `chrome-error://chromewebdata/`
+  - Resolved all web UI scenario login failures
+- **CLI/API Test Infrastructure**: AttributeError in non-web-UI scenarios
+  - Added None-check in login step for CLI/API scenarios
+  - Fixed 88 CLI/API scenarios crashing with `AttributeError`
+  - Graceful handling of web UI login steps in non-web contexts
+- **Hardcoded URLs**: Removed 18+ instances of hardcoded localhost URLs
+  - Centralized tracker URL configuration in `context.tracker_url`
+  - Updated 4 feature files to use dynamic URLs
+  - Updated 5 step definition files to build URLs from context
+  - Environment-agnostic test configuration
+
+### Changed
+
+- Test execution now validates environment configuration
+- Login step definitions context-aware (Web/CLI/API)
+- Project version bumped to 0.5.0 (Sprint 4 complete)
+
+### Technical Details
+
+- **BDD Scenarios**: 125 scenarios defining complete CMDB integration
+  - 6 passing (implemented from previous sprints)
+  - 31 failed (expected - unimplemented features)
+  - 88 implementation pending (expected - BDD-first approach)
+- **Test Infrastructure Fixes**: 2 critical issues resolved
+  - Configuration port mismatch (tracker config vs. runtime)
+  - CLI/API login handling (context awareness)
+- **Configuration Management**: Established environment validation patterns
+- **Systematic Debugging**: Debug scripts, screenshots, and config inspection methodology
+- **Sprint Tracking**: BDD specification complete, ready for implementation phase
+- **Documentation**: 777-line retrospective documenting process and learnings
+
 ## [0.4.0] - 2025-11-16
 
 ### Added
@@ -310,4 +364,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.3...v0.2.0
 [0.3.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.2.0...v0.3.0
 [0.4.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.3.0...v0.4.0
-[unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.4.0...HEAD
+[0.5.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.4.0...v0.5.0
+[unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.5.0...HEAD
