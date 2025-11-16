@@ -69,11 +69,13 @@ repos:
   #       args: [--select, S, --fix]  # Security rules
   #       stages: [pre-push]
 
-  # Python type checking (pre-push)
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.11.2
+  # Python type checking (pre-push) - using uv-installed version
+  - repo: local
     hooks:
       - id: mypy
-        additional_dependencies: [types-requests]
-        args: [--ignore-missing-imports]
+        name: mypy
+        entry: uv run mypy features/steps/ --ignore-missing-imports
+        language: system
+        types: [python]
+        pass_filenames: false
         stages: [pre-push]
