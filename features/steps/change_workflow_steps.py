@@ -133,15 +133,8 @@ def step_enter_implementation_notes(context, notes):
     context.implementation_notes = notes
 
 
-@when('I run "{command}"')
-def step_run_cli_command(context, command):
-    """Run a CLI command."""
-    result = subprocess.run(
-        command.split(), capture_output=True, text=True, timeout=10, check=False
-    )
-    context.cli_output = result.stdout
-    context.cli_stderr = result.stderr
-    context.cli_returncode = result.returncode
+# Note: Step definition for 'I run "{command}"' is in change_list_steps.py
+# to avoid duplication and handle roundup-client commands
 
 
 @when('I PATCH "{endpoint}" with JSON')
