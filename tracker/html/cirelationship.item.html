@@ -1,0 +1,98 @@
+<!-- SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title">
+<tal:block condition="context/id" i18n:translate=""
+ >Relationship <tal:x tal:content="context/id" i18n:name="id"
+ /> - <tal:x content="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:block>
+<tal:block condition="not:context/id" i18n:translate=""
+ >New CI Relationship - <span tal:replace="config/TRACKER_NAME" i18n:name="tracker"
+/></tal:block>
+</title>
+<tal:block metal:fill-slot="body_title">
+ <span tal:condition="python: not context.id"
+  tal:omit-tag="python:1" i18n:translate="">New CI Relationship</span>
+ <span tal:condition="python: context.id"
+  tal:omit-tag="python:1" i18n:translate="">CI Relationship<tal:x
+  replace="context/id" i18n:name="id" /></span>
+</tal:block>
+
+<td class="content" metal:fill-slot="content">
+
+<p tal:condition="python:not (context.is_view_ok()
+ or request.user.hasRole('Anonymous'))" i18n:translate="">
+ You are not allowed to view this page.</p>
+
+<p tal:condition="python:not context.is_view_ok()
+ and request.user.hasRole('Anonymous')" i18n:translate="">
+ Please login with your username and password.</p>
+
+<div tal:condition="context/is_view_ok">
+
+<form method="POST" name="cirelForm"
+      onSubmit="return submit_once()" enctype="multipart/form-data"
+      tal:attributes="action context/designator">
+
+<table class="form">
+<tr>
+ <th class="required" i18n:translate="">Source CI</th>
+ <td tal:content="structure context/source_ci/menu">source_ci</td>
+</tr>
+
+<tr>
+ <th class="required" i18n:translate="">Relationship Type</th>
+ <td tal:content="structure context/relationship_type/menu">relationship_type</td>
+</tr>
+
+<tr>
+ <th class="required" i18n:translate="">Target CI</th>
+ <td tal:content="structure context/target_ci/menu">target_ci</td>
+</tr>
+
+<tr>
+ <th i18n:translate="">Description</th>
+ <td>
+  <textarea name="description" rows="2" cols="60"
+            tal:content="python:context.description.plain()"
+  ></textarea>
+ </td>
+</tr>
+
+<tr>
+ <td>&nbsp;</td>
+ <td>
+  <table class="form">
+   <tr tal:condition="context/id">
+    <th i18n:translate="">Created</th>
+    <td tal:content="context/creation">creation</td>
+    <th i18n:translate="">Creator</th>
+    <td tal:content="structure context/creator/field">creator</td>
+   </tr>
+  </table>
+ </td>
+</tr>
+
+<tr>
+ <td>&nbsp;</td>
+ <td tal:content="structure context/submit">
+  submit button will go here
+ </td>
+</tr>
+
+</table>
+
+</form>
+
+<!-- Note about circular dependencies -->
+<div class="info-box">
+ <p i18n:translate="">
+  <strong>Note:</strong> The system will detect and prevent circular dependencies.
+  A relationship cannot be created if it would create a cycle in the dependency graph.
+ </p>
+</div>
+
+</div>
+
+</td>
+</tal:block>

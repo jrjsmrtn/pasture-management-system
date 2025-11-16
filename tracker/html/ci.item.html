@@ -117,7 +117,7 @@
  <td colspan=3 tal:content="structure python:context.vendor.field(size=60)">vendor</td>
 </tr>
 
-<!-- Relationships -->
+<!-- ITIL Integration -->
 <tr tal:condition="context/id">
  <th i18n:translate="">Related Issues</th>
  <td colspan=3 tal:content="structure context/related_issues/field">related_issues</td>
@@ -158,6 +158,81 @@
 </table>
 
 </form>
+
+<!-- CI Relationships section for existing CIs -->
+<tal:block condition="context/id">
+ <h3 i18n:translate="">CI Relationships</h3>
+
+ <div class="relationships-section">
+  <tal:block tal:define="
+   outgoing_rels python:db.cirelationship.filter(None, {'source_ci': context.id});
+   incoming_rels python:db.cirelationship.filter(None, {'target_ci': context.id})
+  ">
+
+   <!-- Display outgoing relationships -->
+   <tal:block tal:condition="outgoing_rels">
+    <h4 i18n:translate="">Dependencies (This CI → Others)</h4>
+    <table class="list">
+     <tr>
+      <th i18n:translate="">Relationship Type</th>
+      <th i18n:translate="">Target CI</th>
+      <th i18n:translate="">Description</th>
+      <th i18n:translate="">Actions</th>
+     </tr>
+     <tr tal:repeat="rel outgoing_rels">
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
+          tal:content="python:rel_obj.relationship_type"></td>
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel);
+                      target_ci python:db.ci.getnode(rel_obj.target_ci)"
+          tal:content="python:target_ci.name"></td>
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
+          tal:content="python:rel_obj.description or '-'"></td>
+      <td>
+       <a tal:attributes="href string:cirelationship${rel}?@action=retire"
+          onclick="return confirm('Remove this relationship?')"
+          i18n:translate="">Remove</a>
+      </td>
+     </tr>
+    </table>
+   </tal:block>
+
+   <!-- Display incoming relationships -->
+   <tal:block tal:condition="incoming_rels">
+    <h4 i18n:translate="">Referenced By (Others → This CI)</h4>
+    <table class="list">
+     <tr>
+      <th i18n:translate="">Source CI</th>
+      <th i18n:translate="">Relationship Type</th>
+      <th i18n:translate="">Description</th>
+     </tr>
+     <tr tal:repeat="rel incoming_rels">
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel);
+                      source_ci python:db.ci.getnode(rel_obj.source_ci)"
+          tal:content="python:source_ci.name"></td>
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
+          tal:content="python:rel_obj.relationship_type"></td>
+      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
+          tal:content="python:rel_obj.description or '-'"></td>
+     </tr>
+    </table>
+   </tal:block>
+
+   <tal:block tal:condition="python:not outgoing_rels and not incoming_rels">
+    <p class="empty-list-message" i18n:translate="">
+     No relationships defined for this CI.
+    </p>
+   </tal:block>
+
+   <!-- Add Relationship button -->
+   <div class="action-buttons">
+    <a tal:attributes="href string:cirelationship?@template=item&source_ci=${context/id}"
+       class="btn btn-primary" i18n:translate="">Add Relationship</a>
+    <a href="#" id="view-dependencies-btn" class="btn btn-secondary"
+       i18n:translate="">View Dependencies</a>
+   </div>
+  </tal:block>
+ </div>
+</tal:block>
 
 <!-- History section for existing CIs -->
 <tal:block condition="context/id">
