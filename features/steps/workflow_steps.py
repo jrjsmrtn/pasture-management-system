@@ -100,6 +100,12 @@ def step_run_roundup_command(context, command):
     """Run a roundup-admin command."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Replace issue ID placeholders with actual created issue ID
+    # If the command references "issue1" but we created issue15, update it
+    if hasattr(context, "current_issue_id"):
+        # Replace "issue1" with the actual issue ID (e.g., "issue15")
+        command = command.replace("issue1", context.current_issue_id)
+
     # Map status names to IDs in the command
     # e.g., "set issue1 status=in-progress" -> "set issue1 status=2"
     original_command = command
