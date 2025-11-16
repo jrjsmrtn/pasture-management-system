@@ -197,3 +197,5 @@ secrets.yaml
 *.key
 id_rsa*
 pretty.output
+reports/
+.pytest_cache/

@@ -42,6 +42,20 @@ jobs:
     - name: Run mypy
       run: uv run mypy features/steps/ --ignore-missing-imports --explicit-package-bases || true
 
+    - name: Run pytest
+      run: uv run pytest --verbose
+
+    - name: Upload test coverage
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-coverage
+        path: |
+          reports/pytest.xml
+          reports/coverage.xml
+          reports/coverage/
+        retention-days: 30
+
   test:
     name: BDD Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest

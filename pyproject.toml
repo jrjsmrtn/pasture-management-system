@@ -28,6 +28,9 @@ dev = [
     "ruff==0.14.5",
     "mypy>=1.11.2",
     "pre-commit>=3.6.0",
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.0",
 ]
 
 # No build system - this is not a distributable package
@@ -38,6 +41,9 @@ dev = [
     "ruff==0.14.5",
     "mypy>=1.11.2",
     "pre-commit>=3.6.0",
+    "pytest>=8.3.0",
+    "pytest-cov>=6.0.0",
+    "pytest-xdist>=3.6.0",
 ]
 
 [tool.ruff]
@@ -107,4 +113,43 @@ ignore_missing_imports = true
 exclude = [
     "^tracker/",  # Roundup template code
     "^venv/",
+]
+
+[tool.pytest.ini_options]
+# Test discovery
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Output options
+addopts = [
+    "-v",                           # Verbose output
+    "--strict-markers",             # Raise error on unknown markers
+    "--strict-config",              # Raise error on config issues
+    "--tb=short",                   # Shorter traceback format
+    "-ra",                          # Show summary of all test outcomes
+    "--cov=features/steps",         # Coverage for step definitions
+    "--cov-report=term-missing",    # Show missing lines in terminal
+    "--cov-report=html:reports/coverage", # HTML coverage report
+    "--cov-report=xml:reports/coverage.xml", # XML for CI tools
+    "--cov-fail-under=0",           # Coverage tracking only (step defs covered by BDD tests)
+    "--junit-xml=reports/pytest.xml", # JUnit XML for CI
+]
+
+# Markers for categorizing tests
+markers = [
+    "unit: Unit tests for individual components",
+    "integration: Integration tests",
+    "slow: Tests that take more than a few seconds",
+]
+
+# Test file patterns to ignore
+norecursedirs = [
+    ".git",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "tracker",
+    "features",  # BDD tests run via behave, not pytest
 ]
