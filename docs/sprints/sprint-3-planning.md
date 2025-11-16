@@ -374,16 +374,16 @@ ______________________________________________________________________
 
 ## Definition of Done
 
-- [ ] All user stories completed with acceptance criteria met
-- [ ] All BDD scenarios implemented and passing
-- [ ] Change workflow complete with approvals
-- [ ] Change-issue linking functional
-- [ ] Risk assessment integrated
-- [ ] Code passes pre-commit hooks
-- [ ] Documentation and presentation completed
-- [ ] Test coverage >85%
-- [ ] CHANGELOG.md updated for v0.4.0
-- [ ] Sprint retrospective completed
+- [x] All user stories completed with acceptance criteria met
+- [x] All BDD scenarios implemented and passing
+- [x] Change workflow complete with approvals
+- [x] Change-issue linking functional
+- [x] Risk assessment integrated
+- [x] Code passes pre-commit hooks
+- [x] Documentation and presentation completed
+- [ ] Test coverage >85% (deferred - awaiting implementation)
+- [x] CHANGELOG.md updated for v0.4.0
+- [x] Sprint retrospective completed
 
 ## Sprint Backlog
 
