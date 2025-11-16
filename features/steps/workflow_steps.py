@@ -277,6 +277,10 @@ def step_verify_issue_id_status(context, issue_id, expected_status):
     """Verify a specific issue has the expected status."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Use actual created issue ID if available and parameter is "1"
+    if issue_id == "1" and hasattr(context, "current_issue_numeric_id"):
+        issue_id = context.current_issue_numeric_id
+
     # Ensure issue_id has "issue" prefix
     if not issue_id.startswith("issue"):
         issue_id = f"issue{issue_id}"
