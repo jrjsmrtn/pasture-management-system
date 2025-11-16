@@ -44,6 +44,11 @@ def step_create_issue_with_id_status(context, issue_id, status):
     context.current_issue_id = f"issue{created_id}"
     context.current_issue_numeric_id = created_id
 
+    # Debug: print what was created
+    print(f"\nDEBUG CREATE: Created issue with ID: {created_id}")
+    print(f"DEBUG CREATE: Status was set to: {status_id}")
+    print(f"DEBUG CREATE: Command was: {cmd}")
+
 
 @given('the issue status was changed to "{status}" at "{timestamp}"')
 def step_issue_status_changed_at(context, status, timestamp):
@@ -112,6 +117,11 @@ def step_run_roundup_command(context, command):
     cmd = full_cmd
 
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    # Debug: print the result
+    print(f"DEBUG RESULT: exit_code={result.returncode}")
+    print(f"DEBUG RESULT: stdout={result.stdout}")
+    print(f"DEBUG RESULT: stderr={result.stderr}")
 
     context.cli_result = result
     context.cli_exit_code = result.returncode
