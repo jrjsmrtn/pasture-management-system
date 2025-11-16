@@ -21,3 +21,13 @@ STATUS_MAP = {
     "resolved": "3",
     "closed": "4",
 }
+
+# Change status mapping (label -> Roundup ID)
+# ITIL-inspired change workflow
+CHANGESTATUS_MAP = {
+    "planning": "1",
+    "approved": "2",
+    "implementing": "3",
+    "completed": "4",
+    "cancelled": "5",
+}

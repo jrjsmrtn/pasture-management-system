@@ -12,6 +12,8 @@ from behave import given, then, when
 from playwright.sync_api import expect
 from requests.auth import HTTPBasicAuth
 
+from features.steps.common import CHANGESTATUS_MAP
+
 
 # Map priority/category names to IDs (must match schema)
 CHANGEPRIORITY_MAP = {
@@ -26,14 +28,6 @@ CHANGECATEGORY_MAP = {
     "hardware": "2",
     "configuration": "3",
     "network": "4",
-}
-
-CHANGESTATUS_MAP = {
-    "planning": "1",
-    "approved": "2",
-    "implementing": "3",
-    "completed": "4",
-    "cancelled": "5",
 }
 
 
