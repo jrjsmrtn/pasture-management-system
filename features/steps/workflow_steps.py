@@ -97,11 +97,19 @@ def step_run_roundup_command(context, command):
 
     # Map status names to IDs in the command
     # e.g., "set issue1 status=in-progress" -> "set issue1 status=2"
+    original_command = command
     for status_name, status_id in STATUS_MAP.items():
         command = command.replace(f"status={status_name}", f"status={status_id}")
 
+    # Debug: print the full command that will be executed
+    full_cmd = ["roundup-admin", "-i", tracker_dir] + command.split()
+    print(f"\nDEBUG: Original command: {original_command}")
+    print(f"DEBUG: Mapped command: {command}")
+    print(f"DEBUG: Full command list: {full_cmd}")
+    print(f"DEBUG: STATUS_MAP: {STATUS_MAP}")
+
     # Build full command
-    cmd = ["roundup-admin", "-i", tracker_dir] + command.split()
+    cmd = full_cmd
 
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
