@@ -403,9 +403,7 @@ def step_run_cli_command(context, command):
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
     else:
         # Generic command execution
-        result = subprocess.run(
-            command.split(), capture_output=True, text=True, timeout=30
-        )
+        result = subprocess.run(command.split(), capture_output=True, text=True, timeout=30)
 
     # Store result for later assertions
     context.cli_result = result
