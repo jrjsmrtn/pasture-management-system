@@ -23,10 +23,10 @@ PMS adapts ITIL concepts to be lightweight and practical for small-scale environ
 By the end of this tutorial, you will:
 
 1. Understand the issue lifecycle workflow
-2. Know how to transition issues through different states
-3. Recognize valid and invalid status transitions
-4. Use workflows to track work progress
-5. Apply ITIL concepts to homelab management
+1. Know how to transition issues through different states
+1. Recognize valid and invalid status transitions
+1. Use workflows to track work progress
+1. Apply ITIL concepts to homelab management
 
 ## The Issue Lifecycle
 
@@ -36,12 +36,12 @@ In PMS, every issue follows a defined lifecycle from creation to closure. This l
 
 PMS uses four core statuses inspired by ITIL Incident Management:
 
-| Status | Description | What it means |
-|--------|-------------|---------------|
-| **New** | Just reported | Issue has been created but not yet reviewed |
-| **In Progress** | Being worked on | Someone is actively investigating or fixing the issue |
-| **Resolved** | Fix implemented | The fix is complete and ready for verification |
-| **Closed** | Verified and done | The fix has been confirmed and the issue is complete |
+| Status          | Description       | What it means                                         |
+| --------------- | ----------------- | ----------------------------------------------------- |
+| **New**         | Just reported     | Issue has been created but not yet reviewed           |
+| **In Progress** | Being worked on   | Someone is actively investigating or fixing the issue |
+| **Resolved**    | Fix implemented   | The fix is complete and ready for verification        |
+| **Closed**      | Verified and done | The fix has been confirmed and the issue is complete  |
 
 ### Why Multiple Statuses?
 
@@ -75,12 +75,12 @@ In Progress
 
 ### Valid Transitions
 
-| From | To | When to use |
-|------|-----|-------------|
-| New | In Progress | You start investigating or fixing the issue |
-| In Progress | Resolved | You've implemented a fix |
-| Resolved | Closed | You've verified the fix works |
-| Resolved | In Progress | The fix didn't work; you need to rework it |
+| From        | To          | When to use                                 |
+| ----------- | ----------- | ------------------------------------------- |
+| New         | In Progress | You start investigating or fixing the issue |
+| In Progress | Resolved    | You've implemented a fix                    |
+| Resolved    | Closed      | You've verified the fix works               |
+| Resolved    | In Progress | The fix didn't work; you need to rework it  |
 
 ### Invalid Transitions
 
@@ -107,27 +107,31 @@ roundup-admin -i tracker create issue \
 ```
 
 Or via Web UI:
+
 1. Navigate to http://localhost:8080/pms
-2. Click "Create New Issue"
-3. Fill in title: "Backup job failed on NAS"
-4. Select priority: "Urgent"
-5. Click "Submit" (status defaults to "New")
+1. Click "Create New Issue"
+1. Fill in title: "Backup job failed on NAS"
+1. Select priority: "Urgent"
+1. Click "Submit" (status defaults to "New")
 
 ### Step 2: Start Working on It
 
 When you begin investigating:
 
 **Web UI**:
+
 1. Open the issue
-2. Click "Start Work"
-3. Status changes to "In Progress"
+1. Click "Start Work"
+1. Status changes to "In Progress"
 
 **CLI**:
+
 ```bash
 roundup-admin -i tracker set issue1 status=2
 ```
 
 **API**:
+
 ```bash
 curl -X PATCH http://localhost:8080/pms/api/issues/1 \
   -H "Content-Type: application/json" \
@@ -140,11 +144,13 @@ curl -X PATCH http://localhost:8080/pms/api/issues/1 \
 After fixing the backup job configuration:
 
 **Web UI**:
+
 1. Open the issue
-2. Add a message: "Fixed cron schedule and verified backup runs"
-3. Click "Mark Resolved"
+1. Add a message: "Fixed cron schedule and verified backup runs"
+1. Click "Mark Resolved"
 
 **CLI**:
+
 ```bash
 roundup-admin -i tracker set issue1 status=3
 ```
@@ -154,11 +160,13 @@ roundup-admin -i tracker set issue1 status=3
 After confirming the backup runs successfully:
 
 **Web UI**:
+
 1. Open the issue
-2. Add a message: "Verified backup completed successfully on 2025-11-16"
-3. Click "Close Issue"
+1. Add a message: "Verified backup completed successfully on 2025-11-16"
+1. Click "Close Issue"
 
 **CLI**:
+
 ```bash
 roundup-admin -i tracker set issue1 status=4
 ```
@@ -177,11 +185,13 @@ PMS automatically tracks every status change with:
 **Web UI**: Scroll to "History" section on issue details page
 
 **CLI**:
+
 ```bash
 roundup-admin -i tracker history issue1
 ```
 
 This audit trail helps you:
+
 - See how long issues spent in each state
 - Identify bottlenecks (e.g., many issues stuck "In Progress")
 - Review who worked on what
@@ -249,12 +259,14 @@ PMS separates these for clarity. See the [Change Management Tutorial](change-man
 Even for quick fixes, transition through "In Progress" to maintain accurate history.
 
 **Bad**:
+
 ```bash
 # Don't do this
 roundup-admin -i tracker set issue1 status=3  # New → Resolved (blocked!)
 ```
 
 **Good**:
+
 ```bash
 roundup-admin -i tracker set issue1 status=2  # New → In Progress
 roundup-admin -i tracker set issue1 status=3  # In Progress → Resolved
@@ -314,24 +326,24 @@ roundup-admin -i tracker set issue1 assignedto=1 status=2
 ### Exercise 1: Complete Issue Lifecycle
 
 1. Create an issue: "Test web server SSL certificate expiration"
-2. Transition it to "In Progress"
-3. Mark it "Resolved" with a comment
-4. Close it with verification note
+1. Transition it to "In Progress"
+1. Mark it "Resolved" with a comment
+1. Close it with verification note
 
 ### Exercise 2: Handle a Failed Fix
 
 1. Create an issue: "NFS mount not working"
-2. Mark "In Progress"
-3. Mark "Resolved" with fix attempt
-4. Transition back to "In Progress" (fix didn't work)
-5. Mark "Resolved" with corrected fix
-6. Close it
+1. Mark "In Progress"
+1. Mark "Resolved" with fix attempt
+1. Transition back to "In Progress" (fix didn't work)
+1. Mark "Resolved" with corrected fix
+1. Close it
 
 ### Exercise 3: View Status History
 
 1. Use any issue from exercises above
-2. View its history via Web UI or CLI
-3. Observe all status transitions with timestamps
+1. View its history via Web UI or CLI
+1. Observe all status transitions with timestamps
 
 ## Next Steps
 
@@ -359,6 +371,6 @@ Now that you understand issue workflows, explore:
 - [Roundup Documentation](https://roundup-tracker.org/)
 - PMS [Architecture Documentation](../architecture/workspace.dsl)
 
----
+______________________________________________________________________
 
 **Feedback**: Found an issue with this tutorial? [Open an issue](https://github.com/jrjsmrtn/pasture-management-system/issues) or submit a pull request.

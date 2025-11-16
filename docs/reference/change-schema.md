@@ -35,55 +35,55 @@ change = IssueClass(db, "change",
 
 From `IssueClass`:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| title | String | Short summary of the change |
-| messages | Multilink("msg") | Discussion and updates |
-| files | Multilink("file") | Attachments (diagrams, configs, etc.) |
-| nosy | Multilink("user") | Users to notify about updates |
-| superseder | Multilink("change") | Related parent changes |
+| Field      | Type                | Description                           |
+| ---------- | ------------------- | ------------------------------------- |
+| title      | String              | Short summary of the change           |
+| messages   | Multilink("msg")    | Discussion and updates                |
+| files      | Multilink("file")   | Attachments (diagrams, configs, etc.) |
+| nosy       | Multilink("user")   | Users to notify about updates         |
+| superseder | Multilink("change") | Related parent changes                |
 
 From `Class` (automatic):
 
-| Field | Type | Description |
-|-------|------|-------------|
-| creation | Date | When change was created |
-| activity | Date | Last modification timestamp |
-| creator | Link("user") | User who created the change |
-| actor | Link("user") | User who last modified the change |
+| Field    | Type         | Description                       |
+| -------- | ------------ | --------------------------------- |
+| creation | Date         | When change was created           |
+| activity | Date         | Last modification timestamp       |
+| creator  | Link("user") | User who created the change       |
+| actor    | Link("user") | User who last modified the change |
 
 ## Field Specifications
 
 ### Required Fields
 
-| Field | Type | Required | Validation |
-|-------|------|----------|------------|
-| title | String | ✅ Yes | Non-empty, max 255 chars |
-| justification | String | ✅ Yes | Non-empty |
-| priority | Link | ✅ Yes | Must be valid changepriority ID |
-| category | Link | ✅ Yes | Must be valid changecategory ID |
+| Field         | Type   | Required | Validation                      |
+| ------------- | ------ | -------- | ------------------------------- |
+| title         | String | ✅ Yes   | Non-empty, max 255 chars        |
+| justification | String | ✅ Yes   | Non-empty                       |
+| priority      | Link   | ✅ Yes   | Must be valid changepriority ID |
+| category      | Link   | ✅ Yes   | Must be valid changecategory ID |
 
 ### Optional Fields
 
-| Field | Type | Required | Default | Validation |
-|-------|------|----------|---------|------------|
-| description | String | ❌ No | Empty | Max 64KB |
-| impact | String | ❌ No | Empty | Max 16KB |
-| risk | String | ❌ No | Empty | Max 16KB |
-| assignedto | Link("user") | ❌ No | None | Must be valid user ID |
-| status | Link("changestatus") | ❌ No | 1 (Planning) | Must be valid status ID |
-| related_issues | Multilink("issue") | ❌ No | [] | Must be valid issue IDs |
+| Field          | Type                 | Required | Default      | Validation              |
+| -------------- | -------------------- | -------- | ------------ | ----------------------- |
+| description    | String               | ❌ No    | Empty        | Max 64KB                |
+| impact         | String               | ❌ No    | Empty        | Max 16KB                |
+| risk           | String               | ❌ No    | Empty        | Max 16KB                |
+| assignedto     | Link("user")         | ❌ No    | None         | Must be valid user ID   |
+| status         | Link("changestatus") | ❌ No    | 1 (Planning) | Must be valid status ID |
+| related_issues | Multilink("issue")   | ❌ No    | []           | Must be valid issue IDs |
 
 ## Change Priorities
 
 ### Priority Values
 
-| ID | Name | Order | Use When |
-|----|------|-------|----------|
-| 1 | Low | 1 | Cosmetic improvements, non-critical enhancements |
-| 2 | Medium | 2 | Planned upgrades, performance improvements |
-| 3 | High | 3 | Security patches, important feature additions |
-| 4 | Critical | 4 | Emergency fixes, critical security updates |
+| ID  | Name     | Order | Use When                                         |
+| --- | -------- | ----- | ------------------------------------------------ |
+| 1   | Low      | 1     | Cosmetic improvements, non-critical enhancements |
+| 2   | Medium   | 2     | Planned upgrades, performance improvements       |
+| 3   | High     | 3     | Security patches, important feature additions    |
+| 4   | Critical | 4     | Emergency fixes, critical security updates       |
 
 ### Schema Definition
 
@@ -103,21 +103,25 @@ db.changepriority.create(name="Critical", order=4)
 ### Priority Selection Guide
 
 **Critical** - Immediate action required:
+
 - Zero-day security vulnerability
 - Complete service outage imminent
 - Data loss prevention
 
 **High** - Plan within days:
+
 - Known security vulnerability
 - Performance degradation
 - Major feature addition
 
 **Medium** - Plan within weeks:
+
 - Routine upgrades
 - Minor improvements
 - Proactive maintenance
 
 **Low** - Plan when convenient:
+
 - Cosmetic changes
 - Documentation updates
 - Nice-to-have features
@@ -126,12 +130,12 @@ db.changepriority.create(name="Critical", order=4)
 
 ### Category Values
 
-| ID | Name | Order | Description |
-|----|------|-------|-------------|
-| 1 | Software | 1 | Application upgrades, package installations |
-| 2 | Hardware | 2 | Physical equipment changes |
-| 3 | Configuration | 3 | Settings, parameters, tunables |
-| 4 | Network | 4 | Network topology, firewall rules, routing |
+| ID  | Name          | Order | Description                                 |
+| --- | ------------- | ----- | ------------------------------------------- |
+| 1   | Software      | 1     | Application upgrades, package installations |
+| 2   | Hardware      | 2     | Physical equipment changes                  |
+| 3   | Configuration | 3     | Settings, parameters, tunables              |
+| 4   | Network       | 4     | Network topology, firewall rules, routing   |
 
 ### Schema Definition
 
@@ -151,21 +155,25 @@ db.changecategory.create(name="Network", order=4)
 ### Category Examples
 
 **Software**:
+
 - Upgrade PostgreSQL 15 → 16
 - Install monitoring agent
 - Patch container base images
 
 **Hardware**:
+
 - Add RAM to server
 - Replace failed disk
 - Install new network switch
 
 **Configuration**:
+
 - Adjust backup schedule
 - Tune database parameters
 - Modify systemd service settings
 
 **Network**:
+
 - Update firewall rules
 - Configure VLANs
 - Change DNS settings
@@ -174,13 +182,13 @@ db.changecategory.create(name="Network", order=4)
 
 ### Status Values
 
-| ID | Name | Order | Description |
-|----|------|-------|-------------|
-| 1 | Planning | 1 | Change is being designed and scoped |
-| 2 | Approved | 2 | Change has been reviewed and approved |
-| 3 | Implementing | 3 | Change is actively being deployed |
-| 4 | Completed | 4 | Change successfully deployed |
-| 5 | Cancelled | 5 | Change cancelled before implementation |
+| ID  | Name         | Order | Description                            |
+| --- | ------------ | ----- | -------------------------------------- |
+| 1   | Planning     | 1     | Change is being designed and scoped    |
+| 2   | Approved     | 2     | Change has been reviewed and approved  |
+| 3   | Implementing | 3     | Change is actively being deployed      |
+| 4   | Completed    | 4     | Change successfully deployed           |
+| 5   | Cancelled    | 5     | Change cancelled before implementation |
 
 ### Schema Definition
 
@@ -219,11 +227,13 @@ Cancelled
 Short, descriptive summary of the change.
 
 **Good Examples**:
+
 - "Upgrade PostgreSQL from 15.3 to 16.1"
 - "Add 16GB RAM to database server"
 - "Configure automated backup rotation"
 
 **Bad Examples**:
+
 - "Change" (too vague)
 - "Update software packages and configurations across all servers in the homelab environment" (too long)
 
@@ -236,12 +246,14 @@ Short, descriptive summary of the change.
 Detailed explanation of what will change and how.
 
 **Should Include**:
+
 - Current state
 - Desired state
 - Steps to implement
 - Rollback procedure
 
 **Example**:
+
 ```
 Current: PostgreSQL 15.3 running on db-server
 Target: PostgreSQL 16.1
@@ -269,6 +281,7 @@ Business or technical reason for the change.
 **Should Answer**: "Why is this change necessary?"
 
 **Examples**:
+
 - "PostgreSQL 16 provides 30% better query performance for our monitoring queries"
 - "Current SSL certificate expires in 14 days"
 - "Adding RAM will eliminate OOM errors during backup operations"
@@ -282,12 +295,14 @@ Business or technical reason for the change.
 Assessment of how the change affects services and users.
 
 **Should Include**:
+
 - Affected services
 - Downtime required
 - User impact
 - Dependencies
 
 **Example**:
+
 ```
 Services Affected:
 - Main database (downtime: ~30 minutes)
@@ -311,12 +326,14 @@ Dependencies:
 Potential risks and mitigation strategies.
 
 **Should Include**:
+
 - What could go wrong
 - Likelihood (Low/Medium/High)
 - Impact if it occurs
 - Mitigation plan
 
 **Example**:
+
 ```
 Risk 1: Data corruption during migration
 - Likelihood: Low
@@ -343,6 +360,7 @@ Risk 3: Application compatibility issues
 User responsible for implementing the change.
 
 **Usage**:
+
 ```bash
 # Assign to user ID 1 (admin)
 roundup-admin -i tracker set change1 assignedto=1
@@ -357,12 +375,14 @@ roundup-admin -i tracker set change1 assignedto=1
 Issues that this change addresses or relates to.
 
 **Usage**:
+
 ```bash
 # Link change to issues 1 and 3
 roundup-admin -i tracker set change1 related_issues=1,3
 ```
 
 **Use Cases**:
+
 - Change fixes a recurring issue
 - Change implements feature requested in issue
 - Change prevents issues from occurring
@@ -372,18 +392,18 @@ roundup-admin -i tracker set change1 related_issues=1,3
 ### Web UI
 
 1. Navigate to http://localhost:8080/pms
-2. Click "Changes" → "Create New Change"
-3. Fill required fields:
+1. Click "Changes" → "Create New Change"
+1. Fill required fields:
    - Title
    - Justification
    - Priority
    - Category
-4. Optionally fill:
+1. Optionally fill:
    - Description
    - Impact
    - Risk
    - Assigned to
-5. Click "Submit"
+1. Click "Submit"
 
 ### CLI
 
@@ -458,17 +478,21 @@ roundup-admin -i tracker filter change priority=3 category=1
 Implemented in `tracker/html/change.item.html`:
 
 **Title**:
+
 - Cannot be empty
 - Automatically trimmed of whitespace
 
 **Justification**:
+
 - Cannot be empty (HTML5 `required` attribute)
 
 **Priority**:
+
 - Must select from dropdown (HTML5 `required` attribute)
 - Must be valid changepriority ID
 
 **Category**:
+
 - Must select from dropdown (HTML5 `required` attribute)
 - Must be valid changecategory ID
 
@@ -551,15 +575,18 @@ CREATE TABLE _change_related_issues (
 From `tracker/schema.py`:
 
 **Regular Users** can:
+
 - View all changes (`View` permission)
 - Create changes (`Create` permission)
 - Edit changes they created (`Edit` permission)
 
 **Anonymous Users** can:
+
 - View changes (read-only)
 - Cannot create or edit
 
 **Administrators** can:
+
 - Full access to all operations
 
 ## Examples
@@ -613,11 +640,11 @@ roundup-admin -i tracker create change \
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 0.3.0 | 2025-11-16 | Initial implementation |
+| Version | Date       | Changes                |
+| ------- | ---------- | ---------------------- |
+| 0.3.0   | 2025-11-16 | Initial implementation |
 
----
+______________________________________________________________________
 
 **Maintained by**: Pasture Management System project
 **Last updated**: 2025-11-16

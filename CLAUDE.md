@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 The Pasture Management System (PMS) is a dual-objective project:
 
 1. **Functional Tool**: Implement a lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysadmins, built on Roundup Issue Tracker toolkit
-2. **BDD Demonstration**: Demonstrate to Python developers and BDD test writers the usefulness of BDD features, Gherkin, Behave, Playwright testing stack
+1. **BDD Demonstration**: Demonstrate to Python developers and BDD test writers the usefulness of BDD features, Gherkin, Behave, Playwright testing stack
 
 ## Architecture Documentation
 
@@ -25,25 +25,30 @@ See the [docs/adr/](docs/adr/) directory for complete decision history.
 ## Key Development Practices
 
 ### BDD-First Development
+
 - Write Gherkin feature files BEFORE implementation
 - Features serve as tutorials and living documentation
 - Test across three interfaces: Web UI (Playwright), CLI, API
 - Generate JUnit XML reports with screenshots
 
 ### Semantic Versioning
+
 - During development: 0.x.0 versions (minor level bumps per sprint)
 - Bump minor version after each sprint completion
 - Main branch is the dogfooding/development environment
 - Version 1.0.0 will mark production-ready release
 
 ### Testing Strategy
+
 - **BDD**: Behave for Gherkin scenarios (primary demonstration objective)
 - **TDD**: pytest for unit tests and implementation details
 - **Integration**: Test web UI, CLI, and API interfaces
 - Coverage target: >85%
 
 ### Documentation Framework
+
 Following [Diátaxis](https://diataxis.fr/):
+
 - **Tutorials**: BDD feature-based learning guides
 - **How-to**: Task-specific solutions
 - **Reference**: Technical documentation
@@ -52,19 +57,23 @@ Following [Diátaxis](https://diataxis.fr/):
 ## Technology Stack
 
 **Core Platform**:
+
 - Python 3.9+
 - Roundup Issue Tracker Toolkit
 
 **BDD/Testing**:
+
 - Behave (Gherkin scenarios)
 - Playwright (web UI automation)
 - pytest (unit tests)
 
 **Code Quality**:
+
 - ruff (formatting and linting)
 - mypy (type checking)
 
 **Additional**:
+
 - Marpit (markdown presentations)
 - C4 DSL (architecture as code)
 - Pre-commit hooks (quality automation)
@@ -72,6 +81,7 @@ Following [Diátaxis](https://diataxis.fr/):
 ## Development Commands
 
 ### Environment Setup
+
 ```bash
 # Virtual environment
 python3 -m venv venv
@@ -86,6 +96,7 @@ pre-commit install --hook-type pre-push
 ```
 
 ### Code Quality
+
 ```bash
 # Format and lint with ruff
 ruff format .
@@ -100,6 +111,7 @@ pre-commit run --all-files
 ```
 
 ### BDD Testing
+
 ```bash
 # Run all BDD scenarios
 behave
@@ -119,6 +131,7 @@ behave --junit --junit-directory reports/
 ```
 
 ### Architecture Validation
+
 ```bash
 # Validate C4 DSL model
 podman run --rm -v "$(pwd)/docs/architecture:/usr/local/structurizr" \
@@ -164,6 +177,7 @@ pasture-management-system/
 ## AI-Assisted Development Notes
 
 ### Context for AI Collaboration
+
 - ADRs provide decision history and rationale
 - Sprint documentation maintains development continuity
 - BDD features define expected behavior
@@ -171,14 +185,16 @@ pasture-management-system/
 - This is both a functional tool AND an educational demonstration
 
 ### Development Workflow
+
 1. Write BDD feature file (Gherkin scenario)
-2. Implement step definitions (initially failing)
-3. Use TDD to implement functionality
-4. Verify BDD scenario passes
-5. Update documentation as needed
-6. Bump version and update CHANGELOG when features complete
+1. Implement step definitions (initially failing)
+1. Use TDD to implement functionality
+1. Verify BDD scenario passes
+1. Update documentation as needed
+1. Bump version and update CHANGELOG when features complete
 
 ### Quality Gates
+
 - All code must pass pre-commit hooks (local validation)
 - GitHub Actions CI/CD must pass (mirrors pre-commit checks + extended validation)
 - BDD scenarios must pass before completion
@@ -187,12 +203,14 @@ pasture-management-system/
 - ADRs required for significant decisions
 
 ### CI/CD Strategy
-- **Pre-commit hooks**: Fast local validation (<30s)
+
+- **Pre-commit hooks**: Fast local validation (\<30s)
 - **GitHub Actions**: Extended validation on push/PR
 - **Consistency**: Same tools and versions in both environments
 - **Principle**: "What passes locally will pass in CI"
 
 ### Version Management
+
 - Use semantic versioning (currently 0.1.0)
 - Increment minor version for each completed sprint
 - Update CHANGELOG.md with each version bump
@@ -201,6 +219,7 @@ pasture-management-system/
 ## Sprint Organization
 
 Sprint planning and tracking is maintained in `docs/sprints/`:
+
 - Sprint planning documents define goals and user stories
 - Sprint retrospectives capture lessons learned
 - Tutorials based on BDD features and sprint deliverables
@@ -208,6 +227,7 @@ Sprint planning and tracking is maintained in `docs/sprints/`:
 ## Current Focus
 
 **Version 0.1.0** - Project foundation established with:
+
 - Directory structure
 - Foundational ADRs
 - Development tooling configuration

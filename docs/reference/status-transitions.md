@@ -11,12 +11,12 @@ This document provides the complete technical reference for issue status transit
 
 ### Issue Statuses
 
-| ID | Name | Order | Description |
-|----|------|-------|-------------|
-| 1 | new | 1 | Issue has been created but not yet started |
-| 2 | in-progress | 2 | Issue is actively being worked on |
-| 3 | resolved | 3 | Fix has been implemented and awaits verification |
-| 4 | closed | 4 | Issue has been verified and is complete |
+| ID  | Name        | Order | Description                                      |
+| --- | ----------- | ----- | ------------------------------------------------ |
+| 1   | new         | 1     | Issue has been created but not yet started       |
+| 2   | in-progress | 2     | Issue is actively being worked on                |
+| 3   | resolved    | 3     | Fix has been implemented and awaits verification |
+| 4   | closed      | 4     | Issue has been verified and is complete          |
 
 ### Database Schema
 
@@ -38,24 +38,25 @@ db.status.create(name="closed", order=4)
 
 ### Valid Transitions
 
-| From Status | To Status | Allowed | Typical Use Case |
-|-------------|-----------|---------|------------------|
-| new | in-progress | ✅ Yes | Begin working on the issue |
-| new | resolved | ❌ No | Cannot skip investigation phase |
-| new | closed | ❌ No | Cannot close without fixing |
-| in-progress | new | ❌ No | Cannot revert to new |
-| in-progress | resolved | ✅ Yes | Fix implemented, ready for verification |
-| in-progress | closed | ❌ No | Must verify fix first |
-| resolved | new | ❌ No | Cannot revert to new |
-| resolved | in-progress | ✅ Yes | Fix didn't work, need to rework |
-| resolved | closed | ✅ Yes | Fix verified, issue complete |
-| closed | new | ❌ No | Cannot reopen as new |
-| closed | in-progress | ❌ No | Cannot reopen directly |
-| closed | resolved | ❌ No | Cannot unresolve |
+| From Status | To Status   | Allowed | Typical Use Case                        |
+| ----------- | ----------- | ------- | --------------------------------------- |
+| new         | in-progress | ✅ Yes  | Begin working on the issue              |
+| new         | resolved    | ❌ No   | Cannot skip investigation phase         |
+| new         | closed      | ❌ No   | Cannot close without fixing             |
+| in-progress | new         | ❌ No   | Cannot revert to new                    |
+| in-progress | resolved    | ✅ Yes  | Fix implemented, ready for verification |
+| in-progress | closed      | ❌ No   | Must verify fix first                   |
+| resolved    | new         | ❌ No   | Cannot revert to new                    |
+| resolved    | in-progress | ✅ Yes  | Fix didn't work, need to rework         |
+| resolved    | closed      | ✅ Yes  | Fix verified, issue complete            |
+| closed      | new         | ❌ No   | Cannot reopen as new                    |
+| closed      | in-progress | ❌ No   | Cannot reopen directly                  |
+| closed      | resolved    | ❌ No   | Cannot unresolve                        |
 
 ### Transition Rules Summary
 
 **Allowed transitions**:
+
 - `new` → `in-progress`
 - `in-progress` → `resolved`
 - `resolved` → `closed`
@@ -72,6 +73,7 @@ Status transitions are enforced by the `status_workflow.py` detector:
 **Location**: `tracker/detectors/status_workflow.py`
 
 **Key Function**:
+
 ```python
 def check_status_transition(db, cl, nodeid, newvalues):
     """Validate status transitions follow ITIL workflow rules."""
@@ -99,6 +101,7 @@ def check_status_transition(db, cl, nodeid, newvalues):
 ```
 
 **Registration**:
+
 ```python
 def init(db):
     db.issue.audit('set', check_status_transition, priority=100)
@@ -109,12 +112,14 @@ def init(db):
 When an invalid transition is attempted:
 
 **Web UI**:
+
 ```
 Invalid status transition from 'new' to 'closed'.
 Valid transitions from 'new': in-progress
 ```
 
 **CLI**:
+
 ```bash
 $ roundup-admin -i tracker set issue1 status=4
 Error: Invalid status transition from status '1' (new) to '4' (closed)
@@ -122,6 +127,7 @@ Valid transitions: 2 (in-progress)
 ```
 
 **API**:
+
 ```json
 {
   "error": {
@@ -138,11 +144,13 @@ Valid transitions: 2 (in-progress)
 Every status change is automatically recorded in the issue's journal:
 
 **Journal Entry Format**:
+
 ```
 <date> <time> <username> set status: <old_status> -> <new_status>
 ```
 
 **Example**:
+
 ```
 2025-11-16 10:30:00 admin set status: new -> in-progress
 2025-11-16 11:45:00 admin set status: in-progress -> resolved
@@ -154,11 +162,13 @@ Every status change is automatically recorded in the issue's journal:
 **Web UI**: Issue details page → "History" section
 
 **CLI**:
+
 ```bash
 roundup-admin -i tracker history issue1
 ```
 
 **API**:
+
 ```bash
 curl http://localhost:8080/pms/api/issues/1/history \
   -u admin:admin
@@ -170,16 +180,17 @@ curl http://localhost:8080/pms/api/issues/1/history \
 
 The Web UI displays context-sensitive buttons based on current status:
 
-| Current Status | Available Buttons |
-|----------------|-------------------|
-| new | "Start Work" (→ in-progress) |
-| in-progress | "Mark Resolved" (→ resolved) |
-| resolved | "Close Issue" (→ closed)<br>"Reopen" (→ in-progress) |
-| closed | (no transitions available) |
+| Current Status | Available Buttons                                    |
+| -------------- | ---------------------------------------------------- |
+| new            | "Start Work" (→ in-progress)                         |
+| in-progress    | "Mark Resolved" (→ resolved)                         |
+| resolved       | "Close Issue" (→ closed)<br>"Reopen" (→ in-progress) |
+| closed         | (no transitions available)                           |
 
 **Template**: `tracker/html/issue.item.html`
 
 **Button Logic**:
+
 ```html
 <tal:block tal:condition="python:issue.status.id == '1'">
   <!-- Show "Start Work" button -->
@@ -233,6 +244,7 @@ curl -X PATCH http://localhost:8080/pms/api/issues/1 \
 ```
 
 **Response (Success)**:
+
 ```json
 {
   "data": {
@@ -246,6 +258,7 @@ curl -X PATCH http://localhost:8080/pms/api/issues/1 \
 ```
 
 **Response (Validation Error)**:
+
 ```json
 {
   "error": {
@@ -262,11 +275,13 @@ curl -X PATCH http://localhost:8080/pms/api/issues/1 \
 To add custom statuses:
 
 1. **Update initial_data.py**:
+
 ```python
 db.status.create(name="on-hold", order=5)
 ```
 
 2. **Update transition rules** in `tracker/detectors/status_workflow.py`:
+
 ```python
 VALID_TRANSITIONS = {
     '1': ['2'],           # new -> in-progress
@@ -278,6 +293,7 @@ VALID_TRANSITIONS = {
 ```
 
 3. **Reinitialize database**:
+
 ```bash
 rm -rf tracker/db
 roundup-admin -i tracker initialise
@@ -288,11 +304,12 @@ roundup-admin -i tracker initialise
 To allow new transitions:
 
 1. Edit `tracker/detectors/status_workflow.py`
-2. Update `VALID_TRANSITIONS` dictionary
-3. Restart tracker
-4. Update documentation
+1. Update `VALID_TRANSITIONS` dictionary
+1. Restart tracker
+1. Update documentation
 
 **Example**: Allow direct new → resolved:
+
 ```python
 VALID_TRANSITIONS = {
     '1': ['2', '3'],  # Allow new -> resolved
@@ -307,11 +324,13 @@ VALID_TRANSITIONS = {
 **Problem**: Issue accidentally set to wrong status
 
 **Solution**: Use CLI to force correct status (if transition is valid):
+
 ```bash
 roundup-admin -i tracker set issue1 status=2
 ```
 
 **If transition blocked**: Work backwards through valid transitions:
+
 ```bash
 # If resolved but should be in-progress:
 # (resolved → in-progress is valid)
@@ -325,6 +344,7 @@ roundup-admin -i tracker set issue1 status=2
 **Diagnosis**: Check current status and transition matrix above
 
 **Solution**: Follow valid transition path:
+
 ```bash
 # To go from new to closed:
 # Must go: new → in-progress → resolved → closed
@@ -338,6 +358,7 @@ roundup-admin -i tracker set issue1 status=4  # Step 3
 **Problem**: Invalid transitions allowed
 
 **Diagnosis**: Check detector is registered:
+
 ```bash
 roundup-admin -i tracker list detectors
 ```
@@ -351,6 +372,7 @@ roundup-admin -i tracker list detectors
 **Diagnosis**: Journal disabled or permissions issue
 
 **Solution**: Check journal configuration in `tracker/schema.py`:
+
 ```python
 issue = IssueClass(db, "issue",
     # ... fields ...
@@ -388,11 +410,11 @@ CREATE INDEX idx_issue_status_priority ON _issue(status, priority);
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 0.3.0 | 2025-11-16 | Initial implementation with 4 statuses |
+| Version | Date       | Changes                                |
+| ------- | ---------- | -------------------------------------- |
+| 0.3.0   | 2025-11-16 | Initial implementation with 4 statuses |
 
----
+______________________________________________________________________
 
 **Maintained by**: Pasture Management System project
 **Last updated**: 2025-11-16

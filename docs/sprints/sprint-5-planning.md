@@ -20,11 +20,13 @@ Implement reporting and dashboard capabilities to provide visibility into homela
 ### Epic: Reporting and Dashboards
 
 #### Story 1: Issue Statistics Dashboard
+
 **As a** homelab sysadmin
 **I want** to see issue statistics at a glance
 **So that** I can understand my homelab's health
 
 **Acceptance Criteria**:
+
 - Dashboard shows: total issues, open issues, resolved issues, average resolution time
 - Issue trend chart (last 30 days)
 - Issues by priority breakdown
@@ -33,6 +35,7 @@ Implement reporting and dashboard capabilities to provide visibility into homela
 - Auto-refresh capability
 
 **BDD Scenarios**: (Feature file: `features/reporting/issue_dashboard.feature`)
+
 ```gherkin
 @story-1 @web-ui @smoke
 Scenario: View issue statistics dashboard
@@ -82,14 +85,16 @@ Scenario: Fetch issue statistics via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 2: Change Management Reports
+
 **As a** homelab sysadmin
 **I want** to see change success rates and metrics
 **So that** I can improve my change management process
 
 **Acceptance Criteria**:
+
 - Total changes, approved, rejected, completed
 - Change success rate (completed without rollback)
 - Average change duration
@@ -98,6 +103,7 @@ Scenario: Fetch issue statistics via API
 - Risk level distribution
 
 **BDD Scenarios**: (Feature file: `features/reporting/change_reports.feature`)
+
 ```gherkin
 @story-2 @web-ui
 Scenario: View change management metrics
@@ -139,14 +145,16 @@ Scenario: Export change metrics via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 3: CMDB Health Report
+
 **As a** homelab sysadmin
 **I want** to see CMDB health and coverage
 **So that** I can ensure my infrastructure is properly documented
 
 **Acceptance Criteria**:
+
 - Total CIs by type
 - CI status distribution (Active, Maintenance, Retired)
 - CIs by criticality
@@ -155,6 +163,7 @@ Scenario: Export change metrics via API
 - CI relationship coverage
 
 **BDD Scenarios**: (Feature file: `features/reporting/cmdb_reports.feature`)
+
 ```gherkin
 @story-3 @web-ui
 Scenario: View CMDB health dashboard
@@ -204,14 +213,16 @@ Scenario: Get CMDB health metrics via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 4: Custom Report Builder
+
 **As a** homelab sysadmin
 **I want** to create custom reports
 **So that** I can analyze specific aspects of my homelab
 
 **Acceptance Criteria**:
+
 - Select entity type (Issue, Change, CI)
 - Choose fields to display
 - Apply filters (date range, status, priority, etc.)
@@ -220,6 +231,7 @@ Scenario: Get CMDB health metrics via API
 - Save report templates
 
 **BDD Scenarios**: (Feature file: `features/reporting/custom_reports.feature`)
+
 ```gherkin
 @story-4 @web-ui
 Scenario: Create custom issue report
@@ -276,14 +288,16 @@ Scenario: Generate custom report via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 5: Email/Scheduled Reports
+
 **As a** homelab sysadmin
 **I want** to receive scheduled reports via email
 **So that** I can stay informed without logging in
 
 **Acceptance Criteria**:
+
 - Schedule reports (daily, weekly, monthly)
 - Email delivery configuration
 - PDF attachment format
@@ -292,6 +306,7 @@ Scenario: Generate custom report via API
 - Report delivery history
 
 **BDD Scenarios**: (Feature file: `features/reporting/scheduled_reports.feature`)
+
 ```gherkin
 @story-5 @web-ui
 Scenario: Schedule weekly report
@@ -344,35 +359,40 @@ Scenario: Create scheduled report via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### Dashboard Infrastructure
+
 - [ ] Create dashboard framework
 - [ ] Implement charting library integration
 - [ ] Add real-time data refresh
 - [ ] Create responsive dashboard layouts
 
 ### Issue Reporting
+
 - [ ] Calculate issue statistics
 - [ ] Generate issue trend data
 - [ ] Create issue visualizations
 - [ ] Implement resolution time calculations
 
 ### Change Reporting
+
 - [ ] Calculate change metrics
 - [ ] Generate success rate analytics
 - [ ] Create change category breakdown
 - [ ] Implement risk analysis reports
 
 ### CMDB Reporting
+
 - [ ] Calculate CMDB health metrics
 - [ ] Identify orphaned CIs
 - [ ] Detect incomplete records
 - [ ] Generate CI coverage reports
 
 ### Custom Reports
+
 - [ ] Implement report builder UI
 - [ ] Add field selection logic
 - [ ] Implement dynamic filtering
@@ -380,6 +400,7 @@ Scenario: Create scheduled report via API
 - [ ] Create report template storage
 
 ### Scheduled Reports
+
 - [ ] Implement report scheduling
 - [ ] Add email delivery (SMTP configuration)
 - [ ] Generate PDF reports
@@ -387,6 +408,7 @@ Scenario: Create scheduled report via API
 - [ ] Add manual trigger capability
 
 ### Documentation
+
 - [ ] How-to: "Generating Reports"
 - [ ] How-to: "Creating Custom Reports"
 - [ ] How-to: "Scheduling Automated Reports"
@@ -409,34 +431,36 @@ Scenario: Create scheduled report via API
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Issue Statistics Dashboard | 8 | Not Started |
-| Story 2: Change Management Reports | 5 | Not Started |
-| Story 3: CMDB Health Report | 5 | Not Started |
-| Story 4: Custom Report Builder | 8 | Not Started |
-| Story 5: Email/Scheduled Reports | 8 | Not Started |
-| Documentation Tasks | 5 | Not Started |
+| Task                                | Story Points | Status      |
+| ----------------------------------- | ------------ | ----------- |
+| Story 1: Issue Statistics Dashboard | 8            | Not Started |
+| Story 2: Change Management Reports  | 5            | Not Started |
+| Story 3: CMDB Health Report         | 5            | Not Started |
+| Story 4: Custom Report Builder      | 8            | Not Started |
+| Story 5: Email/Scheduled Reports    | 8            | Not Started |
+| Documentation Tasks                 | 5            | Not Started |
 
 **Total Story Points**: 39
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Email Configuration Complexity**: SMTP setup can be environment-specific
   - *Mitigation*: Support multiple email backends, provide clear documentation
 - **Report Performance**: Large datasets may impact report generation time
   - *Mitigation*: Implement caching, optimize queries, add pagination
 
 ### Dependencies
+
 - Sprint 4 completion (CMDB functional)
 - Charting library selection (e.g., Chart.js, D3.js)
 - Email server configuration for homelab
 
 ## Success Metrics
 
-- [ ] Dashboard loads in <2 seconds
-- [ ] Custom reports generate in <5 seconds
+- [ ] Dashboard loads in \<2 seconds
+- [ ] Custom reports generate in \<5 seconds
 - [ ] Scheduled reports deliver reliably
 - [ ] Minimum 30 BDD scenarios passing
 - [ ] All visualizations render correctly at 1024x768

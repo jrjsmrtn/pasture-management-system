@@ -37,6 +37,22 @@ repos:
       - id: ruff  # Fast linting checks (pre-commit)
         args: [--fix]
 
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [-d, 'relaxed']
+
+  # Markdown linting (Python-based)
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.21
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-tables
+
   # Stage 2: Comprehensive checks on pre-push (1-3min acceptable)
   # Python security checks (pre-push) - disabled for test code
   # BDD test files legitimately use assert and subprocess

@@ -130,12 +130,12 @@ The `uv.lock` file ensures reproducible installs across all environments:
 
 ## Comparison with Other Tools
 
-| Feature | uv | pip | poetry |
-|---------|-----|-----|--------|
-| Speed | ⚡️ 10-100x faster | Baseline | ~2x faster |
-| Lock files | ✅ Yes | ❌ No | ✅ Yes |
-| Resolver | ✅ Modern | ⚠️ Basic | ✅ Good |
-| Installation | Simple | Built-in | Complex |
+| Feature      | uv                | pip      | poetry     |
+| ------------ | ----------------- | -------- | ---------- |
+| Speed        | ⚡️ 10-100x faster | Baseline | ~2x faster |
+| Lock files   | ✅ Yes            | ❌ No    | ✅ Yes     |
+| Resolver     | ✅ Modern         | ⚠️ Basic | ✅ Good    |
+| Installation | Simple            | Built-in | Complex    |
 
 ## Troubleshooting
 

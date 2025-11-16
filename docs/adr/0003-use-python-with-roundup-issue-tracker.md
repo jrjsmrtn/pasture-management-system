@@ -29,16 +29,19 @@ We will use **Python 3.x with Roundup Issue Tracker Toolkit** as the foundation 
 ### Technology Stack
 
 **Core Platform**:
+
 - **Roundup Issue Tracker Toolkit**: Open-source issue tracking toolkit with extensive customization capabilities
 - **Python 3.x**: Primary development language (3.9+ for modern features)
 
 **BDD/Testing Stack**:
+
 - **Behave**: Python BDD framework for Gherkin scenario execution
 - **Playwright**: Modern browser automation for web UI testing
 - **pytest**: Unit and integration testing framework
 - **JUnit XML Reports**: Standardized test reporting with screenshots
 
 **Additional Tools**:
+
 - **Marpit**: Markdown presentations for BDD tutorials
 - **C4 DSL (Structurizr)**: Architecture documentation
 - **Pre-commit hooks**: Quality automation
@@ -46,16 +49,17 @@ We will use **Python 3.x with Roundup Issue Tracker Toolkit** as the foundation 
 ### Roundup Toolkit Advantages
 
 1. **Toolkit Architecture**: Designed for customization, not just configuration
-2. **Multiple Interfaces**: Web UI, CLI, and API - perfect for comprehensive BDD demonstration
-3. **ITIL Alignment**: Flexible schema allows modeling issue, change, and CMDB workflows
-4. **Python Native**: Seamless integration with Python BDD ecosystem
-5. **Lightweight**: Suitable for homelab scale deployments
-6. **Mature**: Stable, long-term project with proven track record
-7. **Self-hosted**: Full control and privacy for homelab sysadmins
+1. **Multiple Interfaces**: Web UI, CLI, and API - perfect for comprehensive BDD demonstration
+1. **ITIL Alignment**: Flexible schema allows modeling issue, change, and CMDB workflows
+1. **Python Native**: Seamless integration with Python BDD ecosystem
+1. **Lightweight**: Suitable for homelab scale deployments
+1. **Mature**: Stable, long-term project with proven track record
+1. **Self-hosted**: Full control and privacy for homelab sysadmins
 
 ### Testing Interface Coverage
 
 The project will demonstrate BDD testing across three interfaces:
+
 - **Web UI**: Playwright-based browser automation (English only, 1024x768 resolution)
 - **CLI**: Command-line interface testing
 - **API**: REST/XML-RPC API testing
@@ -136,10 +140,10 @@ pasture-management-system/
 This decision will be validated through:
 
 1. **Successful ITIL Implementation**: Issue, change, CMDB workflows functional
-2. **BDD Coverage**: Comprehensive Gherkin scenarios across all three interfaces
-3. **Performance**: Acceptable response times for homelab deployment
-4. **Maintainability**: Customizations are maintainable and well-documented
-5. **Educational Value**: Platform complexity is appropriate for BDD demonstration
+1. **BDD Coverage**: Comprehensive Gherkin scenarios across all three interfaces
+1. **Performance**: Acceptable response times for homelab deployment
+1. **Maintainability**: Customizations are maintainable and well-documented
+1. **Educational Value**: Platform complexity is appropriate for BDD demonstration
 
 ## Related Decisions
 

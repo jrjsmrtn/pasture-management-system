@@ -20,19 +20,22 @@ Finalize PMS for 1.0.0 production release. Focus on performance optimization, UI
 ### Epic: Production Readiness
 
 #### Story 1: Performance Optimization
+
 **As a** homelab sysadmin
 **I want** PMS to run efficiently on modest hardware
 **So that** it doesn't strain my homelab resources
 
 **Acceptance Criteria**:
-- Web UI page loads in <1 second
-- Dashboard renders in <2 seconds
-- API responses in <500ms (95th percentile)
+
+- Web UI page loads in \<1 second
+- Dashboard renders in \<2 seconds
+- API responses in \<500ms (95th percentile)
 - Database queries optimized
-- Memory footprint <512MB
+- Memory footprint \<512MB
 - Performance benchmarks documented
 
 **BDD Scenarios**: (Feature file: `features/performance/response_times.feature`)
+
 ```gherkin
 @story-1 @performance
 Scenario: Web UI page load performance
@@ -62,14 +65,16 @@ Scenario: API response time under load
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 2: UI/UX Polish
+
 **As a** homelab sysadmin
 **I want** a clean and intuitive interface
 **So that** I can navigate and use PMS efficiently
 
 **Acceptance Criteria**:
+
 - Consistent styling across all pages
 - Responsive design (1024x768 minimum)
 - Intuitive navigation
@@ -79,6 +84,7 @@ Scenario: API response time under load
 - Loading indicators for async operations
 
 **BDD Scenarios**: (Feature file: `features/ui_ux/interface_polish.feature`)
+
 ```gherkin
 @story-2 @web-ui
 Scenario: Consistent navigation across pages
@@ -121,14 +127,16 @@ Scenario: Loading indicators for async operations
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 3: Security Hardening
+
 **As a** homelab sysadmin
 **I want** PMS to be secure
 **So that** my infrastructure data is protected
 
 **Acceptance Criteria**:
+
 - Authentication required for all operations
 - Password complexity requirements
 - Session timeout (configurable)
@@ -141,6 +149,7 @@ Scenario: Loading indicators for async operations
 - SECURITY.md created
 
 **BDD Scenarios**: (Feature file: `features/security/security_hardening.feature`)
+
 ```gherkin
 @story-3 @security @smoke
 Scenario: Unauthenticated access denied
@@ -185,14 +194,16 @@ Scenario: XSS protection in issue titles
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 4: Complete Diátaxis Documentation
+
 **As a** PMS user or contributor
 **I want** comprehensive documentation
 **So that** I can use and understand the system effectively
 
 **Acceptance Criteria**:
+
 - All four Diátaxis sections complete:
   - **Tutorials**: Getting started, Building CMDB, Managing changes
   - **How-to**: Common tasks, troubleshooting, customization
@@ -204,6 +215,7 @@ Scenario: XSS protection in issue titles
 - Documentation versioned and published
 
 **Tasks**:
+
 - [ ] Complete all tutorial documents
 - [ ] Complete all how-to guides
 - [ ] Generate API reference documentation
@@ -214,14 +226,16 @@ Scenario: XSS protection in issue titles
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 5: BDD Demonstration Materials
+
 **As a** Python developer learning BDD
 **I want** comprehensive BDD examples and presentations
 **So that** I can understand and apply BDD in my projects
 
 **Acceptance Criteria**:
+
 - Marpit presentations created:
   - "Introduction to BDD"
   - "Writing Effective Gherkin Scenarios"
@@ -236,6 +250,7 @@ Scenario: XSS protection in issue titles
 - Example of failed scenario with screenshot
 
 **Tasks**:
+
 - [ ] Create all Marpit presentations
 - [ ] Write BDD-focused tutorials
 - [ ] Document step definition patterns
@@ -246,14 +261,16 @@ Scenario: XSS protection in issue titles
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 6: Deployment and Installation
+
 **As a** homelab sysadmin
 **I want** easy deployment options
 **So that** I can quickly install PMS
 
 **Acceptance Criteria**:
+
 - Installation script (bash) for Linux
 - Podman/Docker container image
 - Docker Compose configuration
@@ -265,6 +282,7 @@ Scenario: XSS protection in issue titles
 - Upgrade path documented
 
 **BDD Scenarios**: (Feature file: `features/deployment/installation.feature`)
+
 ```gherkin
 @story-6 @deployment
 Scenario: Fresh installation via script
@@ -297,11 +315,12 @@ Scenario: Backup and restore
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### Performance
+
 - [ ] Profile application for bottlenecks
 - [ ] Optimize database queries (indexes, query optimization)
 - [ ] Implement caching where appropriate
@@ -310,6 +329,7 @@ Scenario: Backup and restore
 - [ ] Performance test suite
 
 ### UI/UX
+
 - [ ] Consistent CSS styling
 - [ ] Responsive design testing
 - [ ] Accessibility audit and improvements
@@ -318,6 +338,7 @@ Scenario: Backup and restore
 - [ ] Error message improvements
 
 ### Security
+
 - [ ] Complete security audit
 - [ ] Implement all security headers
 - [ ] Add rate limiting
@@ -327,6 +348,7 @@ Scenario: Backup and restore
 - [ ] Create SECURITY.md
 
 ### Documentation
+
 - [ ] Complete Diátaxis documentation
 - [ ] API reference generation
 - [ ] Architecture diagrams (C4 DSL)
@@ -335,6 +357,7 @@ Scenario: Backup and restore
 - [ ] FAQ creation
 
 ### BDD Materials
+
 - [ ] Create 4 Marpit presentations
 - [ ] BDD tutorial content
 - [ ] Step definition library documentation
@@ -342,6 +365,7 @@ Scenario: Backup and restore
 - [ ] Example outputs and reports
 
 ### Deployment
+
 - [ ] Create installation scripts
 - [ ] Build container images
 - [ ] Write Docker Compose file
@@ -350,6 +374,7 @@ Scenario: Backup and restore
 - [ ] Upgrade documentation
 
 ### Final Testing
+
 - [ ] End-to-end testing
 - [ ] Cross-browser testing (Chromium, Firefox, WebKit)
 - [ ] Security penetration testing
@@ -375,21 +400,22 @@ Scenario: Backup and restore
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Performance Optimization | 5 | Not Started |
-| Story 2: UI/UX Polish | 5 | Not Started |
-| Story 3: Security Hardening | 8 | Not Started |
-| Story 4: Complete Documentation | 8 | Not Started |
-| Story 5: BDD Demonstration Materials | 8 | Not Started |
-| Story 6: Deployment and Installation | 8 | Not Started |
-| Final Testing and QA | 5 | Not Started |
+| Task                                 | Story Points | Status      |
+| ------------------------------------ | ------------ | ----------- |
+| Story 1: Performance Optimization    | 5            | Not Started |
+| Story 2: UI/UX Polish                | 5            | Not Started |
+| Story 3: Security Hardening          | 8            | Not Started |
+| Story 4: Complete Documentation      | 8            | Not Started |
+| Story 5: BDD Demonstration Materials | 8            | Not Started |
+| Story 6: Deployment and Installation | 8            | Not Started |
+| Final Testing and QA                 | 5            | Not Started |
 
 **Total Story Points**: 47
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Time Pressure**: Many polishing tasks may take longer than estimated
   - *Mitigation*: Prioritize critical items, defer non-essential polish to 1.1.0
 - **Security Issues**: Security audit may uncover major issues
@@ -398,6 +424,7 @@ Scenario: Backup and restore
   - *Mitigation*: Focus on essential documentation, iterate post-1.0.0
 
 ### Dependencies
+
 - All previous sprints complete
 - Security audit tools available
 - Performance testing environment
@@ -405,7 +432,7 @@ Scenario: Backup and restore
 
 ## Success Metrics
 
-- [ ] All performance targets met (<1s page loads, <2s dashboard)
+- [ ] All performance targets met (\<1s page loads, \<2s dashboard)
 - [ ] Zero critical security vulnerabilities
 - [ ] >85% test coverage maintained
 - [ ] 40+ BDD scenarios passing

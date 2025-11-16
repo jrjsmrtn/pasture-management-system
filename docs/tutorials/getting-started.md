@@ -57,6 +57,7 @@ roundup-admin install -t classic tracker
 ```
 
 When prompted, configure:
+
 - **Tracker home**: `tracker` (default)
 - **Template**: `classic` (default)
 
@@ -67,6 +68,7 @@ roundup-admin -i tracker initialise
 ```
 
 When prompted, set:
+
 - **Admin username**: `admin` (or your preferred username)
 - **Admin password**: Choose a secure password
 
@@ -83,13 +85,13 @@ The tracker is now running at: http://localhost:8080/pms/
 ### Via Web UI
 
 1. Open your browser and navigate to http://localhost:8080/pms/
-2. Log in with your admin credentials
-3. Click on "New Issue" or navigate to http://localhost:8080/pms/issue?@template=item
-4. Fill in the issue details:
+1. Log in with your admin credentials
+1. Click on "New Issue" or navigate to http://localhost:8080/pms/issue?@template=item
+1. Fill in the issue details:
    - **Title**: "Test Issue - Server backup failed"
    - **Priority**: Select "urgent" from the dropdown
-5. Click "Submit new entry"
-6. You'll see a success message with the issue ID
+1. Click "Submit new entry"
+1. You'll see a success message with the issue ID
 
 ### Via Command Line
 
@@ -123,6 +125,7 @@ Navigate to http://localhost:8080/pms/issue to see all issues in a table format.
 ### View Issue Details
 
 Click on any issue title to see full details including:
+
 - Title
 - Status
 - Priority
@@ -133,13 +136,13 @@ Click on any issue title to see full details including:
 
 PMS uses the following priority levels:
 
-| Priority | ID | Use Case |
-|----------|-------|----------|
-| Critical | 1 | System down, data loss, security breach |
-| Urgent   | 2 | Major functionality broken, immediate attention needed |
-| Bug      | 3 | Non-critical bugs, workaround available |
-| Feature  | 4 | New feature requests |
-| Wish     | 5 | Nice-to-have improvements |
+| Priority | ID  | Use Case                                               |
+| -------- | --- | ------------------------------------------------------ |
+| Critical | 1   | System down, data loss, security breach                |
+| Urgent   | 2   | Major functionality broken, immediate attention needed |
+| Bug      | 3   | Non-critical bugs, workaround available                |
+| Feature  | 4   | New feature requests                                   |
+| Wish     | 5   | Nice-to-have improvements                              |
 
 ## Running Tests
 
@@ -150,6 +153,7 @@ behave features/issue_tracking/
 ```
 
 This runs:
+
 - Web UI tests (Playwright)
 - CLI tests (roundup-admin)
 - REST API tests (requests library)
@@ -196,6 +200,7 @@ Test screenshots are saved to `screenshots/` on failure. Open them to debug UI i
 **Problem**: `Address already in use` error
 
 **Solution**: Another process is using port 8080. Either:
+
 - Stop the other process
 - Use a different port: `roundup-server -p 8081 pms=tracker`
 
@@ -214,15 +219,17 @@ roundup-admin -i tracker set user1 password=newpassword
 **Problem**: Playwright times out waiting for elements
 
 **Solution**:
+
 1. Ensure the tracker is running: `roundup-server -p 8080 pms=tracker`
-2. Check the tracker is accessible: `curl http://localhost:8080/pms/`
-3. Increase timeout in `features/environment.py` if needed
+1. Check the tracker is accessible: `curl http://localhost:8080/pms/`
+1. Increase timeout in `features/environment.py` if needed
 
 ### REST API Returns 400
 
 **Problem**: "Required Header Missing"
 
 **Solution**: Ensure you include all required headers:
+
 - `X-Requested-With: XMLHttpRequest`
 - `Origin: http://localhost:8080`
 - `Referer: http://localhost:8080/pms/`
@@ -232,10 +239,10 @@ roundup-admin -i tracker set user1 password=newpassword
 Now that you have PMS running, you can:
 
 1. **Customize the tracker**: Edit `tracker/schema.py` to add custom fields
-2. **Configure email**: Set up email notifications in `tracker/config.ini`
-3. **Add users**: Create additional users with `roundup-admin`
-4. **Integrate with monitoring**: Use the REST API to create issues from monitoring tools
-5. **Deploy to production**: Set up a reverse proxy and systemd service
+1. **Configure email**: Set up email notifications in `tracker/config.ini`
+1. **Add users**: Create additional users with `roundup-admin`
+1. **Integrate with monitoring**: Use the REST API to create issues from monitoring tools
+1. **Deploy to production**: Set up a reverse proxy and systemd service
 
 ## Getting Help
 

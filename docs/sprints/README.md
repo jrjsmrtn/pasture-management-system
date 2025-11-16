@@ -12,10 +12,12 @@ This directory contains sprint planning and tracking documents for the Pasture M
 The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a production-ready v1.0.0 release:
 
 ### Sprint 1: Foundation & Basic Issue Tracking (v0.2.0)
+
 **Duration**: 2 weeks
 **Goal**: Set up Roundup tracker with basic issue tracking and first BDD scenarios
 
 **Key Deliverables**:
+
 - Roundup tracker installation and configuration
 - Basic issue CRUD operations (Web UI, CLI, API)
 - BDD infrastructure (Behave, Playwright at 1024x768)
@@ -25,13 +27,15 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 1 Planning](sprint-1-planning.md)
 
----
+______________________________________________________________________
 
 ### Sprint 2: Issue Lifecycle & Change Management Foundation (v0.3.0)
+
 **Duration**: 2 weeks
 **Goal**: Implement issue workflow and introduce change management
 
 **Key Deliverables**:
+
 - Issue status transitions (New → In Progress → Resolved → Closed)
 - Issue assignment to users
 - Change request schema and creation
@@ -41,13 +45,15 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 2 Planning](sprint-2-planning.md)
 
----
+______________________________________________________________________
 
 ### Sprint 3: Change Management Workflows (v0.4.0)
+
 **Duration**: 2 weeks
 **Goal**: Complete change management with approval workflows
 
 **Key Deliverables**:
+
 - Change approval workflow (Request → Assessment → Approval → Implementation → Completion)
 - Change-to-issue relationships
 - Risk assessment and scheduling
@@ -57,13 +63,15 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 3 Planning](sprint-3-planning.md)
 
----
+______________________________________________________________________
 
 ### Sprint 4: CMDB Foundation (v0.5.0)
+
 **Duration**: 2 weeks
 **Goal**: Implement Configuration Management Database
 
 **Key Deliverables**:
+
 - CI schema (Server, Network Device, Storage, Software, Service, VM)
 - CI relationships and dependencies
 - CI-Issue-Change integration
@@ -73,13 +81,15 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 4 Planning](sprint-4-planning.md)
 
----
+______________________________________________________________________
 
 ### Sprint 5: Reporting & Dashboards (v0.6.0)
+
 **Duration**: 2 weeks
 **Goal**: Add reporting and analytics capabilities
 
 **Key Deliverables**:
+
 - Issue statistics dashboard
 - Change management reports
 - CMDB health reports
@@ -90,13 +100,15 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 5 Planning](sprint-5-planning.md)
 
----
+______________________________________________________________________
 
 ### Sprint 6: Polish & Production Release (v1.0.0)
+
 **Duration**: 2 weeks
 **Goal**: Prepare for production release
 
 **Key Deliverables**:
+
 - Performance optimization
 - UI/UX polish and accessibility
 - Security hardening
@@ -108,22 +120,25 @@ The PMS development follows a 6-sprint roadmap (12 weeks total) to deliver a pro
 
 [📄 Sprint 6 Planning](sprint-6-planning.md)
 
----
+______________________________________________________________________
 
 ## Development Metrics
 
 ### Total Effort
+
 - **Duration**: 12 weeks (6 sprints × 2 weeks)
 - **Total Story Points**: 206
 - **Target**: v1.0.0 production release
 
 ### Quality Targets
+
 - **Test Coverage**: >85% throughout development
 - **BDD Scenarios**: 40+ scenarios by v1.0.0
 - **Screenshot Resolution**: 1024x768 (English only)
 - **Documentation**: Complete Diátaxis framework
 
 ### Version Progression
+
 ```
 v0.1.0  → Foundation (current)
 v0.2.0  → Sprint 1 (Basic Issue Tracking)
@@ -139,6 +154,7 @@ v1.0.0  → Sprint 6 (Production Release)
 Each sprint follows this structure:
 
 ### Planning Phase
+
 - Review previous sprint retrospective
 - Define sprint goal and user stories
 - Estimate story points
@@ -146,6 +162,7 @@ Each sprint follows this structure:
 - Create sprint backlog
 
 ### Execution Phase
+
 - Daily progress tracking
 - BDD scenarios written before implementation
 - Code reviews via pre-commit hooks
@@ -153,6 +170,7 @@ Each sprint follows this structure:
 - Documentation updates
 
 ### Review Phase
+
 - Demo completed features
 - Validate against acceptance criteria
 - Review BDD scenario coverage
@@ -160,6 +178,7 @@ Each sprint follows this structure:
 - Tag version release
 
 ### Retrospective Phase
+
 - What went well
 - What could be improved
 - Action items for next sprint
@@ -170,11 +189,13 @@ Each sprint follows this structure:
 Each sprint includes comprehensive BDD scenarios across all three interfaces:
 
 ### Testing Interfaces
+
 - **Web UI**: Playwright browser automation (1024x768)
 - **CLI**: Command-line interface testing
 - **API**: REST/XML-RPC API testing
 
 ### Scenario Coverage Goals
+
 - Sprint 1: 10+ scenarios
 - Sprint 2: 15+ scenarios
 - Sprint 3: 20+ scenarios
@@ -187,6 +208,7 @@ Each sprint includes comprehensive BDD scenarios across all three interfaces:
 Following the Diátaxis framework:
 
 ### Tutorials (Learning-oriented)
+
 - Sprint 1: "Getting Started with PMS"
 - Sprint 2: "Understanding ITIL Workflows"
 - Sprint 4: "Building Your Homelab CMDB"
@@ -194,6 +216,7 @@ Following the Diátaxis framework:
 - Sprint 6: "Writing Your First BDD Feature"
 
 ### How-to Guides (Problem-oriented)
+
 - Sprint 2: "Managing Issue Lifecycle"
 - Sprint 3: "Submitting a Change Request", "Assessing Change Risk"
 - Sprint 4: "Documenting Infrastructure Dependencies"
@@ -201,6 +224,7 @@ Following the Diátaxis framework:
 - Sprint 6: "Debugging BDD Scenarios"
 
 ### Reference (Information-oriented)
+
 - Sprint 1: "Issue Schema"
 - Sprint 2: "Issue Status Transitions", "Change Request Schema"
 - Sprint 3: "Change Workflow States"
@@ -209,6 +233,7 @@ Following the Diátaxis framework:
 - Sprint 6: "API Documentation", "Complete Step Definition Library"
 
 ### Explanation (Understanding-oriented)
+
 - Sprint 2: "Why Change Management Matters"
 - Sprint 3: "ITIL Change Management Principles"
 - Sprint 4: "Why Configuration Management Matters"
@@ -219,7 +244,7 @@ Following the Diátaxis framework:
 BDD demonstration presentations created throughout sprints:
 
 1. **Sprint 3**: "BDD Testing in Practice"
-2. **Sprint 6**:
+1. **Sprint 6**:
    - "Introduction to BDD"
    - "Writing Effective Gherkin Scenarios"
    - "Behave and Playwright Integration"
@@ -234,6 +259,7 @@ BDD demonstration presentations created throughout sprints:
 ## Sprint Documents
 
 Each sprint directory contains:
+
 - `sprint-N-planning.md`: Sprint goals, user stories, and backlog
 - `sprint-N-retrospective.md`: Lessons learned and improvements (created at sprint end)
 
@@ -244,6 +270,6 @@ Each sprint directory contains:
 - [CHANGELOG.md](../../CHANGELOG.md): Version history
 - [CLAUDE.md](../../CLAUDE.md): AI-assisted development context
 
----
+______________________________________________________________________
 
 **Note**: This is a living plan. Sprint scope and timelines may adjust based on actual progress and discovered complexity. The focus remains on delivering quality BDD demonstration value alongside functional ITIL-inspired capabilities.

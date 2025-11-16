@@ -27,37 +27,43 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 ### Phase 1: Environment Setup (Non-Story Tasks)
 
 #### Task 1.1: Python Development Environment
+
 **Priority**: Critical
 **Estimate**: 1 hour
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [x] Create Python virtual environment (`python3 -m venv venv`)
 - [x] Activate virtual environment
 - [x] Verify Python version (3.9+)
 - [x] Document activation commands in README
 
 **Acceptance Criteria**:
+
 - Virtual environment created in project root
 - Python 3.9+ confirmed
 - Activation documented
 
 **Dependencies**: None
 
----
+______________________________________________________________________
 
 #### Task 1.2: Install Roundup and Dependencies
+
 **Priority**: Critical
 **Estimate**: 2 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [x] Install Roundup via pip
 - [x] Create requirements.txt with pinned versions
 - [x] Install development dependencies
 - [x] Test Roundup installation (`roundup-admin --version`)
 
 **Acceptance Criteria**:
+
 - Roundup installed successfully
 - requirements.txt created with all dependencies
 - All packages installed from requirements.txt
@@ -65,6 +71,7 @@ Set up Roundup tracker with basic issue tracking and first BDD scenarios demonst
 **Dependencies**: Task 1.1
 
 **File**: `requirements.txt`
+
 ```txt
 # Core tracker
 roundup>=2.3.0
@@ -85,34 +92,39 @@ mypy>=1.7.0
 sphinx>=7.0.0
 ```
 
----
+______________________________________________________________________
 
 #### Task 1.3: Install BDD Testing Tools
+
 **Priority**: Critical
 **Estimate**: 2 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [x] Install Behave
 - [x] Install Playwright
 - [x] Install Playwright browsers (`playwright install`)
 - [x] Verify installations
 
 **Acceptance Criteria**:
+
 - Behave installed and functional
 - Playwright installed with Chromium browser
 - Test browser launches successfully
 
 **Dependencies**: Task 1.2
 
----
+______________________________________________________________________
 
 #### Task 1.4: Configure Playwright
+
 **Priority**: High
 **Estimate**: 1 hour
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [x] Create Playwright configuration
 - [x] Set viewport to 1024x768
 - [x] Configure screenshot directory
@@ -120,6 +132,7 @@ sphinx>=7.0.0
 - [x] Configure headless mode for CI
 
 **Acceptance Criteria**:
+
 - Playwright config created
 - Screenshots capture at 1024x768
 - English locale configured
@@ -128,14 +141,16 @@ sphinx>=7.0.0
 
 **File**: `tests/playwright.config.py` or similar
 
----
+______________________________________________________________________
 
 #### Task 1.5: Create Behave Environment
+
 **Priority**: High
 **Estimate**: 2 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [x] Create `features/` directory structure
 - [x] Create `environment.py` with before/after hooks
 - [x] Configure screenshot capture on failure
@@ -143,6 +158,7 @@ sphinx>=7.0.0
 - [x] Create base step definition classes
 
 **Acceptance Criteria**:
+
 - Behave environment functional
 - Screenshots captured on failure
 - JUnit XML reports generated
@@ -150,23 +166,27 @@ sphinx>=7.0.0
 **Dependencies**: Task 1.3, Task 1.4
 
 **Files**:
+
 - `features/environment.py`
 - `features/steps/base_steps.py`
 
----
+______________________________________________________________________
 
 ### Phase 2: Roundup Tracker Setup
 
 #### Story 1: Install and Configure Roundup Tracker
+
 **Story Points**: 3
 **Priority**: Critical
 **Status**: ✅ Completed
 **Assignee**: Claude
 
 **User Story**:
+
 > As a homelab sysadmin, I want a working Roundup tracker instance so that I can start tracking issues in my homelab.
 
 **Subtasks**:
+
 - [x] Initialize Roundup tracker with classic template
 - [x] Configure database (SQLite for development)
 - [x] Create admin user
@@ -175,6 +195,7 @@ sphinx>=7.0.0
 - [x] Store configuration in version control
 
 **Acceptance Criteria**:
+
 - Roundup tracker initialized successfully
 - Web UI accessible at localhost
 - Database schema initialized
@@ -182,6 +203,7 @@ sphinx>=7.0.0
 - Configuration stored in version control
 
 **Implementation Steps**:
+
 ```bash
 # Initialize tracker
 roundup-admin install -t classic tracker_data
@@ -198,12 +220,14 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 ```
 
 **Files Created/Modified**:
+
 - `tracker/` (directory)
 - `tracker/config.ini`
 - `tracker/schema.py`
 - `.gitignore` (exclude tracker/db/, tracker/sessions/, tracker/__pycache__/)
 
 **Testing**:
+
 - [x] Start tracker: `roundup-server tracker`
 - [x] Access http://localhost:8080/
 - [x] Login with admin credentials
@@ -211,24 +235,28 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **Dependencies**: Task 1.2
 
----
+______________________________________________________________________
 
 ### Phase 3: BDD Feature Implementation
 
 #### Story 2: Create Issue via Web UI
+
 **Story Points**: 5
 **Priority**: High
 **Status**: ✅ Completed
 **Assignee**: Claude
 
 **User Story**:
+
 > As a homelab sysadmin, I want to create issues through the web interface so that I can track problems in my homelab.
 
 **BDD Scenarios**:
+
 1. Create issue with required fields (@smoke) ✅
-2. Cannot create issue without title (@validation) ✅
+1. Cannot create issue without title (@validation) ✅
 
 **Subtasks**:
+
 - [x] Write feature file: `features/issue_tracking/create_issue_web.feature`
 - [x] Implement step definitions for web UI
 - [x] Customize Roundup issue creation form
@@ -243,6 +271,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] Verify screenshots captured at 1024x768
 
 **Acceptance Criteria**:
+
 - Web UI displays issue creation form
 - Required fields: title, description, priority
 - Issue saved to database
@@ -252,6 +281,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - Screenshots generated
 
 **Files Created/Modified**:
+
 - `features/issue_tracking/create_issue_web.feature`
 - `features/steps/web_ui_steps.py`
 - `tracker_data/html/issue.item.html` (template customization)
@@ -259,22 +289,26 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **Dependencies**: Story 1
 
----
+______________________________________________________________________
 
 #### Story 3: Create Issue via CLI
+
 **Story Points**: 3
 **Priority**: High
 **Status**: ✅ Completed
 **Assignee**: Claude
 
 **User Story**:
+
 > As a homelab sysadmin, I want to create issues from the command line so that I can quickly report issues during troubleshooting.
 
 **BDD Scenarios**:
+
 1. Create issue via command line (@smoke) ✅
-2. Create issue with minimal fields ✅
+1. Create issue with minimal fields ✅
 
 **Subtasks**:
+
 - [x] Write feature file: `features/issue_tracking/create_issue_cli.feature`
 - [x] Implement step definitions for CLI
 - [x] Configure Roundup CLI client
@@ -286,6 +320,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] Verify default values applied
 
 **Acceptance Criteria**:
+
 - CLI command accepts title, description, priority
 - Issue created in database
 - Success message with issue ID returned
@@ -293,28 +328,33 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - 2 BDD scenarios passing
 
 **Files Created/Modified**:
+
 - `features/issue_tracking/create_issue_cli.feature`
 - `features/steps/cli_steps.py`
 - CLI configuration documentation
 
 **Dependencies**: Story 1
 
----
+______________________________________________________________________
 
 #### Story 4: Create Issue via API
+
 **Story Points**: 5
 **Priority**: High
 **Status**: ✅ Completed
 **Assignee**: Claude
 
 **User Story**:
+
 > As an automation script, I want to create issues via REST API so that I can integrate issue tracking with monitoring tools.
 
 **BDD Scenarios**:
+
 1. Create issue via REST API (@smoke) ✅
-2. Cannot create issue without authentication (@security) ✅
+1. Cannot create issue without authentication (@security) ✅
 
 **Subtasks**:
+
 - [x] Write feature file: `features/issue_tracking/create_issue_api.feature`
 - [x] Implement step definitions for API
 - [x] Configure Roundup API endpoint
@@ -328,6 +368,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] Test authentication failure scenarios
 
 **Acceptance Criteria**:
+
 - API endpoint accepts JSON payload
 - Authentication required
 - Issue created in database
@@ -336,6 +377,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - 2 BDD scenarios passing
 
 **Files Created/Modified**:
+
 - `features/issue_tracking/create_issue_api.feature`
 - `features/steps/api_steps.py`
 - `tracker_data/extensions/api.py` (API implementation)
@@ -343,22 +385,26 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **Dependencies**: Story 1
 
----
+______________________________________________________________________
 
 #### Story 5: View Issue List
+
 **Story Points**: 3
 **Priority**: Medium
 **Status**: ✅ Completed
 **Assignee**: Claude
 
 **User Story**:
+
 > As a homelab sysadmin, I want to see all my issues in a list so that I can track what needs attention.
 
 **BDD Scenarios**:
+
 1. View list of issues (@smoke) ✅
-2. View issue details ✅
+1. View issue details ✅
 
 **Subtasks**:
+
 - [x] Write feature file: `features/issue_tracking/view_issues.feature`
 - [x] Implement step definitions for viewing
 - [x] Customize issue list template
@@ -372,6 +418,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] Implement step: "I should see issue details page"
 
 **Acceptance Criteria**:
+
 - Web UI displays issue list with title, priority, status
 - Issues sorted by creation date (newest first)
 - Pagination for large issue lists
@@ -379,22 +426,25 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - 2 BDD scenarios passing
 
 **Files Created/Modified**:
+
 - `features/issue_tracking/view_issues.feature`
 - `features/steps/view_steps.py`
 - `tracker_data/html/issue.index.html` (template customization)
 
 **Dependencies**: Story 2
 
----
+______________________________________________________________________
 
 ### Phase 4: CI/CD Setup
 
 #### Task 4.1: GitHub Actions Workflow
+
 **Priority**: High
 **Estimate**: 3 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [ ] Create `.github/workflows/ci.yml`
 - [ ] Configure Python setup
 - [ ] Mirror pre-commit checks (ruff, mypy)
@@ -403,6 +453,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [ ] Configure test matrix (Python 3.9, 3.10, 3.11)
 
 **Acceptance Criteria**:
+
 - Workflow runs on push and PR
 - All pre-commit checks pass
 - BDD tests execute
@@ -412,20 +463,23 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **File**: `.github/workflows/ci.yml`
 
----
+______________________________________________________________________
 
 #### Task 4.2: SLSA Provenance Generation
+
 **Priority**: Medium
 **Estimate**: 2 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [ ] Install slsa-github-generator action
 - [ ] Configure provenance generation
 - [ ] Test provenance artifact creation
 - [ ] Document verification process
 
 **Acceptance Criteria**:
+
 - SLSA provenance generated for releases
 - Provenance attestation available
 - Verification documented
@@ -434,16 +488,18 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **Reference**: https://github.com/slsa-framework/slsa-github-generator
 
----
+______________________________________________________________________
 
 ### Phase 5: Documentation
 
 #### Task 5.1: Tutorial - Getting Started with PMS
+
 **Priority**: High
 **Estimate**: 4 hours
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [ ] Create tutorial structure
 - [ ] Document installation steps
 - [ ] Include screenshots (1024x768)
@@ -452,6 +508,7 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [ ] Review and edit
 
 **Acceptance Criteria**:
+
 - Tutorial complete and tested
 - All screenshots at 1024x768
 - New user can create first issue
@@ -460,56 +517,64 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 
 **File**: `docs/tutorials/getting-started.md`
 
----
+______________________________________________________________________
 
 #### Task 5.2: Update CHANGELOG for v0.2.0
+
 **Priority**: Medium
 **Estimate**: 30 minutes
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [ ] Document all changes in CHANGELOG.md
 - [ ] Update version links
 - [ ] Review changelog format
 
 **Acceptance Criteria**:
+
 - CHANGELOG.md updated
 - All features documented
 - Links correct
 
 **Dependencies**: All stories complete
 
----
+______________________________________________________________________
 
 ### Phase 6: Sprint Completion
 
 #### Task 6.1: Sprint 1 Retrospective
+
 **Priority**: Medium
 **Estimate**: 1 hour
 **Status**: ✅ Completed
 
 **Subtasks**:
+
 - [ ] Create retrospective document
 - [ ] Document what went well
 - [ ] Document what could be improved
 - [ ] Identify action items for Sprint 2
 
 **Acceptance Criteria**:
+
 - Retrospective documented
 - Action items identified
 
 **File**: `docs/sprints/sprint-1-retrospective.md`
 
----
+______________________________________________________________________
 
 ## Progress Tracking
 
 ### Story Points Progress
+
 ```
 [###################________] 19/27 (70%)
 ```
 
 ### BDD Scenarios Progress
+
 **Target**: 10+ scenarios
 **Current**: 8
 
@@ -519,10 +584,11 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] View issues: 2 scenarios ✅
 
 ### Test Coverage
+
 **Target**: >85%
 **Current**: N/A
 
----
+______________________________________________________________________
 
 ## Definition of Done Checklist
 
@@ -538,31 +604,28 @@ roundup-admin -i tracker_data set user1 username=admin roles=Admin password=<pas
 - [x] GitHub Actions CI/CD functional
 - [x] SLSA provenance generation configured
 
----
+______________________________________________________________________
 
 ## Risk Register
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Roundup learning curve steeper than expected | High | Medium | Allocate extra time, use classic template, consult docs |
-| Playwright setup issues | Medium | Low | Use official Python package, follow best practices |
-| API implementation complexity | Medium | Medium | Start with simple REST endpoint, iterate |
-| Test coverage target not met | Low | Low | Write tests alongside code, not after |
+| Risk                                         | Impact | Probability | Mitigation                                              |
+| -------------------------------------------- | ------ | ----------- | ------------------------------------------------------- |
+| Roundup learning curve steeper than expected | High   | Medium      | Allocate extra time, use classic template, consult docs |
+| Playwright setup issues                      | Medium | Low         | Use official Python package, follow best practices      |
+| API implementation complexity                | Medium | Medium      | Start with simple REST endpoint, iterate                |
+| Test coverage target not met                 | Low    | Low         | Write tests alongside code, not after                   |
 
----
+______________________________________________________________________
 
 ## Daily Standup Template
 
-**What did I complete yesterday?**
--
+## **What did I complete yesterday?**
 
-**What will I work on today?**
--
+## **What will I work on today?**
 
-**Any blockers?**
--
+## **Any blockers?**
 
----
+______________________________________________________________________
 
 ## Notes
 

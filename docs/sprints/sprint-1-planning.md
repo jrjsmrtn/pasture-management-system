@@ -20,11 +20,13 @@ Establish the foundational Roundup tracker instance with basic issue tracking ca
 ### Epic: Basic Issue Tracking
 
 #### Story 1: Install and Configure Roundup Tracker
+
 **As a** homelab sysadmin
 **I want** a working Roundup tracker instance
 **So that** I can start tracking issues in my homelab
 
 **Acceptance Criteria**:
+
 - Roundup tracker initializes successfully
 - Web UI accessible at localhost
 - Database schema initialized
@@ -33,14 +35,16 @@ Establish the foundational Roundup tracker instance with basic issue tracking ca
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 #### Story 2: Create Issue via Web UI
+
 **As a** homelab sysadmin
 **I want** to create issues through the web interface
 **So that** I can track problems in my homelab
 
 **Acceptance Criteria**:
+
 - Web UI displays issue creation form
 - Required fields: title, description, priority
 - Issue saved to database
@@ -48,6 +52,7 @@ Establish the foundational Roundup tracker instance with basic issue tracking ca
 - Created issue viewable in issue list
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/create_issue_web.feature`)
+
 ```gherkin
 @story-2 @web-ui @smoke
 Scenario: Create issue with required fields
@@ -72,20 +77,23 @@ Scenario: Cannot create issue without title
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 3: Create Issue via CLI
+
 **As a** homelab sysadmin
 **I want** to create issues from the command line
 **So that** I can quickly report issues during troubleshooting
 
 **Acceptance Criteria**:
+
 - CLI command accepts title, description, priority
 - Issue created in database
 - Success message with issue ID returned
 - Created issue viewable via web UI
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/create_issue_cli.feature`)
+
 ```gherkin
 @story-3 @cli @smoke
 Scenario: Create issue via command line
@@ -105,14 +113,16 @@ Scenario: Create issue with minimal fields
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 #### Story 4: Create Issue via API
+
 **As a** automation script
 **I want** to create issues via REST API
 **So that** I can integrate issue tracking with monitoring tools
 
 **Acceptance Criteria**:
+
 - API endpoint accepts JSON payload
 - Authentication required
 - Issue created in database
@@ -120,6 +130,7 @@ Scenario: Create issue with minimal fields
 - HTTP 201 status code returned
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/create_issue_api.feature`)
+
 ```gherkin
 @story-4 @api @smoke
 Scenario: Create issue via REST API
@@ -151,20 +162,23 @@ Scenario: Cannot create issue without authentication
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 5: View Issue List
+
 **As a** homelab sysadmin
 **I want** to see all my issues in a list
 **So that** I can track what needs attention
 
 **Acceptance Criteria**:
+
 - Web UI displays issue list with title, priority, status
 - Issues sorted by creation date (newest first)
 - Pagination for large issue lists
 - Click issue to view details
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/view_issues.feature`)
+
 ```gherkin
 @story-5 @web-ui @smoke
 Scenario: View list of issues
@@ -189,11 +203,12 @@ Scenario: View issue details
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### Environment Setup
+
 - [ ] Create Python virtual environment
 - [ ] Install Roundup and dependencies
 - [ ] Initialize Roundup tracker with classic template
@@ -201,6 +216,7 @@ Scenario: View issue details
 - [ ] Set up local development database
 
 ### BDD Infrastructure
+
 - [ ] Install Behave and dependencies
 - [ ] Install Playwright and browsers
 - [ ] Configure Playwright for 1024x768 screenshots
@@ -209,12 +225,14 @@ Scenario: View issue details
 - [ ] Configure JUnit XML report generation
 
 ### Customization
+
 - [ ] Customize issue schema (priority, status fields)
 - [ ] Create basic web UI templates (English only)
 - [ ] Configure CLI interface
 - [ ] Set up basic REST API endpoints
 
 ### Testing
+
 - [ ] Write step definitions for web UI scenarios
 - [ ] Write step definitions for CLI scenarios
 - [ ] Write step definitions for API scenarios
@@ -222,6 +240,7 @@ Scenario: View issue details
 - [ ] Set up test data fixtures
 
 ### Documentation
+
 - [ ] Write "Getting Started" tutorial
 - [ ] Document Roundup installation process
 - [ ] Create reference docs for issue schema
@@ -241,27 +260,29 @@ Scenario: View issue details
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Install and Configure Roundup | 3 | Not Started |
-| Story 2: Create Issue via Web UI | 5 | Not Started |
-| Story 3: Create Issue via CLI | 3 | Not Started |
-| Story 4: Create Issue via API | 5 | Not Started |
-| Story 5: View Issue List | 3 | Not Started |
-| BDD Infrastructure Setup | 5 | Not Started |
-| Tutorial: Getting Started | 3 | Not Started |
+| Task                                   | Story Points | Status      |
+| -------------------------------------- | ------------ | ----------- |
+| Story 1: Install and Configure Roundup | 3            | Not Started |
+| Story 2: Create Issue via Web UI       | 5            | Not Started |
+| Story 3: Create Issue via CLI          | 3            | Not Started |
+| Story 4: Create Issue via API          | 5            | Not Started |
+| Story 5: View Issue List               | 3            | Not Started |
+| BDD Infrastructure Setup               | 5            | Not Started |
+| Tutorial: Getting Started              | 3            | Not Started |
 
 **Total Story Points**: 27
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Roundup Learning Curve**: Team unfamiliar with Roundup customization
   - *Mitigation*: Allocate time for Roundup documentation review, start with classic template
 - **Playwright Setup Complexity**: Browser automation can be tricky
   - *Mitigation*: Use official Playwright Python package, follow best practices
 
 ### Dependencies
+
 - Python 3.9+ installed
 - MacPorts package manager (for macOS)
 - Podman available for C4 DSL validation

@@ -28,7 +28,7 @@ We will use Architecture Decision Records (ADRs) following the adr-tools format 
 ### ADR Process
 
 - Store ADRs in `docs/adr/` directory
-- Number ADRs sequentially (0001, 0002, etc.) using "ADR-[number]: [title]" format
+- Number ADRs sequentially (0001, 0002, etc.) using "ADR-\[number\]: [title]" format
 - Include Status, Context, Decision, and Consequences sections
 - Review ADRs during architecture discussions
 - Update ADRs when decisions evolve

@@ -20,11 +20,13 @@ Implement complete ITIL-inspired change management workflow with approval stages
 ### Epic: Change Management Workflows
 
 #### Story 1: Change Approval Workflow
+
 **As a** homelab sysadmin
 **I want** changes to go through approval stages
 **So that** I can prevent unauthorized or risky changes
 
 **Acceptance Criteria**:
+
 - Change statuses: Requested, Assessment, Approved, Rejected, Scheduled, Implementing, Completed, Cancelled
 - Valid transitions enforced (similar to issue workflow)
 - Approval requires justification/notes
@@ -32,6 +34,7 @@ Implement complete ITIL-inspired change management workflow with approval stages
 - Status history tracked
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_workflow.feature`)
+
 ```gherkin
 @story-1 @web-ui @smoke
 Scenario: Approve change request
@@ -85,14 +88,16 @@ Scenario: Complete change implementation via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 2: Link Changes to Issues
+
 **As a** homelab sysadmin
 **I want** to link change requests to related issues
 **So that** I can track which changes address which problems
 
 **Acceptance Criteria**:
+
 - Change can reference one or more issues
 - Issue can be referenced by multiple changes
 - Relationship viewable from both change and issue
@@ -100,6 +105,7 @@ Scenario: Complete change implementation via API
 - Deleting issue doesn't delete change (orphan handling)
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_issue_links.feature`)
+
 ```gherkin
 @story-2 @web-ui
 Scenario: Link change to existing issue
@@ -149,20 +155,23 @@ Scenario: Link change to issue via CLI
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 3: Change Risk Assessment
+
 **As a** homelab sysadmin
 **I want** to document risk level and mitigation for changes
 **So that** I can make informed decisions about proceeding
 
 **Acceptance Criteria**:
+
 - Risk levels: Very Low, Low, Medium, High, Very High
 - Risk assessment fields: likelihood, impact, mitigation plan
 - Risk assessment required before approval
 - Risk displayed prominently in change view
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_risk.feature`)
+
 ```gherkin
 @story-3 @web-ui
 Scenario: Add risk assessment to change
@@ -204,20 +213,23 @@ Scenario: Update risk assessment via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 4: Change Scheduling
+
 **As a** homelab sysadmin
 **I want** to schedule approved changes for specific times
 **So that** I can plan maintenance windows
 
 **Acceptance Criteria**:
+
 - Scheduled start and end time fields
 - Calendar view of scheduled changes (optional for this sprint)
 - Notifications for upcoming scheduled changes
 - Ability to reschedule
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_scheduling.feature`)
+
 ```gherkin
 @story-4 @web-ui
 Scenario: Schedule approved change
@@ -257,14 +269,16 @@ Scenario: Schedule change via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 5: Change Implementation Tracking
+
 **As a** homelab sysadmin
 **I want** to track change implementation progress
 **So that** I can document what was actually done
 
 **Acceptance Criteria**:
+
 - Implementation notes field
 - Actual start/end time tracking
 - Deviation from plan documentation
@@ -272,6 +286,7 @@ Scenario: Schedule change via API
 - Rollback documentation if needed
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_implementation.feature`)
+
 ```gherkin
 @story-5 @web-ui
 Scenario: Begin change implementation
@@ -306,11 +321,12 @@ Scenario: Document change rollback
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### Change Workflow
+
 - [ ] Define complete status transition matrix
 - [ ] Implement workflow validation logic
 - [ ] Add approval/rejection functionality
@@ -319,6 +335,7 @@ Scenario: Document change rollback
 - [ ] Add API endpoints for status transitions
 
 ### Change-Issue Relationships
+
 - [ ] Design relationship schema
 - [ ] Implement linking functionality
 - [ ] Display relationships in UI
@@ -326,24 +343,28 @@ Scenario: Document change rollback
 - [ ] Add API linking endpoints
 
 ### Risk Assessment
+
 - [ ] Add risk assessment fields to schema
 - [ ] Implement risk validation rules
 - [ ] Create risk assessment UI
 - [ ] Add risk indicators to change list
 
 ### Scheduling
+
 - [ ] Add scheduling fields to schema
 - [ ] Implement scheduling UI
 - [ ] Add time validation
 - [ ] Track actual vs. scheduled times
 
 ### Implementation Tracking
+
 - [ ] Add implementation fields
 - [ ] Create implementation notes UI
 - [ ] Track rollback scenarios
 - [ ] Document deviations
 
 ### Documentation
+
 - [ ] Tutorial: "Managing Changes in Your Homelab"
 - [ ] How-to: "Submitting a Change Request"
 - [ ] How-to: "Assessing Change Risk"
@@ -366,26 +387,28 @@ Scenario: Document change rollback
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Change Approval Workflow | 8 | Not Started |
-| Story 2: Link Changes to Issues | 5 | Not Started |
-| Story 3: Change Risk Assessment | 5 | Not Started |
-| Story 4: Change Scheduling | 5 | Not Started |
-| Story 5: Change Implementation Tracking | 5 | Not Started |
-| Documentation and Presentation | 5 | Not Started |
+| Task                                    | Story Points | Status      |
+| --------------------------------------- | ------------ | ----------- |
+| Story 1: Change Approval Workflow       | 8            | Not Started |
+| Story 2: Link Changes to Issues         | 5            | Not Started |
+| Story 3: Change Risk Assessment         | 5            | Not Started |
+| Story 4: Change Scheduling              | 5            | Not Started |
+| Story 5: Change Implementation Tracking | 5            | Not Started |
+| Documentation and Presentation          | 5            | Not Started |
 
 **Total Story Points**: 33
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Workflow Complexity**: Complete change workflow may be more complex than anticipated
   - *Mitigation*: Break down into smaller iterations, test thoroughly
 - **UI Complexity**: Multiple workflow actions may clutter interface
   - *Mitigation*: Progressive disclosure, context-sensitive actions
 
 ### Dependencies
+
 - Sprint 2 completion (change foundation established)
 - Understanding of ITIL change management principles
 

@@ -20,11 +20,13 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 ### Epic: Issue Lifecycle Management
 
 #### Story 1: Issue Status Workflow
+
 **As a** homelab sysadmin
 **I want** issues to move through defined statuses
 **So that** I can track progress on resolving problems
 
 **Acceptance Criteria**:
+
 - Issue statuses: New, In Progress, Resolved, Closed
 - Valid transitions defined (e.g., New → In Progress, not New → Closed)
 - Status changes recorded with timestamp
@@ -32,6 +34,7 @@ Implement issue status transitions following ITIL-inspired workflow patterns and
 - Invalid transitions rejected with error message
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/issue_workflow.feature`)
+
 ```gherkin
 @story-1 @web-ui @smoke
 Scenario: Transition issue from New to In Progress
@@ -71,14 +74,16 @@ Scenario: Transition issue via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 2: Assign Issues to Owner
+
 **As a** homelab sysadmin
 **I want** to assign issues to specific people
 **So that** responsibilities are clear
 
 **Acceptance Criteria**:
+
 - Issue has assignee field
 - User list available for assignment
 - Assignee can be set during creation or later
@@ -86,6 +91,7 @@ Scenario: Transition issue via API
 - Filter issues by assignee
 
 **BDD Scenarios**: (Feature file: `features/issue_tracking/assign_issues.feature`)
+
 ```gherkin
 @story-2 @web-ui
 Scenario: Assign issue to user
@@ -111,16 +117,18 @@ Scenario: Filter issues by assignee
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 ### Epic: Change Management Foundation
 
 #### Story 3: Define Change Request Schema
+
 **As a** homelab sysadmin
 **I want** to track change requests separately from issues
 **So that** I can manage planned changes systematically
 
 **Acceptance Criteria**:
+
 - Change schema defined with fields: title, description, justification, impact, risk
 - Change priority levels: Low, Medium, High, Critical
 - Change categories: Software, Hardware, Configuration, Network
@@ -128,6 +136,7 @@ Scenario: Filter issues by assignee
 - Database migration successful
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/change_schema.feature`)
+
 ```gherkin
 @story-3 @api
 Scenario: Verify change schema fields
@@ -146,14 +155,16 @@ Scenario: Verify change schema fields
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 #### Story 4: Create Change Request
+
 **As a** homelab sysadmin
 **I want** to create change requests
 **So that** I can plan and track infrastructure changes
 
 **Acceptance Criteria**:
+
 - Web UI form for change creation
 - Required fields validated
 - Change saved to database
@@ -161,6 +172,7 @@ Scenario: Verify change schema fields
 - Change viewable in change list
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/create_change.feature`)
+
 ```gherkin
 @story-4 @web-ui @smoke
 Scenario: Create change request with required fields
@@ -209,20 +221,23 @@ Scenario: Create change via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 5: View Change List
+
 **As a** homelab sysadmin
 **I want** to see all change requests
 **So that** I can track planned infrastructure changes
 
 **Acceptance Criteria**:
+
 - Web UI displays change list
 - Changes sorted by priority and creation date
 - Filter by status, priority, category
 - Click change to view details
 
 **BDD Scenarios**: (Feature file: `features/change_mgmt/view_changes.feature`)
+
 ```gherkin
 @story-5 @web-ui
 Scenario: View list of changes
@@ -250,11 +265,12 @@ Scenario: Filter changes by category
 
 **Story Points**: 3
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### Issue Workflow
+
 - [ ] Define status transition matrix
 - [ ] Implement status validation logic
 - [ ] Add status history tracking
@@ -263,12 +279,14 @@ Scenario: Filter changes by category
 - [ ] Add API endpoints for status transitions
 
 ### User Assignment
+
 - [ ] Add assignee field to issue schema
 - [ ] Create user management basics
 - [ ] Implement assignment web UI
 - [ ] Add filtering by assignee
 
 ### Change Management
+
 - [ ] Design change request schema
 - [ ] Create database migration
 - [ ] Implement change creation (web/CLI/API)
@@ -276,6 +294,7 @@ Scenario: Filter changes by category
 - [ ] Add filtering and sorting
 
 ### Documentation
+
 - [ ] Tutorial: "Understanding ITIL Workflows"
 - [ ] How-to: "Managing Issue Lifecycle"
 - [ ] Reference: "Issue Status Transitions"
@@ -296,26 +315,28 @@ Scenario: Filter changes by category
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Issue Status Workflow | 8 | Not Started |
-| Story 2: Assign Issues to Owner | 3 | Not Started |
-| Story 3: Define Change Request Schema | 3 | Not Started |
-| Story 4: Create Change Request | 5 | Not Started |
-| Story 5: View Change List | 3 | Not Started |
-| Documentation Tasks | 5 | Not Started |
+| Task                                  | Story Points | Status      |
+| ------------------------------------- | ------------ | ----------- |
+| Story 1: Issue Status Workflow        | 8            | Not Started |
+| Story 2: Assign Issues to Owner       | 3            | Not Started |
+| Story 3: Define Change Request Schema | 3            | Not Started |
+| Story 4: Create Change Request        | 5            | Not Started |
+| Story 5: View Change List             | 3            | Not Started |
+| Documentation Tasks                   | 5            | Not Started |
 
 **Total Story Points**: 27
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Workflow Complexity**: Status transitions may be more complex than anticipated
   - *Mitigation*: Start with simple linear workflow, iterate based on feedback
 - **Schema Migration**: Database changes need careful testing
   - *Mitigation*: Test migrations on separate database copy first
 
 ### Dependencies
+
 - Sprint 1 completion (basic issue tracking functional)
 - Roundup detector/reactor customization knowledge
 

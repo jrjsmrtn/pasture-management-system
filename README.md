@@ -10,7 +10,7 @@ A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysa
 ## Dual Project Objectives
 
 1. **Functional Tool**: Implement a practical issue tracking and change management system for homelab environments
-2. **BDD Demonstration**: Showcase the power of Behavior-Driven Development (BDD) with Python, Gherkin, Behave, and Playwright testing
+1. **BDD Demonstration**: Showcase the power of Behavior-Driven Development (BDD) with Python, Gherkin, Behave, and Playwright testing
 
 ## Key Features
 

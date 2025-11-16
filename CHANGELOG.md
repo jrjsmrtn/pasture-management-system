@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.0] - 2025-11-16
 
 ### Added
+
 - **ITIL Workflow Implementation**: Complete issue lifecycle management with status transitions (Story 1)
   - Four statuses: New, In Progress, Resolved, Closed
   - Status transition validation detector enforcing ITIL workflow rules
@@ -54,12 +55,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Default login step for simplified test scenarios
 
 ### Changed
+
 - Status workflow enforces valid transitions (prevents invalid jumps like New → Closed)
 - Issue creation now requires priority field for data quality
 - Web UI displays context-sensitive workflow buttons based on current status
 - Project version bumped to 0.3.0 (Sprint 2 complete)
 
 ### Technical Details
+
 - **Story Points**: 22/27 completed (81% of Sprint 2, 5 points documentation)
 - **BDD Scenarios**: 31 scenarios, all passing or dry-run validated
   - Issue workflow: 7 scenarios ✅
@@ -85,6 +88,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.0] - 2025-11-15
 
 ### Added
+
 - **Roundup Tracker Integration**: Complete issue tracking system with Web UI, CLI, and REST API
   - Roundup 2.4.0 with classic template
   - SQLite database backend
@@ -131,10 +135,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Progress tracking and metrics
 
 ### Changed
+
 - Project version bumped to 0.2.0 (first minor release)
 - Development environment now includes Roundup tracker
 
 ### Technical Details
+
 - **Testing**: 8 BDD scenarios, 56 steps, all passing
 - **Coverage**: Web UI (Playwright), CLI (subprocess), API (requests)
 - **Interfaces**: 3 complete interfaces for issue management
@@ -144,6 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.3] - 2025-11-15
 
 ### Added
+
 - MIT License (LICENSE file)
 - ADR-0004: Adopt MIT License and SLSA Level 1
 - SPDX headers to all source and documentation files
@@ -151,11 +158,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SLSA Level 1 compliance plan
 
 ### Changed
+
 - All documentation files now include SPDX-FileCopyrightText and SPDX-License-Identifier headers
 
 ## [0.1.2] - 2025-11-15
 
 ### Added
+
 - CI/CD and Quality Automation section in ADR-0002
 - Pre-commit hooks strategy documentation
 - GitHub Actions CI/CD strategy
@@ -163,12 +172,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI/CD validation criteria
 
 ### Changed
+
 - CLAUDE.md quality gates to include GitHub Actions requirement
 - Enhanced development workflow with CI/CD best practices
 
 ## [0.1.1] - 2025-11-15
 
 ### Added
+
 - Complete 6-sprint development plan (v0.2.0 → v1.0.0)
 - Sprint planning documents for all 6 sprints (206 story points total)
 - Sprint overview README with metrics and timeline
@@ -178,12 +189,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Web UI configuration (English only, 1024x768 screenshots)
 
 ### Changed
+
 - Semantic versioning strategy to use minor version bumps per sprint (0.x.0)
 - CLAUDE.md to reflect version management approach
 
 ## [0.1.0] - 2025-11-15
 
 ### Added
+
 - Initial project structure and foundation
 - Architecture Decision Records (ADR-0001, ADR-0002, ADR-0003)
 - Diátaxis documentation framework structure
@@ -193,10 +206,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documentation README following Diátaxis framework
 - Directory structure for features, docs, and sprints
 
-[Unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.3...v0.2.0
-[0.1.3]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/jrjsmrtn/pasture-management-system/releases/tag/v0.1.0
+[0.1.1]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.0...v0.1.1
+[0.1.2]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.1...v0.1.2
+[0.1.3]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.2...v0.1.3
+[0.2.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.1.3...v0.2.0
+[0.3.0]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.2.0...v0.3.0
+[unreleased]: https://github.com/jrjsmrtn/pasture-management-system/compare/v0.3.0...HEAD

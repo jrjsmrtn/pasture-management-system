@@ -20,11 +20,13 @@ Establish the CMDB capability for tracking homelab infrastructure configuration 
 ### Epic: CMDB Foundation
 
 #### Story 1: Define Configuration Item Schema
+
 **As a** homelab sysadmin
 **I want** to track configuration items in my infrastructure
 **So that** I can maintain an inventory of my homelab assets
 
 **Acceptance Criteria**:
+
 - CI types: Server, Network Device, Storage, Software, Service, Virtual Machine
 - Common attributes: name, type, status, location, owner, criticality
 - Type-specific attributes (e.g., servers have CPU/RAM, network devices have IP/ports)
@@ -32,6 +34,7 @@ Establish the CMDB capability for tracking homelab infrastructure configuration 
 - Schema documented in reference docs
 
 **BDD Scenarios**: (Feature file: `features/cmdb/ci_schema.feature`)
+
 ```gherkin
 @story-1 @api
 Scenario: Verify CI schema structure
@@ -67,14 +70,16 @@ Scenario: Verify server-specific attributes
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 2: Create Configuration Items
+
 **As a** homelab sysadmin
 **I want** to add configuration items to my CMDB
 **So that** I can track what infrastructure I have
 
 **Acceptance Criteria**:
+
 - Web UI form for CI creation
 - Type-specific attribute forms
 - CI saved to database
@@ -82,6 +87,7 @@ Scenario: Verify server-specific attributes
 - CI viewable in CI list
 
 **BDD Scenarios**: (Feature file: `features/cmdb/create_ci.feature`)
+
 ```gherkin
 @story-2 @web-ui @smoke
 Scenario: Create server CI
@@ -138,14 +144,16 @@ Scenario: Create virtual machine via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 3: CI Relationships and Dependencies
+
 **As a** homelab sysadmin
 **I want** to define relationships between configuration items
 **So that** I can understand dependencies in my infrastructure
 
 **Acceptance Criteria**:
+
 - Relationship types: Runs On, Depends On, Connects To, Contains, Hosted By
 - Bidirectional relationships (e.g., VM "Runs On" Server, Server "Hosts" VM)
 - Multiple relationships per CI
@@ -153,6 +161,7 @@ Scenario: Create virtual machine via API
 - Circular dependency detection
 
 **BDD Scenarios**: (Feature file: `features/cmdb/ci_relationships.feature`)
+
 ```gherkin
 @story-3 @web-ui
 Scenario: Link virtual machine to physical server
@@ -206,14 +215,16 @@ Scenario: Create CI relationship via API
 
 **Story Points**: 8
 
----
+______________________________________________________________________
 
 #### Story 4: Link CIs to Issues and Changes
+
 **As a** homelab sysadmin
 **I want** to link issues and changes to affected CIs
 **So that** I can track which infrastructure is impacted
 
 **Acceptance Criteria**:
+
 - Issue can reference affected CIs
 - Change can reference target CIs
 - CI view shows related issues and changes
@@ -221,6 +232,7 @@ Scenario: Create CI relationship via API
 - Filter issues/changes by CI
 
 **BDD Scenarios**: (Feature file: `features/cmdb/ci_integration.feature`)
+
 ```gherkin
 @story-4 @web-ui
 Scenario: Link issue to affected CI
@@ -270,14 +282,16 @@ Scenario: Create change with CI targets via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 #### Story 5: CI Search and Filtering
+
 **As a** homelab sysadmin
 **I want** to search and filter configuration items
 **So that** I can quickly find infrastructure components
 
 **Acceptance Criteria**:
+
 - Search by name, type, location, status
 - Filter by criticality, owner, CI type
 - Sort by various attributes
@@ -285,6 +299,7 @@ Scenario: Create change with CI targets via API
 - Quick filters for common searches
 
 **BDD Scenarios**: (Feature file: `features/cmdb/ci_search.feature`)
+
 ```gherkin
 @story-5 @web-ui
 Scenario: Search CIs by name
@@ -333,23 +348,26 @@ Scenario: Export CMDB via API
 
 **Story Points**: 5
 
----
+______________________________________________________________________
 
 ## Technical Tasks
 
 ### CMDB Schema
+
 - [ ] Design CI base schema and type-specific schemas
 - [ ] Create database migrations
 - [ ] Implement CI type inheritance/composition
 - [ ] Add lifecycle state management
 
 ### CI Management
+
 - [ ] Implement CI creation (web/CLI/API)
 - [ ] Create CI list and detail views
 - [ ] Add type-specific attribute forms
 - [ ] Implement CI search and filtering
 
 ### Relationships
+
 - [ ] Design relationship schema
 - [ ] Implement relationship management
 - [ ] Add relationship visualization
@@ -357,12 +375,14 @@ Scenario: Export CMDB via API
 - [ ] Create dependency tree views
 
 ### Integration
+
 - [ ] Link CIs to issues
 - [ ] Link CIs to changes
 - [ ] Implement impact analysis
 - [ ] Add CI context to issue/change views
 
 ### Documentation
+
 - [ ] Tutorial: "Building Your Homelab CMDB"
 - [ ] How-to: "Documenting Infrastructure Dependencies"
 - [ ] Reference: "CMDB Schema and Attributes"
@@ -384,26 +404,28 @@ Scenario: Export CMDB via API
 
 ## Sprint Backlog
 
-| Task | Story Points | Status |
-|------|-------------|--------|
-| Story 1: Define CI Schema | 5 | Not Started |
-| Story 2: Create Configuration Items | 5 | Not Started |
-| Story 3: CI Relationships | 8 | Not Started |
-| Story 4: Link CIs to Issues/Changes | 5 | Not Started |
-| Story 5: CI Search and Filtering | 5 | Not Started |
-| Documentation Tasks | 5 | Not Started |
+| Task                                | Story Points | Status      |
+| ----------------------------------- | ------------ | ----------- |
+| Story 1: Define CI Schema           | 5            | Not Started |
+| Story 2: Create Configuration Items | 5            | Not Started |
+| Story 3: CI Relationships           | 8            | Not Started |
+| Story 4: Link CIs to Issues/Changes | 5            | Not Started |
+| Story 5: CI Search and Filtering    | 5            | Not Started |
+| Documentation Tasks                 | 5            | Not Started |
 
 **Total Story Points**: 33
 
 ## Risks and Dependencies
 
 ### Risks
+
 - **Schema Complexity**: Type-specific attributes may be complex to model
   - *Mitigation*: Start with common attributes, add type-specific incrementally
 - **Relationship Complexity**: Dependency management can be intricate
   - *Mitigation*: Implement basic relationships first, add advanced features iteratively
 
 ### Dependencies
+
 - Sprint 3 completion (change management functional)
 - Understanding of CMDB concepts and homelab infrastructure
 

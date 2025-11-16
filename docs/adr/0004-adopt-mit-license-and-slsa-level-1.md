@@ -13,6 +13,7 @@ The Pasture Management System has dual objectives as both a functional homelab t
 ### License Considerations
 
 The project serves multiple audiences:
+
 - Homelab sysadmins seeking a practical ITIL-inspired tool
 - Python developers learning BDD/Gherkin/Behave/Playwright
 - Security-conscious users requiring transparent software practices
@@ -28,15 +29,17 @@ As a homelab management tool handling infrastructure data, supply chain security
 We will use the **MIT License** for the Pasture Management System.
 
 **Rationale**:
+
 1. **Educational Accessibility**: Minimal restrictions maximize learning and adoption of BDD patterns
-2. **Homelab Community Fit**: Permissive license aligns with DIY homelab culture
-3. **Simplicity**: Easy to understand, low barrier for contributions
-4. **Commercial Friendly**: Allows commercial use without copyleft requirements
-5. **Roundup Compatibility**: Compatible with Roundup's Python-based permissive licensing
+1. **Homelab Community Fit**: Permissive license aligns with DIY homelab culture
+1. **Simplicity**: Easy to understand, low barrier for contributions
+1. **Commercial Friendly**: Allows commercial use without copyleft requirements
+1. **Roundup Compatibility**: Compatible with Roundup's Python-based permissive licensing
 
 **Copyright**: Copyright (c) 2025 Georges Martin <jrjsmrtn@gmail.com>
 
 **SPDX Headers**: All source files will include SPDX-License-Identifier headers:
+
 ```python
 # SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
 # SPDX-License-Identifier: MIT
@@ -47,11 +50,13 @@ We will use the **MIT License** for the Pasture Management System.
 We will implement **SLSA Level 1** supply chain security practices.
 
 **SLSA Level 1 Requirements**:
+
 1. **Build Process**: Fully scripted/automated build process
-2. **Provenance**: Generate provenance metadata for build artifacts
-3. **Provenance Availability**: Make provenance available to consumers
+1. **Provenance**: Generate provenance metadata for build artifacts
+1. **Provenance Availability**: Make provenance available to consumers
 
 **Implementation**:
+
 - Automated builds via GitHub Actions
 - Generate and publish SLSA provenance attestations
 - Sign releases and artifacts
@@ -59,6 +64,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 - Reproducible builds where possible
 
 **Build Provenance Will Include**:
+
 - Build platform (GitHub Actions)
 - Build steps executed
 - Source repository and commit SHA
@@ -70,6 +76,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 ### Positive
 
 **License**:
+
 - Maximum educational value and code reuse
 - Simple contribution process
 - Broad adoption potential
@@ -77,6 +84,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 - Clear legal standing
 
 **SLSA Level 1**:
+
 - Increased trust for homelab deployments
 - Transparent build process
 - Artifact integrity verification
@@ -86,11 +94,13 @@ We will implement **SLSA Level 1** supply chain security practices.
 ### Negative
 
 **License**:
+
 - No copyleft protection (derivatives can be closed-source)
 - No explicit patent grant (unlike Apache 2.0)
 - Trademark protection requires separate measures
 
 **SLSA Level 1**:
+
 - Additional CI/CD complexity
 - Build time overhead for provenance generation
 - Learning curve for supply chain security concepts
@@ -99,6 +109,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 ## Implementation
 
 ### Phase 1: License Application
+
 - [x] Create LICENSE file with MIT License text
 - [ ] Add SPDX headers to all source files
 - [ ] Update README.md with license information
@@ -106,6 +117,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 - [ ] Document license in CLAUDE.md
 
 ### Phase 2: SLSA Level 1 Implementation (Sprint 1)
+
 - [ ] Configure GitHub Actions for automated builds
 - [ ] Install SLSA GitHub Actions generators
 - [ ] Generate provenance for Python packages
@@ -114,6 +126,7 @@ We will implement **SLSA Level 1** supply chain security practices.
 - [ ] Add SLSA badge to README
 
 ### Phase 3: Verification
+
 - [ ] Verify SLSA provenance generation
 - [ ] Test provenance verification workflow
 - [ ] Document how users can verify artifacts
@@ -122,12 +135,14 @@ We will implement **SLSA Level 1** supply chain security practices.
 ## SPDX Header Format
 
 All Python source files will include:
+
 ```python
 # SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
 # SPDX-License-Identifier: MIT
 ```
 
 All Markdown documentation files will include:
+
 ```markdown
 <!--
 SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
@@ -136,6 +151,7 @@ SPDX-License-Identifier: MIT
 ```
 
 All YAML/configuration files will include:
+
 ```yaml
 # SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
 # SPDX-License-Identifier: MIT
@@ -150,12 +166,14 @@ All YAML/configuration files will include:
 ## Validation Criteria
 
 **License**:
+
 - [ ] LICENSE file present in repository root
 - [ ] All source files have SPDX headers
 - [ ] README documents license clearly
 - [ ] GitHub repository shows license badge
 
 **SLSA Level 1**:
+
 - [ ] Builds fully automated via GitHub Actions
 - [ ] Provenance generated for all releases
 - [ ] Provenance publicly available and verifiable
@@ -171,11 +189,13 @@ All YAML/configuration files will include:
 ## Future Considerations
 
 **SLSA Level 2+**: Future progression to higher SLSA levels:
+
 - Level 2: Source and build platform integrity
 - Level 3: Hardened builds, non-falsifiable provenance
 - Level 4: Two-party review of all changes
 
 **License Evolution**: Monitor for:
+
 - Patent protection requirements (consider Apache 2.0)
 - Trademark registration needs
 - Contributor License Agreement (CLA) requirements
