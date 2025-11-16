@@ -39,36 +39,9 @@ def step_create_issue_with_title(context, title):
     context.created_issues[title] = issue_id
 
 
-@given('a change exists with title "{title}"')
-def step_create_change_with_title(context, title):
-    """Create a change with specific title."""
-    tracker_dir = getattr(context, "tracker_dir", "tracker")
-
-    # Create change via CLI
-    cmd = [
-        "roundup-admin",
-        "-i",
-        tracker_dir,
-        "create",
-        "change",
-        f"title={title}",
-        f"description=Test change for {title}",
-        "justification=Testing change-issue links",
-        "priority=2",  # medium
-        "category=1",  # software
-        "status=1",  # planning
-    ]
-
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, check=True)
-
-    # Extract change ID from output
-    change_id = result.stdout.strip()
-
-    # Store change information
-    if not hasattr(context, "created_changes"):
-        context.created_changes = {}
-    context.created_changes[title] = change_id
-    context.current_change_id = change_id
+# Note: Step definition for 'a change exists with title "{title}"' and
+# 'a change exists with title "{title}" and status "{status}"' are in
+# change_workflow_steps.py to avoid duplication
 
 
 @given('a change "{change_title}" is linked to the issue')
