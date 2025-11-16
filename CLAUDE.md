@@ -224,14 +224,50 @@ Sprint planning and tracking is maintained in `docs/sprints/`:
 - Sprint retrospectives capture lessons learned
 - Tutorials based on BDD features and sprint deliverables
 
+### Story and Sprint Completion
+
+When completing stories or sprints, follow the procedures documented in:
+
+- **[ADR-0002: Sprint and Story Completion Procedures](docs/adr/0002-adopt-development-best-practices.md#story-completion-procedure)**
+
+**Quick Checklist for Stories**:
+
+- Verify acceptance criteria and BDD scenarios pass
+- Update `docs/sprints/sprint-N-backlog.md` status to ✅ Complete
+- Commit with format: `feat: implement [description] (Sprint N, Story M)`
+
+**Quick Checklist for Sprints**:
+
+- Create/update sprint backlog (`sprint-N-backlog.md`)
+- Write sprint retrospective (`sprint-N-retrospective.md`)
+- Update CHANGELOG.md with `## [0.x.0] - YYYY-MM-DD` section
+- Update `docs/sprints/README.md` current status
+- Bump version (0.x.0 format, x increments per sprint)
+- Commit with format: `chore: complete Sprint N wrap-up (v0.x.0)`
+- Tag release: `git tag v0.x.0`
+
+See ADR-0002 for complete procedures, document structures, and quality checklists.
+
 ## Current Focus
 
-**Version 0.1.0** - Project foundation established with:
+**Version 0.4.0** - Sprint 3 complete, Sprint 4 implementation complete:
 
-- Directory structure
-- Foundational ADRs
-- Development tooling configuration
-- Documentation framework
-- Complete 6-sprint development plan (v0.2.0 → v1.0.0)
+**Completed Sprints**:
 
-Next steps: Sprint 1 (v0.2.0) - Set up Roundup tracker and implement basic issue tracking with BDD scenarios.
+- ✅ Sprint 1 (v0.2.0): Basic issue tracking with Roundup tracker
+- ✅ Sprint 2 (v0.3.0): Issue lifecycle and change management foundation
+- ✅ Sprint 3 (v0.4.0): Complete change management workflows
+- ✅ Sprint 4 (v0.5.0): CMDB foundation (implementation complete, wrap-up pending)
+
+**Sprint 4 Implementation Status**:
+
+- All 5 user stories implemented and committed
+- CMDB schema and CI creation complete
+- CI relationships and dependencies functional
+- CI-Issue-Change integration working
+- CI search and filtering operational
+
+**Next Steps**:
+
+- Complete Sprint 4 wrap-up (create backlog, retrospective, update CHANGELOG, bump to v0.5.0)
+- Begin Sprint 5 (v0.6.0): Reporting and Analytics

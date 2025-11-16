@@ -118,6 +118,148 @@ podman run --rm -p 8080:8080 \
 - **Sprint Review**: Demonstrate functionality, validate requirements
 - **Sprint Retrospective**: Continuous improvement
 
+#### Story Completion Procedure
+
+When a user story is completed, follow these steps:
+
+1. **Verify Acceptance Criteria**
+
+   - All acceptance criteria from the story planning document must be met
+   - All BDD scenarios for the story must pass
+   - Code passes all quality gates (pre-commit hooks, pre-push hooks)
+
+1. **Update Sprint Backlog**
+
+   - Mark story status as ✅ Complete in `docs/sprints/sprint-N-backlog.md`
+   - Update BDD scenario count and status (e.g., "7 scenarios - **ALL PASSING** ✅")
+   - Add completion timestamp if relevant
+   - Update story points summary (completed/in-progress/remaining)
+
+1. **Commit the Story**
+
+   - Use commit message format: `feat: implement [story description] (Sprint N, Story M)`
+   - Example: `feat: implement CI search and filtering (Sprint 4, Story 5)`
+   - Ensure commit includes all related code, tests, and documentation
+
+#### Sprint Completion Procedure
+
+When all user stories in a sprint are completed, follow this wrap-up process:
+
+1. **Create/Update Sprint Backlog** (`docs/sprints/sprint-N-backlog.md`)
+
+   - If it doesn't exist, create it following the Sprint Backlog Document Structure below
+   - Mark sprint status as: **Status**: ✅ Complete
+   - Update story points summary showing all points completed
+   - Mark all stories and tasks as ✅ Complete with BDD scenario counts
+   - Add actual start/end dates and duration
+
+1. **Create Sprint Retrospective** (`docs/sprints/sprint-N-retrospective.md`)
+
+   - Follow the Sprint Retrospective Document Structure below
+   - Include comprehensive analysis of sprint performance
+   - Document lessons learned and action items
+   - Include retrospective completion date and version released
+
+1. **Update CHANGELOG.md**
+
+   - Add a new version section: `## [0.x.0] - YYYY-MM-DD`
+   - Document all features added in the sprint under `### Added`
+   - Include comprehensive details:
+     - Story descriptions with acceptance criteria highlights
+     - BDD scenario counts (total and by story)
+     - Documentation deliverables with line counts
+     - Technical details (story points, coverage stats, new files)
+   - Add any changes under `### Changed`
+   - Document fixes under `### Fixed`
+   - Include Technical Details subsection summarizing metrics
+   - Update version links at bottom of CHANGELOG.md
+
+1. **Update Sprint Overview** (`docs/sprints/README.md`)
+
+   - Update "Current Status" section (bottom of file)
+   - Change from current version to new version
+   - Update "Next Sprint" to the upcoming sprint
+   - Keep the status concise and accurate
+
+1. **Bump Version**
+
+   - Update version number in relevant files (if applicable)
+   - Version format: 0.x.0 where x increments per sprint
+   - Sprint 1 → v0.2.0, Sprint 2 → v0.3.0, Sprint 3 → v0.4.0, etc.
+
+1. **Create Sprint Wrap-up Commit**
+
+   - Commit message format: `chore: complete Sprint N wrap-up (v0.x.0)`
+   - Example: `chore: complete Sprint 3 wrap-up (v0.4.0)`
+   - Include all documentation updates in this commit:
+     - CHANGELOG.md updates
+     - Sprint backlog completion
+     - Sprint retrospective
+     - docs/sprints/README.md update
+
+1. **Tag Release**
+
+   - Create git tag: `git tag v0.x.0`
+   - Push tag: `git push [remote] v0.x.0`
+   - Tag message should reference the sprint: "Sprint N Complete: [brief description]"
+
+#### Sprint Backlog Document Structure
+
+Sprint backlog files should follow this structure (see `sprint-1-backlog.md` and `sprint-2-backlog.md` as examples):
+
+- **Header**: Sprint number, target version, status, dates
+- **Sprint Goal**: One-sentence goal statement
+- **Story Points Summary**: Total/completed/in-progress/remaining
+- **Backlog Items**: Organized by epic/story
+  - Each story includes: story points, priority, status, user story text
+  - Acceptance criteria as checklist
+  - BDD scenario count and status
+  - Dependencies and technical notes
+- **Technical Tasks**: Implementation-level tasks
+- **Definition of Done**: Sprint-level checklist
+
+#### Sprint Retrospective Document Structure
+
+Sprint retrospective files should follow this structure (see `sprint-3-retrospective.md` as the gold standard):
+
+- **Header**: Duration, goal, completion date, version
+- **Sprint Summary**: Narrative summary with key metrics table
+- **Sprint Backlog Completion**: Table showing all stories with points, status, scenarios, LOC
+- **What Went Well**: 3-6 successes with evidence and impact
+- **What Could Be Improved**: 2-4 challenges with root cause and solutions
+- **Key Learnings**: 3-6 lessons learned with evidence
+- **Action Items for Next Sprint**: Categorized action items
+- **Sprint Highlights**: Most valuable deliverable, best innovation, impressive stats
+- **Velocity and Capacity Analysis**: Trends and recommendations
+- **Definition of Done Check**: Final checklist status
+- **Looking Ahead**: Potential focus areas for next sprint
+- **Final Thoughts**: Overall assessment with rating
+
+#### Quality Checklist for Sprint Completion
+
+Before considering a sprint complete, verify:
+
+- [ ] All user stories marked complete in sprint backlog
+- [ ] All BDD scenarios passing
+- [ ] All documentation deliverables completed
+- [ ] Sprint backlog document created/updated
+- [ ] Sprint retrospective written
+- [ ] CHANGELOG.md updated with new version
+- [ ] docs/sprints/README.md current status updated
+- [ ] Version bumped appropriately
+- [ ] Sprint wrap-up commit created
+- [ ] Git tag created for release
+- [ ] All commits follow commit message conventions
+- [ ] Pre-commit and pre-push hooks pass
+
+#### Commit Message Conventions
+
+- **Story completion**: `feat: implement [story description] (Sprint N, Story M)`
+- **Sprint wrap-up**: `chore: complete Sprint N wrap-up (v0.x.0)`
+- **Documentation**: `docs: add [document type] for [topic]`
+- **Bug fixes**: `fix: [description]`
+- **Refactoring**: `refactor: [description]`
+
 ### Documentation Framework (Diátaxis)
 
 **Framework**: Follow [Diátaxis](https://diataxis.fr/) framework
