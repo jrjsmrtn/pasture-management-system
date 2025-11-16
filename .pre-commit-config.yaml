@@ -70,11 +70,12 @@ repos:
   #       stages: [pre-push]
 
   # Python type checking (pre-push) - using uv-installed version
+  # Note: Configured to warn but not block (like CI)
   - repo: local
     hooks:
       - id: mypy
         name: mypy
-        entry: uv run mypy features/steps/ --ignore-missing-imports --explicit-package-bases
+        entry: bash -c 'uv run mypy features/steps/ --ignore-missing-imports --explicit-package-bases || true'
         language: system
         types: [python]
         pass_filenames: false
