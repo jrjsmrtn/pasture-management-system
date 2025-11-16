@@ -99,6 +99,28 @@
  </td>
 </tr>
 
+<tr tal:condition="context/id">
+ <th i18n:translate="">Related Changes</th>
+ <td colspan=3>
+  <tal:block tal:define="related_changes python:db.change.filter(None, {'related_issues': context.id})">
+   <tal:block tal:condition="related_changes">
+    <ul style="margin: 0; padding-left: 20px;">
+     <li tal:repeat="change_id related_changes">
+      <tal:block tal:define="change python:db.change.getnode(change_id)">
+       <a tal:attributes="href string:change${change_id}"
+          tal:content="python:f'change{change_id}: {change.title}'">change link</a>
+       (<span tal:replace="python:db.changestatus.get(change.status, 'name')">status</span>)
+      </tal:block>
+     </li>
+    </ul>
+   </tal:block>
+   <tal:block tal:condition="not:related_changes">
+    <em i18n:translate="">No related changes</em>
+   </tal:block>
+  </tal:block>
+ </td>
+</tr>
+
 <tr tal:condition="context/is_edit_ok">
  <th i18n:translate="">Change Note</th>
  <td colspan=3>
