@@ -83,22 +83,25 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-### Sprint 5: Reporting & Dashboards (v0.6.0)
+### Sprint 5: CMDB Implementation & Test Infrastructure (v0.6.0)
 
 **Duration**: 2 weeks
-**Goal**: Add reporting and analytics capabilities
+**Goal**: Implement CMDB foundation and establish test infrastructure
+
+> **⚠️ REVISED 2025-11-16**: Original plan (Reporting & Dashboards) deferred to Sprint 6+
 
 **Key Deliverables**:
 
-- Issue statistics dashboard
-- Change management reports
-- CMDB health reports
-- Custom report builder
-- Scheduled/email reports
+- CMDB schema implementation in Roundup
+- CI creation, relationships, and search (Web UI, CLI, API)
+- CI-Issue-Change integration
+- Environment validation framework
+- Smoke test suite
+- Scenario pass rate: 5% → 50%+ (6 → 60+ passing scenarios)
 
-**Story Points**: 39
+**Story Points**: 41
 
-[📄 Sprint 5 Planning](sprint-5-planning.md)
+[📄 Sprint 5 Planning (Revised)](sprint-5-planning-revised.md) | [Original Plan (Superseded)](sprint-5-planning.md)
 
 ______________________________________________________________________
 
@@ -252,9 +255,9 @@ BDD demonstration presentations created throughout sprints:
 
 ## Current Status
 
-**Current Version**: v0.1.0 (Foundation)
-**Next Sprint**: Sprint 1 - Foundation & Basic Issue Tracking
-**Target**: v0.2.0
+**Current Version**: v0.5.0 (Sprint 4 Complete)
+**Next Sprint**: Sprint 5 - CMDB Implementation & Test Infrastructure
+**Target**: v0.6.0
 
 ## Sprint Documents
 

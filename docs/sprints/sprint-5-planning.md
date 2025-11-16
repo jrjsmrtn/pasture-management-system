@@ -5,15 +5,31 @@ SPDX-License-Identifier: MIT
 
 # Sprint 5 Plan - Pasture Management System
 
+> **⚠️ PLAN REVISED - 2025-11-16**
+>
+> This sprint plan has been revised based on Sprint 4 outcomes.
+> **Active Plan**: [Sprint 5 Planning (Revised)](sprint-5-planning-revised.md)
+>
+> **Original Focus**: Reporting & Dashboards
+> **Revised Focus**: CMDB Implementation & Test Infrastructure
+>
+> **Rationale**: Sprint 4 created 125 BDD scenarios with only 6 passing (5%). Must implement CMDB features before building reports about them. Original sprint 5 content moved to Sprint 6+.
+
+______________________________________________________________________
+
+# Sprint 5 Plan (ORIGINAL - SUPERSEDED) - Pasture Management System
+
 **Sprint Duration**: 2 weeks
-**Sprint Goal**: Add reporting, dashboards, and analytics capabilities
-**Target Version**: v0.6.0
+**Sprint Goal**: ~~Add reporting, dashboards, and analytics capabilities~~ **SUPERSEDED - See Revised Plan**
+**Target Version**: ~~v0.6.0~~ **DEFERRED**
 **Start Date**: TBD
 **End Date**: TBD
 
 ## Sprint Objective
 
-Implement reporting and dashboard capabilities to provide visibility into homelab operations. Add metrics, analytics, and visualization to help sysadmins understand their issue trends, change success rates, and CMDB health. This sprint focuses on operational insights and management visibility.
+~~Implement reporting and dashboard capabilities to provide visibility into homelab operations. Add metrics, analytics, and visualization to help sysadmins understand their issue trends, change success rates, and CMDB health. This sprint focuses on operational insights and management visibility.~~
+
+**NOTE**: This content has been deferred to Sprint 6+ to focus Sprint 5 on implementing the CMDB foundation specified in Sprint 4's BDD scenarios.
 
 ## User Stories
 
