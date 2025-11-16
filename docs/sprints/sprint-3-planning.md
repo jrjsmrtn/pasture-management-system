@@ -365,12 +365,12 @@ ______________________________________________________________________
 
 ### Documentation
 
-- [ ] Tutorial: "Managing Changes in Your Homelab"
-- [ ] How-to: "Submitting a Change Request"
-- [ ] How-to: "Assessing Change Risk"
-- [ ] Reference: "Change Workflow States"
-- [ ] Explanation: "ITIL Change Management Principles"
-- [ ] Marpit presentation: "BDD Testing in Practice"
+- [x] Tutorial: "Managing Changes in Your Homelab"
+- [x] How-to: "Submitting a Change Request"
+- [x] How-to: "Assessing Change Risk"
+- [x] Reference: "Change Workflow States"
+- [x] Explanation: "ITIL Change Management Principles"
+- [x] Marpit presentation: "BDD Testing in Practice"
 
 ## Definition of Done
 
@@ -394,12 +394,12 @@ ______________________________________________________________________
 | Story 3: Change Risk Assessment         | 5            | ✅ Complete |
 | Story 4: Change Scheduling              | 5            | ✅ Complete |
 | Story 5: Change Implementation Tracking | 5            | ✅ Complete |
-| Documentation and Presentation          | 5            | Not Started |
+| Documentation and Presentation          | 5            | ✅ Complete |
 
 **Total Story Points**: 33
-**Completed**: 28 points (85%)
+**Completed**: 33 points (100%)
 **In Progress**: 0 points
-**Remaining**: 5 points
+**Remaining**: 0 points
 
 ## Risks and Dependencies
 
