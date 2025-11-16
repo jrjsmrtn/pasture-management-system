@@ -8,7 +8,7 @@ Feature: Assign Issues to Owner
   So that responsibilities are clear
 
   Background:
-    Given the Roundup tracker is running at "http://localhost:8080/pms"
+    Given the Roundup tracker is running
 
   @web-ui @smoke
   Scenario: Assign issue to user during creation

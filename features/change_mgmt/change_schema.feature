@@ -8,7 +8,7 @@ Feature: Change Request Schema
   So that I can track planned infrastructure changes systematically
 
   Background:
-    Given the Roundup tracker is running at "http://localhost:8080/pms"
+    Given the Roundup tracker is running
 
   @api
   Scenario: Verify change schema fields via API

@@ -15,8 +15,9 @@ from features.steps.common import PRIORITY_MAP
 @given("the Roundup REST API is accessible")
 def step_api_accessible(context):
     """Verify the Roundup REST API is accessible."""
-    # Get the API URL from environment or use default
-    api_url = "http://localhost:8080/pms/rest/data"
+    # Get the API URL from context.tracker_url (configured in environment.py)
+    tracker_url = context.tracker_url
+    api_url = f"{tracker_url.rstrip('/')}/rest/data"
     context.api_url = api_url
 
     # Simple connectivity test
@@ -68,11 +69,17 @@ def step_post_to_api(context):
     context.api_issue_data = issue_data
 
     # Prepare headers with CSRF protection headers
+    # Extract base URL (protocol://host:port) from tracker_url
+    from urllib.parse import urlparse
+
+    parsed = urlparse(context.tracker_url)
+    base_url = f"{parsed.scheme}://{parsed.netloc}"
+
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-        "Origin": "http://localhost:8080",
-        "Referer": "http://localhost:8080/pms/",
+        "Origin": base_url,
+        "Referer": context.tracker_url,
     }
 
     # Make the POST request
@@ -104,11 +111,17 @@ def step_post_without_auth(context):
         payload[field_name] = field_value
 
     # Prepare headers
+    # Extract base URL (protocol://host:port) from tracker_url
+    from urllib.parse import urlparse
+
+    parsed = urlparse(context.tracker_url)
+    base_url = f"{parsed.scheme}://{parsed.netloc}"
+
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-        "Origin": "http://localhost:8080",
-        "Referer": "http://localhost:8080/pms/",
+        "Origin": base_url,
+        "Referer": context.tracker_url,
     }
 
     # Make the POST request WITHOUT auth

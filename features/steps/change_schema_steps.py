@@ -11,7 +11,8 @@ from requests.auth import HTTPBasicAuth
 @when('I GET "{endpoint}" via API')
 def step_get_via_api(context, endpoint):
     """Send a GET request to the API."""
-    api_url = "http://localhost:8080/pms"
+    # Get base URL from context
+    api_url = context.tracker_url.rstrip("/")
     full_url = f"{api_url}{endpoint}"
     auth = HTTPBasicAuth("admin", "admin")
 

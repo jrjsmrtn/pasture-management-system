@@ -30,7 +30,7 @@ CHANGECATEGORY_MAP = {
 @when('I navigate to the "New Change" page')
 def step_navigate_to_new_change_page(context):
     """Navigate to the new change request creation page."""
-    context.page.goto("http://localhost:8080/pms/change?@template=item")
+    context.page.goto(f"{context.tracker_url}change?@template=item")
     context.page.wait_for_load_state("networkidle")
 
 
@@ -164,17 +164,24 @@ def step_verify_change_status(context, status):
 @when('I POST to "{endpoint}" with JSON:')
 def step_post_to_endpoint_with_json(context, endpoint):
     """POST JSON data to an API endpoint."""
-    api_url = "http://localhost:8080/pms"
+    # Get base URL from context
+    api_url = context.tracker_url.rstrip("/")
     full_url = f"{api_url}{endpoint}"
     auth = HTTPBasicAuth("admin", "admin")
 
     payload = json.loads(context.text)
 
+    # Extract base URL (protocol://host:port) from tracker_url
+    from urllib.parse import urlparse
+
+    parsed = urlparse(context.tracker_url)
+    base_url = f"{parsed.scheme}://{parsed.netloc}"
+
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-        "Origin": "http://localhost:8080",
-        "Referer": "http://localhost:8080/pms/",
+        "Origin": base_url,
+        "Referer": context.tracker_url,
     }
 
     response = requests.post(full_url, json=payload, headers=headers, auth=auth, timeout=30)

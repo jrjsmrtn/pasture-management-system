@@ -6,13 +6,15 @@
 from behave import given, then, when
 from playwright.sync_api import expect
 
+from tests.config.playwright_config import DEFAULT_TRACKER_URL
+
 
 @given("the Roundup tracker is running")
 @given('the Roundup tracker is running at "{url}"')
 def step_tracker_running(context, url=None):
     """Verify the Roundup tracker is accessible."""
-    # Use provided URL or default from context
-    tracker_url = url if url else getattr(context, "tracker_url", "http://localhost:8080/pms")
+    # Use provided URL or default from context (configured in environment.py)
+    tracker_url = url if url else getattr(context, "tracker_url", DEFAULT_TRACKER_URL)
 
     # Store the URL in context
     context.tracker_url = tracker_url
@@ -41,6 +43,10 @@ def step_login_default(context):
 @given('I am logged in to the web UI as "{username}" with password "{password}"')
 def step_login_as_user(context, username, password="admin"):
     """Log in to the Roundup tracker as the specified user."""
+    # Skip for non-web-UI scenarios (CLI/API)
+    if not hasattr(context, "page") or context.page is None:
+        return
+
     # Navigate to the tracker
     context.page.goto(context.tracker_url)
 

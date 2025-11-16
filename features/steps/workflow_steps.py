@@ -141,8 +141,9 @@ def step_patch_api_with_json(context):
     # Get the issue ID from context
     issue_id = context.current_issue_id.replace("issue", "")
 
-    # Build full URL
-    api_url = "http://localhost:8080/pms/rest/data"
+    # Build full URL using context.tracker_url
+    tracker_url = context.tracker_url.rstrip("/")
+    api_url = f"{tracker_url}/rest/data"
     endpoint = f"/issue/{issue_id}"
     full_url = f"{api_url}{endpoint}"
 
@@ -170,11 +171,17 @@ def step_patch_api_with_json(context):
             payload["status"] = status_id
 
     # Prepare headers with If-Match
+    # Extract base URL (protocol://host:port) from tracker_url
+    from urllib.parse import urlparse
+
+    parsed = urlparse(context.tracker_url)
+    base_url = f"{parsed.scheme}://{parsed.netloc}"
+
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
-        "Origin": "http://localhost:8080",
-        "Referer": "http://localhost:8080/pms/",
+        "Origin": base_url,
+        "Referer": context.tracker_url,
         "If-Match": etag,
     }
 

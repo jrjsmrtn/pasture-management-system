@@ -8,7 +8,7 @@ Feature: Create Change Request
   So that I can plan and track infrastructure changes
 
   Background:
-    Given the Roundup tracker is running at "http://localhost:8080/pms"
+    Given the Roundup tracker is running
 
   @web-ui @smoke
   Scenario: Create change request with required fields

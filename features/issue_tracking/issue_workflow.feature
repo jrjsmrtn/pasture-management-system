@@ -8,7 +8,7 @@ Feature: Issue Status Workflow
   So that I can track progress on resolving problems
 
   Background:
-    Given the Roundup tracker is running at "http://localhost:8080/pms"
+    Given the Roundup tracker is running
 
   @web-ui @smoke
   Scenario: Transition issue from New to In Progress

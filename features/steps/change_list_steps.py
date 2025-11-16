@@ -107,7 +107,7 @@ def step_no_changes_exist(context):
 @when('I navigate to "Changes"')
 def step_navigate_to_changes(context):
     """Navigate to the change request list page."""
-    context.page.goto("http://localhost:8080/pms/change?@template=index")
+    context.page.goto(f"{context.tracker_url}change?@template=index")
     context.page.wait_for_load_state("networkidle")
 
 
@@ -301,7 +301,8 @@ def step_should_not_see_text_cli(context, text):
 @when('I GET "{endpoint}"')
 def step_get_endpoint(context, endpoint):
     """GET data from an API endpoint."""
-    api_url = "http://localhost:8080/pms"
+    # Get base URL from context
+    api_url = context.tracker_url.rstrip("/")
     full_url = f"{api_url}{endpoint}"
     auth = HTTPBasicAuth("admin", "admin")
 
