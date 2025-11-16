@@ -61,9 +61,7 @@ def check_status_transition(db, cl, nodeid, newvalues):
         current_status_name = status_class.get(current_status_id, "name")
         new_status_name = status_class.get(new_status_id, "name")
 
-        raise ValueError(
-            f"Invalid status transition: {current_status_name} -> {new_status_name}"
-        )
+        raise ValueError(f"Invalid status transition: {current_status_name} -> {new_status_name}")
 
 
 def init(db):

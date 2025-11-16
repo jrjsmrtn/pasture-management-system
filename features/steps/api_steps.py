@@ -131,14 +131,14 @@ def step_verify_api_status(context, expected_status):
     # Handle "201 or 200" format
     if " or " in expected_status:
         allowed_statuses = [int(s.strip()) for s in expected_status.split(" or ")]
-        assert (
-            context.api_status_code in allowed_statuses
-        ), f"Expected status {expected_status}, got {context.api_status_code}. Response: {context.api_response.text}"
+        assert context.api_status_code in allowed_statuses, (
+            f"Expected status {expected_status}, got {context.api_status_code}. Response: {context.api_response.text}"
+        )
     else:
         expected_code = int(expected_status)
-        assert (
-            context.api_status_code == expected_code
-        ), f"Expected status {expected_code}, got {context.api_status_code}. Response: {context.api_response.text}"
+        assert context.api_status_code == expected_code, (
+            f"Expected status {expected_code}, got {context.api_status_code}. Response: {context.api_response.text}"
+        )
 
 
 @then("the response should contain an issue ID")

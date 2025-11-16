@@ -29,13 +29,19 @@ repos:
       - id: gitleaks  # Secret scanning on every commit
         stages: [pre-commit]
 
-  # Python formatting and linting with ruff
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
+  # Python formatting and linting with ruff (using uv-installed version)
+  - repo: local
     hooks:
-      - id: ruff-format  # Formatting (fast - pre-commit)
-      - id: ruff  # Fast linting checks (pre-commit)
-        args: [--fix]
+      - id: ruff-format
+        name: ruff-format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+      - id: ruff
+        name: ruff
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint

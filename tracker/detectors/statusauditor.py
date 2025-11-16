@@ -21,27 +21,25 @@
 
 from roundup.configuration import BooleanOption, InvalidOptionError
 
+
 def chatty(db, cl, nodeid, newvalues):
-    ''' If the issue is currently 'resolved', 'done-cbb' or None,
-        then set it to 'chatting'. If issue is 'unread' and
-        chatting_requires_two_users is true, set state
-        to 'chatting' if the person adding the new message is not
-        the same as the person who created the issue. This allows
-        somebody to submit multiple emails describing the problem
-        without changing it to 'chatting'. 'chatting' should
-        indicate at least two people are 'chatting'.
-    '''
+    """If the issue is currently 'resolved', 'done-cbb' or None,
+    then set it to 'chatting'. If issue is 'unread' and
+    chatting_requires_two_users is true, set state
+    to 'chatting' if the person adding the new message is not
+    the same as the person who created the issue. This allows
+    somebody to submit multiple emails describing the problem
+    without changing it to 'chatting'. 'chatting' should
+    indicate at least two people are 'chatting'.
+    """
     # If set to true, change state from 'unread' to 'chatting' only
     # if the author of the update is not the person who created the
     # first message (and thus the issue). If false (default ini file
     # setting) set 'chatting' when the second message is received.
     try:
-        chatting_requires_two_users = BooleanOption(None,
-                        "detector::Statusauditor",
-                        "CHATTING_REQUIRES_TWO_USERS").str2value(
-        db.config.detectors[
-        'STATUSAUDITOR_CHATTING_REQUIRES_TWO_USERS' ]
-    )
+        chatting_requires_two_users = BooleanOption(
+            None, "detector::Statusauditor", "CHATTING_REQUIRES_TWO_USERS"
+        ).str2value(db.config.detectors["STATUSAUDITOR_CHATTING_REQUIRES_TWO_USERS"])
     except InvalidOptionError:
         chatting_requires_two_users = False
         # NOTE if this is hit, detectors/config.ini needs to be updated with:
@@ -50,35 +48,35 @@ def chatty(db, cl, nodeid, newvalues):
         # to enable or no to disable (same as default)
 
     # don't fire if there's no new message (ie. chat)
-    if 'messages' not in newvalues:
+    if "messages" not in newvalues:
         return
-    if newvalues['messages'] == cl.get(nodeid, 'messages'):
+    if newvalues["messages"] == cl.get(nodeid, "messages"):
         return
 
     # get the chatting state ID
     try:
-        chatting_id = db.status.lookup('chatting')
+        chatting_id = db.status.lookup("chatting")
     except KeyError:
         # no chatting state, ignore all this stuff
         return
 
     # get the current value
-    current_status = cl.get(nodeid, 'status')
+    current_status = cl.get(nodeid, "status")
 
     # see if there's an explicit change in this transaction
-    if 'status' in newvalues:
+    if "status" in newvalues:
         # yep, skip
         return
 
     # determine the id of 'unread', 'resolved' and 'chatting'
     fromstates = []
-    for state in 'unread resolved done-cbb'.split():
+    for state in "unread resolved done-cbb".split():
         try:
             fromstates.append(db.status.lookup(state))
         except KeyError:
             pass
 
-    unread = fromstates[0] # grab the 'unread' state which is first
+    unread = fromstates[0]  # grab the 'unread' state which is first
 
     # ok, there's no explicit change, so check if we are in a state that
     # should be changed. First see if we should set 'chatting' based on
@@ -87,7 +85,7 @@ def chatty(db, cl, nodeid, newvalues):
         # find creator of issue and compare to currentuser making
         # update. If the creator is same as initial author don't
         # change to 'chatting'.
-        issue_creator = cl.get(nodeid, 'creator')
+        issue_creator = cl.get(nodeid, "creator")
         if issue_creator == db.getuid():
             # person is chatting with themselves, don't set 'chatting'
             return
@@ -96,30 +94,30 @@ def chatty(db, cl, nodeid, newvalues):
     # we are 'chatting'.
     if current_status in fromstates + [None]:
         # yep, we're now chatting
-        newvalues['status'] = chatting_id
+        newvalues["status"] = chatting_id
 
 
 def presetunread(db, cl, nodeid, newvalues):
-    ''' Make sure the status is set on new issues
-    '''
-    if 'status' in newvalues and newvalues['status']:
+    """Make sure the status is set on new issues"""
+    if "status" in newvalues and newvalues["status"]:
         return
 
     # get the unread state ID
     try:
-        unread_id = db.status.lookup('unread')
+        unread_id = db.status.lookup("unread")
     except KeyError:
         # no unread state, ignore all this stuff
         return
 
     # ok, do it
-    newvalues['status'] = unread_id
+    newvalues["status"] = unread_id
 
 
 def init(db):
     # fire before changes are made
-    db.issue.audit('set', chatty)
-    db.issue.audit('create', presetunread)
+    db.issue.audit("set", chatty)
+    db.issue.audit("create", presetunread)
+
 
 # vim: set filetype=python ts=4 sw=4 et si
-#SHA: 7fb686830827f1b7d9694456314bacda69739549
+# SHA: 7fb686830827f1b7d9694456314bacda69739549
