@@ -139,7 +139,7 @@ def step_create_multiple_issues(context):
         context.created_issues[title] = issue_id
 
 
-@given('a change exists with ID "{change_id}"')
+@given('a change exists with ID "{change_id:d}"')
 def step_create_change_with_id(context, change_id):
     """Create a change (ID will be auto-assigned)."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")

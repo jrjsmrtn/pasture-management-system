@@ -40,7 +40,7 @@ def step_create_change_with_status(context, title, status):
     context.change_title = title
 
 
-@given('a change exists with ID "{change_id}" and status "{status}"')
+@given('a change exists with ID "{change_id:d}" and status "{status}"')
 def step_create_change_with_id_and_status(context, change_id, status):
     """Create a change with specific ID and status (via CLI)."""
     status_id = CHANGESTATUS_MAP.get(status.lower())
