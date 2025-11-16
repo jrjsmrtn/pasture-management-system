@@ -6,7 +6,7 @@
 	tal:condition="request/form/properties/value | false"
 	    ><tal:loop tal:repeat="field
                  python:request.form['properties'].value.split(',')"
-              ><tal:x tal:condition="field" 
+              ><tal:x tal:condition="field"
                   tal:replace="python:',\n   \x22%s\x22: \x22%s\x22' % (
                            field, i18n.gettext(field))"
             /></tal:loop></tal:block>

@@ -7,7 +7,7 @@
 
 <form method="GET" name="itemSynopsis"
       tal:attributes="action request/classname">
-      
+
 <table class="form" tal:define="
    cols python:request.columns or 'id activity title status assignedto'.split();
    sort_on python:request.sort and request.sort[0] or nothing;

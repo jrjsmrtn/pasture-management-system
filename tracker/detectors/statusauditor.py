@@ -48,7 +48,7 @@ def chatty(db, cl, nodeid, newvalues):
         #   [statusauditor]
         #   chatting_requires_two_users = yes
         # to enable or no to disable (same as default)
-        
+
     # don't fire if there's no new message (ie. chat)
     if 'messages' not in newvalues:
         return

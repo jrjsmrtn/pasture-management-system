@@ -25,7 +25,7 @@ qs python:'&'.join([a for a in qs.split('&') if not a.startswith('@template=')])
       tal:define="
       property request/form/property/value;
    props python:('properties' in request.form and request.form['properties'].value.split(',')) or [];
-   cols python:request.columns or props or 
+   cols python:request.columns or props or
         'id username address realname roles'.split();
    sort_on request/sort | nothing;
    sort_desc python:sort_on and request.sort[0][0] == '-';

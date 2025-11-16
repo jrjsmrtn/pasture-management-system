@@ -151,9 +151,9 @@ def step_patch_api_with_json(context):
 
     # First, GET the issue to retrieve its etag
     get_response = requests.get(full_url, auth=auth, timeout=30)
-    assert get_response.status_code == 200, (
-        f"Failed to GET issue for etag: {get_response.status_code}"
-    )
+    assert (
+        get_response.status_code == 200
+    ), f"Failed to GET issue for etag: {get_response.status_code}"
 
     issue_data = get_response.json()
     etag = issue_data.get("data", {}).get("@etag")
@@ -212,9 +212,9 @@ def step_verify_issue_status(context, expected_status):
     assert status_id, f"Unknown status: {expected_status}"
 
     # Check for "status: N" in output
-    assert f"status: {status_id}" in output.lower(), (
-        f"Expected status '{expected_status}' (ID {status_id}) not found in issue. Output: {output}"
-    )
+    assert (
+        f"status: {status_id}" in output.lower()
+    ), f"Expected status '{expected_status}' (ID {status_id}) not found in issue. Output: {output}"
 
 
 @then('I should see "{text}"')
@@ -299,9 +299,9 @@ def step_verify_issue_id_status(context, issue_id, expected_status):
     assert status_id, f"Unknown status: {expected_status}"
 
     # Check for "status: N" in output
-    assert f"status: {status_id}" in output.lower(), (
-        f"Expected status '{expected_status}' (ID {status_id}) not found in issue. Output: {output}"
-    )
+    assert (
+        f"status: {status_id}" in output.lower()
+    ), f"Expected status '{expected_status}' (ID {status_id}) not found in issue. Output: {output}"
 
 
 @given("I have a valid API token")

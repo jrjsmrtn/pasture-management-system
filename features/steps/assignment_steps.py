@@ -72,9 +72,9 @@ def step_verify_issue_assigned_to(context, username):
     # Look for "assignedto: N" in output (where N is the user ID)
     # We'll check for the username presence as well
     assert "assignedto:" in output.lower(), f"No assignedto field found in issue. Output: {output}"
-    assert username in output or "1" in output, (
-        f"Issue not assigned to '{username}'. Output: {output}"
-    )
+    assert (
+        username in output or "1" in output
+    ), f"Issue not assigned to '{username}'. Output: {output}"
 
 
 @when('I filter issues by assignee "{assignee}"')

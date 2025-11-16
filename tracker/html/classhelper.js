@@ -1,5 +1,5 @@
 /**
- * Properties for the ClassHelper component, 
+ * Properties for the ClassHelper component,
  * made into a type for better readability.
  * @typedef {Object} HelpUrlProps
  * Type of data that needs to be shown (eg. issue, user, keywords) parsed from helpurl
@@ -44,15 +44,15 @@ const ALTERNATIVE_DROPDOWN_PATHNAMES = {
 }
 
 /**
- * This is a custom web component(user named html tag) that wraps a helpurl link 
+ * This is a custom web component(user named html tag) that wraps a helpurl link
  * and provides additional functionality.
- * 
+ *
  * The classhelper is an interactive popup window that displays a table of data.
  * Users can interact with this window to search, navigate and select data from the table.
  * The selected data is either "Id" or "a Value" from the table row.
  * There can be multiple selections in the table.
  * The selected data is then populated in a form field in the main window.
- * 
+ *
  * How to use.
  * ------------
  * The helpurl must be wrapped under this web component(user named html tag).
@@ -63,35 +63,35 @@ const ALTERNATIVE_DROPDOWN_PATHNAMES = {
  *    )
  * </roundup-classhelper>
  * ```
- * 
+ *
  * The data-search-with attribute of the web component is optional.
- * 
+ *
  * data-search-with attribute value is a list of comma separated names of table data fields.
  * (It is possible that a data field is present in search form but absent in the table).
- * 
+ *
  * A square parentheses open+close ("[]") can be added to the column name eg."status[]",
- * this will make that search field as a dropdown in the search form in popup window, 
+ * this will make that search field as a dropdown in the search form in popup window,
  * then a user can see all the possible values that column can have.
- * 
- * eg. data-search-with="title,status[],keyword[]+name" where status can have values like "open", 
- * "closed" a dropdown will be shown with null, open and closed. This is an aesthetic usage 
+ *
+ * eg. data-search-with="title,status[],keyword[]+name" where status can have values like "open",
+ * "closed" a dropdown will be shown with null, open and closed. This is an aesthetic usage
  * instead of writing in a text field for options in status.
- * 
+ *
  * A plus sign or minus sign with data field can be used to specify the sort order of the dropdown.
  * In the above example, keyword[]+name will sort the dropdown in ascending order(a-z) of name of the keyword.
  * A value keyword[]-name will sort the dropdown in descending order(z-a) of name of the keyword.
- * 
+ *
  * data-search-with="<<column name>>[]{+|-}{id|name}"
  * Here column name is required,
  * optionally there can be [] for a dropdown,
- * optionally with "[]" present to a column name there can be 
+ * optionally with "[]" present to a column name there can be
  * [+ or -] with succeeding "id" or "name" for sorting dropdown.
- * 
+ *
  * The data-popup-title attribute of the web component is optional.
  * the value of this attribute is the title of the popup window.
  * the user can use "{itemDesignator}" in the title to replace in the attribute value.
  * and the current context of classhelper will replace "{itemDesignator}".
- * 
+ *
  */
 class ClassHelper extends HTMLElement {
 
@@ -100,15 +100,15 @@ class ClassHelper extends HTMLElement {
     /** @type {Window} handler to popup window */
     popupRef = null;
 
-    /** 
+    /**
      * Result from making a call to the rest api, for the translation keywords.
      * @type {Object.<string, string>} */
     static translations = null;
 
-    /** 
+    /**
      * Stores the result from api calls made to rest api,
      * for the parameters in data-search-with attribute of this web component
-     * where a parameter is defined as a dropdown in 
+     * where a parameter is defined as a dropdown in
      * @type {Object.<string, Map.<string, string>>} */
     dropdownsData = null;
 
@@ -121,7 +121,7 @@ class ClassHelper extends HTMLElement {
     /** @type {HelpUrlProps} */
     helpurlProps = null;
 
-    /** 
+    /**
  * The qualified domain name with protocol and port(if any)
  * with the tracker name if any.
  * eg. http://localhost:8080/demo or https://demo.roundup-tracker.org
@@ -518,7 +518,7 @@ class ClassHelper extends HTMLElement {
         }
     }
 
-    /** 
+    /**
      * from roundup docs rest api url - "{host}/{tracker}
      * we pass helpurl which is parsed from anchor tag and return a URL.
      * @param {HelpUrlProps} props
@@ -613,7 +613,7 @@ class ClassHelper extends HTMLElement {
 
             input.setAttribute("name", param);
             input.setAttribute("id", param);
-            input.classList.add("search-input"); // Add class for styling   
+            input.classList.add("search-input"); // Add class for styling
 	    if (!focusSet) {
 	      input.setAttribute("autofocus", "");
 	      focusSet = true;
@@ -786,10 +786,10 @@ class ClassHelper extends HTMLElement {
     }
 
     /**
-     * 
-     * @param {string[]} headers 
-     * @param {Object.<string, any>[]} data 
-     * @returns 
+     *
+     * @param {string[]} headers
+     * @param {Object.<string, any>[]} data
+     * @returns
      */
     getTableFragment(headers, data, preSelectedValues) {
         let includeCheckbox = !this.popupRef.document.body.classList.contains(CLASSHELPER_TABLE_SELECTION_NONE);
@@ -899,7 +899,7 @@ class ClassHelper extends HTMLElement {
     /**
      * main method called when classhelper is clicked
      * @param {URL | string} apiURL
-     * @param {HelpUrlProps} props 
+     * @param {HelpUrlProps} props
      * @param {string[]} preSelectedValues
      * @param {FormData} formData
      * @throws {Error} when fetching or parsing data from roundup rest api fails
@@ -1198,7 +1198,7 @@ class ClassHelper extends HTMLElement {
         popupBody.replaceChild(newTableFrag, oldTableFrag);
     }
 
-    /** method when a value is selected in 
+    /** method when a value is selected in
      * @param {HelpUrlProps} props
      * @param {string} value
      */

@@ -62,7 +62,7 @@ def audit_user_fields(db, cl, nodeid, newvalues):
     if 'username' in newvalues:
         if not valid_username.match(newvalues['username']):
             raise ValueError("Username/Login Name must consist only of the letters a-z (any case), digits 0-9 and the symbols: @._-!+%")
-        
+
     for address in get_addresses(newvalues):
         if not valid_address(address):
             raise ValueError('Email address syntax is invalid "%s"'%address)

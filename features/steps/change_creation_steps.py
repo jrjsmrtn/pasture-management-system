@@ -84,9 +84,9 @@ def step_verify_change_saved(context, title):
 
     output = result.stdout
     # Look for the title in the output
-    assert title in output or "change1" in output.lower(), (
-        f"Change with title '{title}' not found. Output: {output}"
-    )
+    assert (
+        title in output or "change1" in output.lower()
+    ), f"Change with title '{title}' not found. Output: {output}"
 
 
 @then("I should see an error message about required fields")
@@ -94,9 +94,9 @@ def step_verify_required_field_error(context):
     """Verify an error message about required fields is displayed."""
     page_content = context.page.content()
     # Roundup shows "required" in error messages
-    assert "required" in page_content.lower() or "error" in page_content.lower(), (
-        "No error message about required fields found on page"
-    )
+    assert (
+        "required" in page_content.lower() or "error" in page_content.lower()
+    ), "No error message about required fields found on page"
 
 
 @given("I have CLI access to the tracker")
@@ -139,9 +139,9 @@ def step_create_change_via_cli(context):
 @then("the change should be created successfully")
 def step_verify_change_created_successfully(context):
     """Verify the change was created successfully via CLI."""
-    assert context.cli_result.returncode == 0, (
-        f"Change creation failed. Stderr: {context.cli_result.stderr}"
-    )
+    assert (
+        context.cli_result.returncode == 0
+    ), f"Change creation failed. Stderr: {context.cli_result.stderr}"
 
 
 @then('the change should have status "{status}"')

@@ -100,7 +100,7 @@ function Cap(str) {
 
 /**
  * Takes a domain name (behind the @ part of an email address)
- * Customise this to handle the mail domains you're interested in 
+ * Customise this to handle the mail domains you're interested in
  */
 function default_organisation(orga) {
     switch (orga.toLowerCase()) {
@@ -111,4 +111,3 @@ function default_organisation(orga) {
             return orga
     }
 }
-

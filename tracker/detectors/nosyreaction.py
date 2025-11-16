@@ -14,24 +14,24 @@
 # FOR A PARTICULAR PURPOSE.  THE CODE PROVIDED HEREUNDER IS ON AN "AS IS"
 # BASIS, AND THERE IS NO OBLIGATION WHATSOEVER TO PROVIDE MAINTENANCE,
 # SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
-# 
+#
 
 from roundup import roundupdb, hyperdb
 
 def nosyreaction(db, cl, nodeid, oldvalues):
     ''' A standard detector is provided that watches for additions to the
         "messages" property.
-        
+
         When a new message is added, the detector sends it to all the users on
         the "nosy" list for the issue that are not already on the "recipients"
         list of the message.
-        
+
         Those users are then appended to the "recipients" property on the
         message, so multiple copies of a message are never sent to the same
         user.
-        
+
         The journal recorded by the hyperdatabase on the "recipients" property
-        then provides a log of when the message was sent to whom. 
+        then provides a log of when the message was sent to whom.
     '''
     # send a copy of all new messages to the nosy list
     for msgid in determineNewMessages(cl, nodeid, oldvalues):

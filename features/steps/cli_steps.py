@@ -106,9 +106,9 @@ def step_issue_exists_in_database(context):
 
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
-    assert result.returncode == 0, (
-        f"Failed to find issue{issue_id} in database. Stderr: {result.stderr}"
-    )
+    assert (
+        result.returncode == 0
+    ), f"Failed to find issue{issue_id} in database. Stderr: {result.stderr}"
 
     # Store the output for verification in other steps
     context.issue_display_output = result.stdout
@@ -121,9 +121,9 @@ def step_verify_issue_title(context, expected_title):
     if hasattr(context, "issue_display_output"):
         # CLI approach - check display output
         output = context.issue_display_output
-        assert expected_title in output, (
-            f"Expected title '{expected_title}' not found in issue. Output: {output}"
-        )
+        assert (
+            expected_title in output
+        ), f"Expected title '{expected_title}' not found in issue. Output: {output}"
     elif hasattr(context, "page"):
         # Web UI approach - check page content
         # Navigate to the created issue if we have its ID
@@ -134,9 +134,9 @@ def step_verify_issue_title(context, expected_title):
 
         # Check the title is displayed
         page_content = context.page.content()
-        assert expected_title in page_content, (
-            f"Expected title '{expected_title}' not found in page"
-        )
+        assert (
+            expected_title in page_content
+        ), f"Expected title '{expected_title}' not found in page"
     else:
         raise AssertionError("Neither CLI nor Web UI context available for verification")
 
@@ -152,16 +152,16 @@ def step_verify_issue_priority(context, expected_priority):
 
         # roundup-admin display shows priority: 2 (the ID), not the name
         # Check for "priority: N" format
-        assert f"priority: {priority_id}" in output.lower(), (
-            f"Expected priority ID '{priority_id}' for '{expected_priority}' not found in issue. Output: {output}"
-        )
+        assert (
+            f"priority: {priority_id}" in output.lower()
+        ), f"Expected priority ID '{priority_id}' for '{expected_priority}' not found in issue. Output: {output}"
     elif hasattr(context, "page"):
         # Web UI approach - check page content
         # The priority should be visible on the issue page
         page_content = context.page.content()
-        assert expected_priority in page_content.lower(), (
-            f"Expected priority '{expected_priority}' not found"
-        )
+        assert (
+            expected_priority in page_content.lower()
+        ), f"Expected priority '{expected_priority}' not found"
     else:
         raise AssertionError("Neither CLI nor Web UI context available for verification")
 
@@ -173,6 +173,6 @@ def step_verify_default_priority(context):
     output = context.issue_display_output
 
     # Should have some priority value
-    assert "priority" in output.lower() or output.strip(), (
-        f"Issue display output appears invalid. Output: {output}"
-    )
+    assert (
+        "priority" in output.lower() or output.strip()
+    ), f"Issue display output appears invalid. Output: {output}"

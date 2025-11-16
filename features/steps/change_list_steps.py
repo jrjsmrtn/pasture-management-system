@@ -202,9 +202,9 @@ def step_verify_changes_in_order(context):
 
     # Verify positions are in ascending order
     for i in range(len(positions) - 1):
-        assert positions[i][1] < positions[i + 1][1], (
-            f"Expected '{positions[i][0]}' to appear before '{positions[i + 1][0]}'"
-        )
+        assert (
+            positions[i][1] < positions[i + 1][1]
+        ), f"Expected '{positions[i][0]}' to appear before '{positions[i + 1][0]}'"
 
 
 @when('I click on "{title}"')
@@ -286,9 +286,9 @@ def step_run_cli_list_changes_filtered(context, category):
 @then('I should not see "{text}" in CLI output')
 def step_should_not_see_text_cli(context, text):
     """Verify text does not appear in CLI output."""
-    assert text not in context.cli_output, (
-        f"Found '{text}' in output, but expected it not to be there"
-    )
+    assert (
+        text not in context.cli_output
+    ), f"Found '{text}' in output, but expected it not to be there"
 
 
 # API step definitions for change lists
@@ -354,9 +354,9 @@ def step_verify_first_change(context, title):
 
     assert len(changes) > 0, "No changes in API response"
     first_change = changes[0]
-    assert first_change.get("title") == title, (
-        f"Expected first change to be '{title}', found '{first_change.get('title')}'"
-    )
+    assert (
+        first_change.get("title") == title
+    ), f"Expected first change to be '{title}', found '{first_change.get('title')}'"
 
 
 @then('the last change should be "{title}"')
@@ -371,9 +371,9 @@ def step_verify_last_change(context, title):
 
     assert len(changes) > 0, "No changes in API response"
     last_change = changes[-1]
-    assert last_change.get("title") == title, (
-        f"Expected last change to be '{title}', found '{last_change.get('title')}'"
-    )
+    assert (
+        last_change.get("title") == title
+    ), f"Expected last change to be '{title}', found '{last_change.get('title')}'"
 
 
 # ============================================================================

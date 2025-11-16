@@ -22,9 +22,11 @@ def step_api_accessible(context):
     # Simple connectivity test
     try:
         response = requests.get(f"{api_url}/issue", auth=HTTPBasicAuth("admin", "admin"), timeout=5)
-        assert response.status_code in [200, 401, 403], (
-            f"API not accessible. Status: {response.status_code}"
-        )
+        assert response.status_code in [
+            200,
+            401,
+            403,
+        ], f"API not accessible. Status: {response.status_code}"
     except requests.RequestException as e:
         raise AssertionError(f"API not accessible: {e}")
 
@@ -129,14 +131,14 @@ def step_verify_api_status(context, expected_status):
     # Handle "201 or 200" format
     if " or " in expected_status:
         allowed_statuses = [int(s.strip()) for s in expected_status.split(" or ")]
-        assert context.api_status_code in allowed_statuses, (
-            f"Expected status {expected_status}, got {context.api_status_code}. Response: {context.api_response.text}"
-        )
+        assert (
+            context.api_status_code in allowed_statuses
+        ), f"Expected status {expected_status}, got {context.api_status_code}. Response: {context.api_response.text}"
     else:
         expected_code = int(expected_status)
-        assert context.api_status_code == expected_code, (
-            f"Expected status {expected_code}, got {context.api_status_code}. Response: {context.api_response.text}"
-        )
+        assert (
+            context.api_status_code == expected_code
+        ), f"Expected status {expected_code}, got {context.api_status_code}. Response: {context.api_response.text}"
 
 
 @then("the response should contain an issue ID")
@@ -160,6 +162,7 @@ def step_response_contains_issue_id(context):
 def step_issue_not_created_via_api(context):
     """Verify the issue was not created (for negative tests)."""
     # Just verify the status code was not successful
-    assert context.api_status_code not in [200, 201], (
-        f"Issue should not have been created, but got status {context.api_status_code}"
-    )
+    assert context.api_status_code not in [
+        200,
+        201,
+    ], f"Issue should not have been created, but got status {context.api_status_code}"
