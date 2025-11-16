@@ -31,11 +31,11 @@ changecat.create(name="network", order="4")
 
 # Change Management - ITIL workflow statuses
 changestat = db.getclass("changestatus")
-changestat.create(name="proposed", order="1")  # Change request submitted
-changestat.create(name="approved", order="2")  # Change approved for scheduling
-changestat.create(name="scheduled", order="3")  # Change scheduled for implementation
-changestat.create(name="implemented", order="4")  # Change has been implemented
-changestat.create(name="closed", order="5")  # Change verified and closed
+changestat.create(name="planning", order="1")  # Change request being planned
+changestat.create(name="approved", order="2")  # Change approved for implementation
+changestat.create(name="implementing", order="3")  # Change implementation in progress
+changestat.create(name="completed", order="4")  # Change successfully completed
+changestat.create(name="cancelled", order="5")  # Change cancelled/rejected
 
 # create the two default users
 user = db.getclass("user")
