@@ -5,10 +5,11 @@
 Behave environment configuration for PMS BDD testing.
 
 This module sets up the testing environment for Behave scenarios,
-including Playwright browser setup, screenshot capture, and cleanup.
+including Playwright browser setup, screenshot capture, and database cleanup.
 """
 
 import os
+import shutil
 import subprocess
 from datetime import datetime
 from pathlib import Path
@@ -152,81 +153,43 @@ def after_step(context, step):
             print(f"\nFailed to capture screenshot: {e}")
 
 
-def _cleanup_test_data(context):
+def _reinitialize_database(context):
     """
-    Clean up test issues and changes created during the scenario.
+    Reinitialize the tracker database to ensure test isolation.
 
-    This function deletes issues and changes created during testing to prevent
-    database bloat and ensure test isolation.
+    This deletes the database and recreates it from initial_data.py,
+    providing a clean state for each scenario.
     """
-    # Get tracker directory
     tracker_dir = getattr(context, "tracker_dir", "tracker")
-
     cleanup_enabled = os.getenv("CLEANUP_TEST_DATA", "true").lower() == "true"
+
     if not cleanup_enabled:
         return
 
-    # Clean up issues
-    issue_ids = set()
+    try:
+        # Delete database files
+        db_dir = Path(tracker_dir) / "db"
+        if db_dir.exists():
+            shutil.rmtree(db_dir)
 
-    # From single issue creation
-    if hasattr(context, "created_issue_id"):
-        issue_id = context.created_issue_id
-        # Extract numeric ID
-        if issue_id.startswith("issue"):
-            issue_id = issue_id[5:]
-        issue_ids.add(issue_id)
+        # Reinitialize database
+        # Provide admin password twice for confirmation
+        cmd = ["roundup-admin", "-i", tracker_dir, "initialise"]
+        process = subprocess.Popen(
+            cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        stdout, stderr = process.communicate(input="admin\nadmin\n", timeout=30)
 
-    # From multiple issue creation
-    if hasattr(context, "test_issue_ids"):
-        issue_ids.update(context.test_issue_ids)
+        if process.returncode != 0:
+            print(f"\nWarning: Database reinit failed: {stderr}")
 
-    # From API creation
-    if hasattr(context, "api_issue_id"):
-        issue_ids.add(context.api_issue_id)
-
-    # Delete each issue
-    if issue_ids:
-        for issue_id in issue_ids:
-            try:
-                cmd = ["roundup-admin", "-i", tracker_dir, "retire", f"issue{issue_id}"]
-                subprocess.run(cmd, capture_output=True, timeout=10, check=False)
-            except Exception as e:
-                # Don't fail the test if cleanup fails
-                print(f"\nWarning: Failed to cleanup issue{issue_id}: {e}")
-
-    # Clean up changes
-    change_ids = set()
-
-    # From single change creation
-    if hasattr(context, "created_change_id"):
-        change_id = context.created_change_id
-        # Extract numeric ID
-        if change_id.startswith("change"):
-            change_id = change_id[6:]
-        change_ids.add(change_id)
-
-    # From multiple change creation
-    if hasattr(context, "test_change_ids"):
-        change_ids.update(context.test_change_ids)
-
-    # From API creation
-    if hasattr(context, "api_change_id"):
-        change_ids.add(context.api_change_id)
-
-    # From change list scenarios
-    if hasattr(context, "change_ids"):
-        change_ids.update(context.change_ids)
-
-    # Delete each change
-    if change_ids:
-        for change_id in change_ids:
-            try:
-                cmd = ["roundup-admin", "-i", tracker_dir, "retire", f"change{change_id}"]
-                subprocess.run(cmd, capture_output=True, timeout=10, check=False)
-            except Exception as e:
-                # Don't fail the test if cleanup fails
-                print(f"\nWarning: Failed to cleanup change{change_id}: {e}")
+    except Exception as e:
+        # Don't fail the test if cleanup fails
+        print(f"\nWarning: Failed to reinitialize database: {e}")
 
 
 def after_scenario(context, scenario):
@@ -234,10 +197,10 @@ def after_scenario(context, scenario):
     Run after each scenario.
 
     Capture final screenshot for passed scenarios (optional)
-    and perform cleanup of test data.
+    and reinitialize database for test isolation.
     """
-    # Clean up test data (issues and changes)
-    _cleanup_test_data(context)
+    # Reinitialize database to clean state
+    _reinitialize_database(context)
 
     # Optionally capture screenshot for passed scenarios
     if scenario.status == "passed" and os.getenv("SCREENSHOT_ON_PASS", "false").lower() == "true":
