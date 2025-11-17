@@ -13,7 +13,6 @@ Feature: Link CIs to Issues and Changes
     And a CI exists with name "db-server-01" and type "Server"
     And I am logged in to the web UI
     When I view the issue
-    And I click "Edit"
     And I select affected CI "db-server-01"
     And I click "Submit"
     Then the issue should be linked to "db-server-01"

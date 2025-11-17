@@ -113,9 +113,9 @@
    <ul style="margin: 0; padding-left: 20px;">
     <li tal:repeat="ci context/affected_cis">
      <a tal:attributes="href string:ci${ci/id}"
-        tal:content="python:f'{ci.name} ({db.citype.get(ci.type, \"name\")})'">CI link</a>
+        tal:content="python:f'{ci.name} ({ci.type.name})'">CI link</a>
      <tal:block tal:condition="python:hasattr(ci, 'criticality') and ci.criticality">
-      - Criticality: <strong tal:content="python:db.cicriticality.get(ci.criticality, 'name')">criticality</strong>
+      - Criticality: <strong tal:content="ci/criticality/name">criticality</strong>
      </tal:block>
     </li>
    </ul>

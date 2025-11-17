@@ -129,7 +129,9 @@ def step_view_issue(context):
     # The ID might already have 'issue' prefix from view_steps.py
     if not issue_id.startswith("issue"):
         issue_id = f"issue{issue_id}"
-    context.page.goto(f"{context.tracker_url}/{issue_id}")
+    # Remove trailing slash from tracker_url to avoid double slashes
+    tracker_url = context.tracker_url.rstrip("/")
+    context.page.goto(f"{tracker_url}/{issue_id}")
     context.page.wait_for_load_state("networkidle")
 
 
@@ -147,6 +149,22 @@ def step_select_affected_ci(context, ci_name):
     ci_id = context.ci_map.get(ci_name)
     if not ci_id:
         raise ValueError(f"CI '{ci_name}' not found")
+
+    # Wait for the page to be fully loaded
+    context.page.wait_for_load_state("networkidle")
+
+    # Debug: Print current URL and check if field exists
+    print(f"\nDEBUG: Current URL: {context.page.url}")
+    print(f"DEBUG: Looking for CI ID: {ci_id}")
+
+    # Check if the input field exists (without visibility requirement)
+    field_exists = context.page.locator("input[name='affected_cis']").count() > 0
+    print(f"DEBUG: Field exists: {field_exists}")
+
+    if not field_exists:
+        # Take screenshot for debugging
+        context.page.screenshot(path="screenshots/field_not_found.png")
+        print("DEBUG: Screenshot saved to screenshots/field_not_found.png")
 
     # Multilink fields are rendered as text inputs where you enter comma-separated IDs
     # Fill the text input field with the CI ID
