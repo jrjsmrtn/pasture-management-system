@@ -106,18 +106,20 @@ def step_select_relationship_type(context, rel_type):
 
 @when('I select target CI "{target_name}"')
 def step_select_target_ci(context, target_name):
-    """Select target CI from dropdown."""
+    """Select target CI from dropdown or fill multilink field."""
     # Get target CI ID
     target_id = context.ci_map.get(target_name)
     if not target_id:
         raise ValueError(f"Target CI '{target_name}' not found")
 
-    # Try both field names - singular for relationships, plural for changes
+    # Try both field names - singular for relationships (select), plural for changes (multilink text input)
     try:
+        # For cirelationship form - uses select dropdown
         context.page.select_option("select[name='target_ci']", target_id)
     except Exception:
-        # If singular doesn't work, try plural (for changes)
-        context.page.select_option("select[name='target_cis']", target_id)
+        # For change form - uses multilink text input field
+        # Multilink fields are text inputs where you enter comma-separated IDs
+        context.page.fill("input[name='target_cis']", target_id)
 
 
 @when('I click "Save"')

@@ -148,9 +148,9 @@ def step_select_affected_ci(context, ci_name):
     if not ci_id:
         raise ValueError(f"CI '{ci_name}' not found")
 
-    # For multilink fields, we might need to use a different selector
-    # This depends on how Roundup renders multilink fields
-    context.page.select_option("select[name='affected_cis']", ci_id)
+    # Multilink fields are rendered as text inputs where you enter comma-separated IDs
+    # Fill the text input field with the CI ID
+    context.page.fill("input[name='affected_cis']", ci_id)
 
 
 # Note: Step "I select target CI" is defined in ci_relationship_steps.py

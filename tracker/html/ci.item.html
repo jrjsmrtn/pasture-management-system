@@ -112,12 +112,46 @@
 <!-- ITIL Integration -->
 <tr tal:condition="context/id">
  <th i18n:translate="">Related Issues</th>
- <td colspan=3 tal:content="structure context/related_issues/field">related_issues</td>
+ <td colspan=3>
+  <span tal:replace="structure context/related_issues/field" />
+  <roundup-classhelper data-search-with="title,status[],priority[],id">
+    <span tal:condition="context/is_edit_ok"
+          tal:replace="structure python:db.issue.classhelp('id,title,status',
+                       property='related_issues', width='600')" />
+  </roundup-classhelper>
+  <tal:block tal:condition="context/related_issues">
+   <br><span i18n:translate="">View:</span>
+   <ul style="margin: 0; padding-left: 20px;">
+    <li tal:repeat="issue context/related_issues">
+     <a tal:attributes="href string:issue${issue/id}"
+        tal:content="python:f'issue{issue.id}: {issue.title}'">issue link</a>
+     (<span tal:replace="issue/status/name">status</span>)
+    </li>
+   </ul>
+  </tal:block>
+ </td>
 </tr>
 
 <tr tal:condition="context/id">
  <th i18n:translate="">Related Changes</th>
- <td colspan=3 tal:content="structure context/related_changes/field">related_changes</td>
+ <td colspan=3>
+  <span tal:replace="structure context/related_changes/field" />
+  <roundup-classhelper data-search-with="title,status[],priority[],id">
+    <span tal:condition="context/is_edit_ok"
+          tal:replace="structure python:db.change.classhelp('id,title,status',
+                       property='related_changes', width='600')" />
+  </roundup-classhelper>
+  <tal:block tal:condition="context/related_changes">
+   <br><span i18n:translate="">View:</span>
+   <ul style="margin: 0; padding-left: 20px;">
+    <li tal:repeat="change context/related_changes">
+     <a tal:attributes="href string:change${change/id}"
+        tal:content="python:f'change{change.id}: {change.title}'">change link</a>
+     (<span tal:replace="change/status/name">status</span>)
+    </li>
+   </ul>
+  </tal:block>
+ </td>
 </tr>
 
 <tr>
