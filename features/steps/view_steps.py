@@ -62,6 +62,9 @@ def step_create_single_issue(context, title, status=None):
     cmd_args = ["roundup-admin", "-i", tracker_dir, "create", "issue"]
     cmd_args.append(f"title={title}")
 
+    # Always set priority (required field) - default to "bug" (3)
+    cmd_args.append("priority=3")
+
     # Add status if provided
     if status:
         status_id = STATUS_MAP.get(status)

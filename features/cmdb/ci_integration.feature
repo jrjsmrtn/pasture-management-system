@@ -14,7 +14,7 @@ Feature: Link CIs to Issues and Changes
     And I am logged in to the web UI
     When I view the issue
     And I select affected CI "db-server-01"
-    And I click "Submit"
+    And I click "Submit Changes"
     Then the issue should be linked to "db-server-01"
     And I should see "db-server-01" in the affected CIs section
 

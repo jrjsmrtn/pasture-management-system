@@ -139,7 +139,9 @@ def step_view_issue(context):
 def step_edit_change(context):
     """Navigate to the change edit page."""
     change_id = context.current_change_id
-    context.page.goto(f"{context.tracker_url}/change{change_id}")
+    # Remove trailing slash from tracker_url to avoid double slashes
+    tracker_url = context.tracker_url.rstrip("/")
+    context.page.goto(f"{tracker_url}/change{change_id}")
     context.page.wait_for_load_state("networkidle")
 
 
@@ -185,7 +187,9 @@ def step_verify_issue_ci_link(context, ci_name):
     # The ID might already have 'issue' prefix from view_steps.py
     if not issue_id.startswith("issue"):
         issue_id = f"issue{issue_id}"
-    context.page.goto(f"{context.tracker_url}/{issue_id}")
+    # Remove trailing slash from tracker_url to avoid double slashes
+    tracker_url = context.tracker_url.rstrip("/")
+    context.page.goto(f"{tracker_url}/{issue_id}")
     context.page.wait_for_load_state("networkidle")
 
     content = context.page.content()
@@ -197,7 +201,9 @@ def step_verify_issue_ci_link(context, ci_name):
 def step_verify_change_ci_link(context, ci_name):
     """Verify that the change is linked to a CI."""
     change_id = context.current_change_id
-    context.page.goto(f"{context.tracker_url}/change{change_id}")
+    # Remove trailing slash from tracker_url to avoid double slashes
+    tracker_url = context.tracker_url.rstrip("/")
+    context.page.goto(f"{tracker_url}/change{change_id}")
     context.page.wait_for_load_state("networkidle")
 
     content = context.page.content()
