@@ -5,13 +5,19 @@
 Change workflow detector for enforcing valid change status transitions.
 
 This detector implements ITIL-inspired change management workflow rules:
-- planning (1) → approved (2)
-- approved (2) → implementing (3)
-- implementing (3) → completed (4)
-- Any stage → cancelled (5) (rejection/cancellation)
+- planning → approved
+- approved → implementing
+- implementing → completed
+- Any stage → cancelled (rejection/cancellation)
 
 Invalid transitions (e.g., planning → completed) are rejected.
 """
+
+import logging
+
+from roundup.exceptions import Reject
+
+logger = logging.getLogger(__name__)
 
 
 def check_change_status_transition(db, cl, nodeid, newvalues):
@@ -25,7 +31,7 @@ def check_change_status_transition(db, cl, nodeid, newvalues):
         newvalues: Dictionary of new values being set
 
     Raises:
-        ValueError: If the status transition is invalid
+        Reject: If the status transition is invalid
     """
     # Only validate on updates (not creation)
     if nodeid is None:
@@ -43,26 +49,58 @@ def check_change_status_transition(db, cl, nodeid, newvalues):
     if current_status_id == new_status_id:
         return
 
-    # Define valid transitions (current_status_id -> [allowed_next_status_ids])
-    # Status IDs: planning=1, approved=2, implementing=3, completed=4, cancelled=5
+    # Look up status IDs by name (robust approach - survives database reinitializations)
+    status_class = db.getclass("changestatus")
+    planning_id = status_class.lookup("planning")
+    approved_id = status_class.lookup("approved")
+    implementing_id = status_class.lookup("implementing")
+    completed_id = status_class.lookup("completed")
+    cancelled_id = status_class.lookup("cancelled")
+
+    # Define valid transitions using looked-up IDs
     VALID_TRANSITIONS = {
-        "1": ["2", "5"],  # planning → approved or cancelled
-        "2": ["3", "5"],  # approved → implementing or cancelled
-        "3": ["4", "5"],  # implementing → completed or cancelled
-        "4": [],  # completed is terminal (no transitions allowed)
-        "5": [],  # cancelled is terminal (no transitions allowed)
+        planning_id: [approved_id, cancelled_id],  # planning → approved or cancelled
+        approved_id: [implementing_id, cancelled_id],  # approved → implementing or cancelled
+        implementing_id: [completed_id, cancelled_id],  # implementing → completed or cancelled
+        completed_id: [],  # completed is terminal (no transitions allowed)
+        cancelled_id: [],  # cancelled is terminal (no transitions allowed)
     }
 
     # Check if transition is valid
     allowed_statuses = VALID_TRANSITIONS.get(current_status_id, [])
 
-    if new_status_id not in allowed_statuses:
-        # Get status names for better error messages
-        status_class = db.getclass("changestatus")
-        current_status_name = status_class.get(current_status_id, "name")
-        new_status_name = status_class.get(new_status_id, "name")
+    # Get status names for logging
+    current_status_name = status_class.get(current_status_id, "name")
+    new_status_name = status_class.get(new_status_id, "name")
 
-        raise ValueError(f"Invalid status transition: {current_status_name} -> {new_status_name}")
+    logger.debug(
+        "Checking change status transition",
+        extra={
+            "nodeid": nodeid,
+            "current_status": current_status_name,
+            "new_status": new_status_name,
+        },
+    )
+
+    if new_status_id not in allowed_statuses:
+        logger.warning(
+            "Invalid change status transition rejected",
+            extra={
+                "nodeid": nodeid,
+                "current_status": current_status_name,
+                "new_status": new_status_name,
+            },
+        )
+        raise Reject(f"Invalid status transition: {current_status_name} -> {new_status_name}")
+
+    logger.debug(
+        "Change status transition validated",
+        extra={
+            "nodeid": nodeid,
+            "current_status": current_status_name,
+            "new_status": new_status_name,
+        },
+    )
 
 
 def init(db):

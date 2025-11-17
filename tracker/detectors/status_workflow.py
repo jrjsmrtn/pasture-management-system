@@ -5,13 +5,19 @@
 Status workflow detector for enforcing valid issue status transitions.
 
 This detector implements ITIL-inspired workflow rules:
-- new (1) → in-progress (2)
-- in-progress (2) → resolved (3)
-- resolved (3) → closed (4)
-- resolved (3) → in-progress (2) (reopening)
+- new → in-progress
+- in-progress → resolved
+- resolved → closed
+- resolved → in-progress (reopening)
 
 Invalid transitions (e.g., new → closed) are rejected.
 """
+
+import logging
+
+from roundup.exceptions import Reject
+
+logger = logging.getLogger(__name__)
 
 
 def check_status_transition(db, cl, nodeid, newvalues):
@@ -25,7 +31,7 @@ def check_status_transition(db, cl, nodeid, newvalues):
         newvalues: Dictionary of new values being set
 
     Raises:
-        ValueError: If the status transition is invalid
+        Reject: If the status transition is invalid
     """
     # Only validate on updates (not creation)
     if nodeid is None:
@@ -43,25 +49,56 @@ def check_status_transition(db, cl, nodeid, newvalues):
     if current_status_id == new_status_id:
         return
 
-    # Define valid transitions (current_status_id -> [allowed_next_status_ids])
-    # Status IDs: new=1, in-progress=2, resolved=3, closed=4
+    # Look up status IDs by name (robust approach - survives database reinitializations)
+    status_class = db.getclass("status")
+    new_id = status_class.lookup("new")
+    in_progress_id = status_class.lookup("in-progress")
+    resolved_id = status_class.lookup("resolved")
+    closed_id = status_class.lookup("closed")
+
+    # Define valid transitions using looked-up IDs
     VALID_TRANSITIONS = {
-        "1": ["2"],  # new → in-progress
-        "2": ["3"],  # in-progress → resolved
-        "3": ["2", "4"],  # resolved → in-progress (reopen) or closed
-        "4": [],  # closed is terminal (no transitions allowed)
+        new_id: [in_progress_id],  # new → in-progress
+        in_progress_id: [resolved_id],  # in-progress → resolved
+        resolved_id: [in_progress_id, closed_id],  # resolved → in-progress (reopen) or closed
+        closed_id: [],  # closed is terminal (no transitions allowed)
     }
 
     # Check if transition is valid
     allowed_statuses = VALID_TRANSITIONS.get(current_status_id, [])
 
-    if new_status_id not in allowed_statuses:
-        # Get status names for better error messages
-        status_class = db.getclass("status")
-        current_status_name = status_class.get(current_status_id, "name")
-        new_status_name = status_class.get(new_status_id, "name")
+    # Get status names for logging
+    current_status_name = status_class.get(current_status_id, "name")
+    new_status_name = status_class.get(new_status_id, "name")
 
-        raise ValueError(f"Invalid status transition: {current_status_name} -> {new_status_name}")
+    logger.debug(
+        "Checking issue status transition",
+        extra={
+            "nodeid": nodeid,
+            "current_status": current_status_name,
+            "new_status": new_status_name,
+        },
+    )
+
+    if new_status_id not in allowed_statuses:
+        logger.warning(
+            "Invalid issue status transition rejected",
+            extra={
+                "nodeid": nodeid,
+                "current_status": current_status_name,
+                "new_status": new_status_name,
+            },
+        )
+        raise Reject(f"Invalid status transition: {current_status_name} -> {new_status_name}")
+
+    logger.debug(
+        "Issue status transition validated",
+        extra={
+            "nodeid": nodeid,
+            "current_status": current_status_name,
+            "new_status": new_status_name,
+        },
+    )
 
 
 def init(db):
