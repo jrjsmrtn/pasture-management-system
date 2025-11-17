@@ -1,15 +1,38 @@
-<!--
-SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
-SPDX-License-Identifier: MIT
--->
-
 # Roundup Development Best Practices
 
-**Document Version:** 1.1
+**Document Version:** 1.2
 **Roundup Version:** 2.5.0
 **Last Updated:** 2025-01-17
 **Official Documentation:** https://www.roundup-tracker.org/docs.html
 **Wiki Resources:** https://wiki.roundup-tracker.org
+
+______________________________________________________________________
+
+## Attribution
+
+This document is a derivative compilation of best practices from:
+
+**Primary Sources:**
+
+- **Roundup Official Documentation** (https://www.roundup-tracker.org/docs.html)
+  - Copyright © 2001-2025 Roundup-Team, Richard Jones, and contributors
+  - Licensed under the MIT License
+- **Roundup Community Wiki** (https://wiki.roundup-tracker.org)
+  - Contributed by the Roundup community
+  - Various contributors and examples
+
+**About This Compilation:**
+This document reorganizes, consolidates, and extends the official Roundup documentation and community wiki examples for use with the Pasture Management System's CMDB and ITIL workflow implementation. All original source materials are credited and referenced throughout.
+
+**Roundup Project Credits:**
+
+- Roundup Issue Tracker: https://roundup-tracker.org
+- Project maintainers and contributors: https://www.roundup-tracker.org/docs/acknowledgements.html
+- Original copyright holders: Roundup-Team (2009-2025), Richard Jones (2003-2009), eKit.com Inc (2002), Bizar Software Pty Ltd (2001)
+
+______________________________________________________________________
+
+## About This Document
 
 This document provides comprehensive best practices for developing with Roundup Issue Tracker, specifically tailored for the Pasture Management System's CMDB and ITIL workflow implementation. It combines insights from official documentation and community wiki patterns.
 
@@ -23,7 +46,7 @@ This document provides comprehensive best practices for developing with Roundup 
 - [Testing Strategies](#testing-strategies)
 - [Performance Optimization](#performance-optimization)
 
----
+______________________________________________________________________
 
 ## Schema Development
 
@@ -33,17 +56,17 @@ This document provides comprehensive best practices for developing with Roundup 
 
 Roundup provides several property types for schema definition:
 
-| Type | Use Case | Example |
-|------|----------|---------|
-| `String` | Text fields, names, descriptions | `name=String(indexme='yes')` |
-| `Link` | Single reference to another class | `assignedto=Link("user")` |
-| `Multilink` | Multiple references | `nosy=Multilink("user")` |
-| `Date` | Timestamps | `created=Date()` |
-| `Interval` | Time durations | `estimate=Interval()` |
-| `Number` | Decimals | `priority=Number()` |
-| `Integer` | Whole numbers | `order=Integer()` |
-| `Boolean` | True/false flags | `is_active=Boolean()` |
-| `Password` | Encrypted credentials | `password=Password()` |
+| Type        | Use Case                          | Example                      |
+| ----------- | --------------------------------- | ---------------------------- |
+| `String`    | Text fields, names, descriptions  | `name=String(indexme='yes')` |
+| `Link`      | Single reference to another class | `assignedto=Link("user")`    |
+| `Multilink` | Multiple references               | `nosy=Multilink("user")`     |
+| `Date`      | Timestamps                        | `created=Date()`             |
+| `Interval`  | Time durations                    | `estimate=Interval()`        |
+| `Number`    | Decimals                          | `priority=Number()`          |
+| `Integer`   | Whole numbers                     | `order=Integer()`            |
+| `Boolean`   | True/false flags                  | `is_active=Boolean()`        |
+| `Password`  | Encrypted credentials             | `password=Password()`        |
 
 ### Relationship Patterns for CMDB
 
@@ -62,6 +85,7 @@ ci = Class(db, "ci",
 ```
 
 **Key Points:**
+
 - The `rev_multilink` creates a read-only property on the linked class
 - Setting `parent=3456` on ci1234 automatically adds "1234" to ci3456's `children`
 - Eliminates manual synchronization of bidirectional relationships
@@ -80,6 +104,7 @@ cirelationship = Class(db, "cirelationship",
 ```
 
 **Best Practices:**
+
 - Use junction/association classes for many-to-many with attributes
 - Always validate both ends of relationships in detectors
 - Consider cascade behavior when retiring related items
@@ -132,6 +157,7 @@ def init(db):
 ```
 
 **How It Works:**
+
 - Maintains traversal path in `ids` list
 - Recursively follows relationships
 - Raises `Reject` exception when loop detected
@@ -156,30 +182,35 @@ nosy_names = [db.user.get(uid, 'username') for uid in nosy_list]
 ### Schema Best Practices
 
 1. **Use `setkey()` for unique identifiers:**
+
    ```python
    ci.setkey("name")  # Makes name unique and usable for lookups
    ```
 
-2. **Set display labels with `setlabelprop()`:**
+1. **Set display labels with `setlabelprop()`:**
+
    ```python
    ci.setlabelprop("name")  # Used in dropdowns and lists
    ```
 
-3. **Define sort order with `setorderprop()`:**
+1. **Define sort order with `setorderprop()`:**
+
    ```python
    ci.setorderprop("name")  # Default sort order
    ```
 
    **Warning:** ALL items must have a value for the order property, or sorting becomes random.
 
-4. **Index for search performance:**
+1. **Index for search performance:**
+
    ```python
    description=String(indexme='yes')  # Enable full-text search
    ```
 
    Use selectively - don't index every String property.
 
-5. **Schema changes auto-apply:**
+1. **Schema changes auto-apply:**
+
    - Modifications to `schema.py` are automatically applied on next tracker access
    - No manual migration scripts needed for schema additions
    - **Server restart required** to load new schema definitions
@@ -234,6 +265,7 @@ msg = Class(db, "msg",
 ```
 
 **Benefits:**
+
 - Reduces storage overhead for text-heavy content
 - Reusable across multiple class definitions
 - No modification to core Roundup classes
@@ -241,6 +273,7 @@ msg = Class(db, "msg",
 - Files remain readable with standard tools (e.g., `zcat`)
 
 **Use Cases:**
+
 - Compression for messages, files, descriptions
 - Deduplication to prevent duplicate file storage
 - Encryption for sensitive data
@@ -253,27 +286,31 @@ msg = Class(db, "msg",
 While `rev_multilink` provides automatic read-only reverse links, the ReverseLinkEdit extension allows **manual bidirectional editing** through web interface:
 
 **Syntax in web forms:**
+
 - `(3)` or `(+3)`: Add item 3 to target's multilink
 - `(-7)`: Remove item 7 from target's multilink
 - `1 2`: Direct links unchanged
 
 **Example:** Editing issue5's superseder field with `1 2 (3) (4) (-7)`:
+
 - Issue5 supersedes: 1, 2
 - Issue3 and 4 get 5 added to their superseder
 - Issue7 has 5 removed from its superseder
 
 **Implementation:**
+
 - Requires custom `Edit2Action` class in `extensions/`
 - Overrides standard `EditItemAction`
 - Parses parenthetical notation
 - Generates reverse link operations
 
 **Limitations:**
+
 - Only works for editing existing items (not creation)
 - Requires edit permissions on all affected items
 - Assumes numeric identifiers
 
----
+______________________________________________________________________
 
 ## Detector Development
 
@@ -292,6 +329,7 @@ Roundup provides two detector types:
 - Used for validation, permission checks, and data normalization
 
 **Example - CI Validation:**
+
 ```python
 def validate_ci_data(db, cl, nodeid, newdata):
     """Auditor: Validate CI data before creation/modification."""
@@ -326,6 +364,7 @@ def init(db):
 - Used for cascading updates, notifications, logging
 
 **Example - Relationship Management:**
+
 ```python
 def update_related_cis(db, cl, nodeid, olddata):
     """Reactor: Update related CIs when relationship changes."""
@@ -350,6 +389,7 @@ def init(db):
 ### Error Handling Patterns
 
 **Rejection with user-friendly messages:**
+
 ```python
 from roundup.exceptions import Reject
 
@@ -359,6 +399,7 @@ def check_permissions(db, cl, nodeid, newdata):
 ```
 
 **Validation errors:**
+
 ```python
 def validate_state_transition(db, cl, nodeid, newdata):
     if 'status' in newdata:
@@ -370,6 +411,7 @@ def validate_state_transition(db, cl, nodeid, newdata):
 ```
 
 **Unauthorized actions:**
+
 ```python
 from roundup import security
 
@@ -381,6 +423,7 @@ def restrict_field_changes(db, cl, nodeid, newdata):
 ### Detector Best Practices
 
 1. **Execution Priority:**
+
    ```python
    # Higher priority (110) runs after default priority (100)
    db.issue.audit('set', my_auditor, 110)
@@ -388,12 +431,14 @@ def restrict_field_changes(db, cl, nodeid, newdata):
 
    Use when one detector depends on another's modifications.
 
-2. **Performance Considerations:**
+1. **Performance Considerations:**
+
    - **Avoid user enumeration:** Don't loop through all users in detectors
    - **Batch operations:** Group multiple updates to reduce overhead
    - **Cache lookups:** Store repeated `db.class.get()` calls in variables
 
    **Bad:**
+
    ```python
    # Performance bottleneck - loops through ALL users
    for userid in db.user.list():
@@ -402,24 +447,28 @@ def restrict_field_changes(db, cl, nodeid, newdata):
    ```
 
    **Good:**
+
    ```python
    # Query only relevant users
    users_with_interest = db.user.filter(None, {'interests': keyword})
    nosy.extend(users_with_interest)
    ```
 
-3. **Transaction Safety:**
+1. **Transaction Safety:**
+
    - Auditors run within the same transaction as the triggering change
    - If an auditor raises an exception, all changes are rolled back
    - Reactors run after transaction commit (changes already saved)
 
-4. **Testing Detectors:**
+1. **Testing Detectors:**
+
    - **Server restart required** after detector changes
    - Test both success and failure paths
    - Use BDD scenarios to validate detector behavior
    - Check transaction rollback on auditor rejections
 
-5. **Common Use Cases:**
+1. **Common Use Cases:**
+
    - **Validation:** Required fields, state transitions, data format
    - **Automation:** Auto-assign, nosy list management, status cascades
    - **Security:** Permission enforcement, field-level restrictions
@@ -458,6 +507,7 @@ def init(db):
 ```
 
 **Key Points:**
+
 - Recipients parameter **must be a list** (even for single recipient)
 - Use `generateCreateNote()` for creation notifications
 - Catch `MessageSendError` and re-raise as `DetectorError`
@@ -501,6 +551,7 @@ def init(db):
 ```
 
 **Best Practices:**
+
 - Define silent field lists to prevent notification fatigue
 - Require messages for critical field changes (status, assignedto)
 - Allow users to modify their own nosy status without notifications
@@ -540,18 +591,20 @@ finally:
 ```
 
 **Use Cases:**
+
 - Automated monitoring alerts
 - Batch issue creation from external systems
 - Integration with CI/CD pipelines
 - Scheduled maintenance task creation
 
 **Configuration:**
+
 - Set `TRACKERHOME` environment variable
 - Authenticate with valid `USER` and `USERID`
 - Use `db.commit()` to save changes
 - Always close database connection with `db.close()`
 
----
+______________________________________________________________________
 
 ## Template Customization
 
@@ -565,14 +618,14 @@ Roundup uses TAL (Template Attribute Language) for dynamic HTML generation.
 
 #### Core TAL Patterns
 
-| Pattern | Purpose | Example |
-|---------|---------|---------|
-| `tal:content` | Replace element content | `<td tal:content="i/name">placeholder</td>` |
-| `tal:condition` | Conditional rendering | `<div tal:condition="context/is_active">...</div>` |
-| `tal:repeat` | Loop through collections | `<tr tal:repeat="i batch">...</tr>` |
-| `tal:attributes` | Dynamic attributes | `<a tal:attributes="href string:ci${i/id}">Link</a>` |
-| `tal:replace` | Replace entire element | `<span tal:replace="i/priority">-</span>` |
-| `tal:define` | Define variables | `<div tal:define="urgent python:i.priority > 5">` |
+| Pattern          | Purpose                  | Example                                              |
+| ---------------- | ------------------------ | ---------------------------------------------------- |
+| `tal:content`    | Replace element content  | `<td tal:content="i/name">placeholder</td>`          |
+| `tal:condition`  | Conditional rendering    | `<div tal:condition="context/is_active">...</div>`   |
+| `tal:repeat`     | Loop through collections | `<tr tal:repeat="i batch">...</tr>`                  |
+| `tal:attributes` | Dynamic attributes       | `<a tal:attributes="href string:ci${i/id}">Link</a>` |
+| `tal:replace`    | Replace entire element   | `<span tal:replace="i/priority">-</span>`            |
+| `tal:define`     | Define variables         | `<div tal:define="urgent python:i.priority > 5">`    |
 
 #### String Interpolation
 
@@ -591,13 +644,13 @@ Roundup uses TAL (Template Attribute Language) for dynamic HTML generation.
 
 #### Standard Context Variables
 
-| Variable | Description | Usage |
-|----------|-------------|-------|
-| `context` | Current item being displayed | `context/name`, `context/description` |
+| Variable  | Description                       | Usage                                          |
+| --------- | --------------------------------- | ---------------------------------------------- |
+| `context` | Current item being displayed      | `context/name`, `context/description`          |
 | `request` | HTTP request with user, form data | `request/user/username`, `request/form/status` |
-| `db` | Database access for lookups | `python:db.ci.get(id, 'name')` |
-| `utils` | Registered utility functions | `python:utils.anti_csrf_nonce()` |
-| `batch` | Paginated result set | For index/list templates |
+| `db`      | Database access for lookups       | `python:db.ci.get(id, 'name')`                 |
+| `utils`   | Registered utility functions      | `python:utils.anti_csrf_nonce()`               |
+| `batch`   | Paginated result set              | For index/list templates                       |
 
 #### Form Field Generation
 
@@ -632,12 +685,12 @@ Roundup uses TAL (Template Attribute Language) for dynamic HTML generation.
 
 #### Hidden Control Fields
 
-| Field | Purpose | Example |
-|-------|---------|---------|
-| `@action` | Server action | `<input type="hidden" name="@action" value="new">` |
-| `@template` | Next template to render | `<input type="hidden" name="@template" value="ci.item">` |
-| `@link@property` | Link new item to parent | `<input type="hidden" name="@link@issue" value="123">` |
-| `@required` | Required fields | `<input type="hidden" name="@required" value="name">` |
+| Field            | Purpose                 | Example                                                  |
+| ---------------- | ----------------------- | -------------------------------------------------------- |
+| `@action`        | Server action           | `<input type="hidden" name="@action" value="new">`       |
+| `@template`      | Next template to render | `<input type="hidden" name="@template" value="ci.item">` |
+| `@link@property` | Link new item to parent | `<input type="hidden" name="@link@issue" value="123">`   |
+| `@required`      | Required fields         | `<input type="hidden" name="@required" value="name">`    |
 
 ### Multi-Step Workflows
 
@@ -709,16 +762,19 @@ Create wizard-style interfaces:
 ### Template Debugging
 
 1. **HTML Comments for Identification:**
+
    ```html
    <!-- ci.item.html - CI Details Page -->
    ```
 
-2. **TAL Error Messages:**
+1. **TAL Error Messages:**
+
    - Display in browser with file and line number
    - Check syntax on first page load
    - Server restart needed for persistent servers
 
-3. **Debugging Variables:**
+1. **Debugging Variables:**
+
    ```html
    <!-- Show all context properties -->
    <pre tal:content="python:dir(context)">properties</pre>
@@ -730,6 +786,7 @@ Create wizard-style interfaces:
 ### Template Performance Best Practices
 
 1. **Use Conditions to Avoid Unnecessary Rendering:**
+
    ```html
    <!-- Bad: Renders empty table -->
    <table>
@@ -746,7 +803,8 @@ Create wizard-style interfaces:
    </table>
    ```
 
-2. **Cache Repeated Lookups:**
+1. **Cache Repeated Lookups:**
+
    ```html
    <!-- Bad: Multiple database lookups -->
    <td tal:content="python:db.user.get(i.assignedto, 'username')">user</td>
@@ -759,17 +817,19 @@ Create wizard-style interfaces:
    </tr>
    ```
 
-3. **Limit Loop Iterations:**
+1. **Limit Loop Iterations:**
+
    - Use batching for large result sets
    - Implement pagination for index templates
    - Consider lazy loading for related items
 
-4. **Server Restart for Template Changes:**
+1. **Server Restart for Template Changes:**
+
    - Template changes are **cached** by server
    - **Restart server** to see template updates
    - Use `roundup-server` restart sequence (see [Server Management](#server-management))
 
----
+______________________________________________________________________
 
 ## REST API Development
 
@@ -794,10 +854,11 @@ response = requests.get(
 For third-party integrations without sharing credentials:
 
 1. Generate JWT with appropriate role-based permissions
-2. Configure `secret_key` in `config.ini`
-3. Use JWT in `Authorization` header
+1. Configure `secret_key` in `config.ini`
+1. Use JWT in `Authorization` header
 
 **Requirements:**
+
 - User must have "Rest Access" permission
 - `secret_key` configured for proper ETag generation
 - Rate limiting configurable via `api_failed_login_limit`
@@ -858,6 +919,7 @@ name = response.json()['data']
 #### Update (PUT/PATCH)
 
 **PUT - Replace values:**
+
 ```python
 # First, get the current ETag
 response = requests.get(
@@ -883,6 +945,7 @@ response = requests.put(
 ```
 
 **PATCH - Operators (add, replace, remove):**
+
 ```python
 patch_operations = {
     "nosy": {
@@ -988,12 +1051,12 @@ response = requests.get(
 
 #### Verbose Levels
 
-| Level | Description |
-|-------|-------------|
-| 0 | Minimal data, IDs only |
-| 1 | Include links to related resources |
-| 2 | Include relationship metadata |
-| 3 | Full resource representation |
+| Level | Description                        |
+| ----- | ---------------------------------- |
+| 0     | Minimal data, IDs only             |
+| 1     | Include links to related resources |
+| 2     | Include relationship metadata      |
+| 3     | Full resource representation       |
 
 ```python
 response = requests.get(
@@ -1005,16 +1068,16 @@ response = requests.get(
 
 ### Error Responses and Status Codes
 
-| Code | Meaning | Common Causes |
-|------|---------|---------------|
-| 200 | Success | GET/PUT/PATCH succeeded |
-| 201 | Created | POST succeeded |
-| 400 | Bad Request | Malformed JSON, validation failure |
-| 401 | Unauthorized | Authentication failure, invalid JWT |
-| 403 | Forbidden | Insufficient permissions |
-| 406 | Not Acceptable | Unsupported Accept header |
-| 415 | Unsupported Media Type | Wrong Content-Type |
-| 429 | Too Many Requests | Rate limit exceeded |
+| Code | Meaning                | Common Causes                       |
+| ---- | ---------------------- | ----------------------------------- |
+| 200  | Success                | GET/PUT/PATCH succeeded             |
+| 201  | Created                | POST succeeded                      |
+| 400  | Bad Request            | Malformed JSON, validation failure  |
+| 401  | Unauthorized           | Authentication failure, invalid JWT |
+| 403  | Forbidden              | Insufficient permissions            |
+| 406  | Not Acceptable         | Unsupported Accept header           |
+| 415  | Unsupported Media Type | Wrong Content-Type                  |
+| 429  | Too Many Requests      | Rate limit exceeded                 |
 
 #### Rate Limit Headers
 
@@ -1123,6 +1186,7 @@ def test_ci_creation_api(page):
 #### Testing Best Practices
 
 1. **Store ETags for Updates:**
+
    ```python
    # Get resource
    get_response = requests.get(url, auth=auth)
@@ -1137,7 +1201,8 @@ def test_ci_creation_api(page):
    )
    ```
 
-2. **Use `@verbose=0` as Templates:**
+1. **Use `@verbose=0` as Templates:**
+
    ```python
    # Get minimal payload structure
    response = requests.get(
@@ -1152,7 +1217,8 @@ def test_ci_creation_api(page):
    new_ci.update({'name': 'new-server', 'ci_type': '1'})
    ```
 
-3. **Implement POE (Post Once Exactly) for Reliability:**
+1. **Implement POE (Post Once Exactly) for Reliability:**
+
    ```python
    # Request single-use URL
    poe_response = requests.get(
@@ -1169,7 +1235,8 @@ def test_ci_creation_api(page):
    )
    ```
 
-4. **Monitor Rate Limits:**
+1. **Monitor Rate Limits:**
+
    ```python
    def api_call_with_rate_limit(url, auth):
        response = requests.get(url, auth=auth)
@@ -1182,7 +1249,7 @@ def test_ci_creation_api(page):
        return response
    ```
 
----
+______________________________________________________________________
 
 ## Server Management
 
@@ -1191,14 +1258,17 @@ def test_ci_creation_api(page):
 ### Critical Server Behaviors
 
 1. **Detectors Loaded on Startup:**
+
    - Detector changes require **server restart** to take effect
    - Use complete restart sequence to avoid stale code
 
-2. **Templates Are Cached:**
+1. **Templates Are Cached:**
+
    - Template modifications require **server restart** for persistent servers
    - Development mode: use `roundup-server` without `-D` to reduce caching
 
-3. **Schema Changes Auto-Apply:**
+1. **Schema Changes Auto-Apply:**
+
    - Modifications to `schema.py` auto-apply on next tracker access
    - **Server restart recommended** after schema changes to ensure clean state
 
@@ -1222,18 +1292,22 @@ curl -s http://localhost:9080/pms/ | grep -q "Roundup" && \
 ### Development vs Production
 
 **Development (foreground for testing):**
+
 ```bash
 uv run roundup-server -p 9080 pms=tracker
 ```
+
 - See logs in console
 - Ctrl+C to stop
 - Good for interactive debugging
 
 **BDD Testing (background):**
+
 ```bash
 pkill -f "roundup-server" && sleep 2 && \
 uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
 ```
+
 - Silent background execution
 - Required for Behave scenario execution
 - Clean restart before test runs
@@ -1241,20 +1315,24 @@ uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
 ### Server Configuration Best Practices
 
 1. **Logging:**
+
    - Configure via Python logging module for structured logs
    - Set appropriate log levels per environment (DEBUG/INFO/WARNING)
    - Use file-based logging for production
 
-2. **Full-Text Search:**
+1. **Full-Text Search:**
+
    - SQLite: Enable FTS5 for phrase searches and boolean operations
    - PostgreSQL: Configure native full-text search for production scale
    - Index selectively with `indexme='yes'` on String properties
 
-3. **Session Management:**
+1. **Session Management:**
+
    - Use Redis for session database in production (better performance)
    - File-based sessions acceptable for development
 
-4. **Security:**
+1. **Security:**
+
    - Configure Content Security Policy with dynamic nonces
    - Use `secret_key` in config.ini for proper ETag/JWT generation
    - Enable rate limiting for REST API (`api_failed_login_limit`)
@@ -1322,6 +1400,7 @@ Support external authentication:
 - **LDAP/Active Directory**: External user database integration
 
 **Configuration Example:**
+
 ```ini
 [oauth]
 provider = google
@@ -1369,13 +1448,14 @@ For Linux deployments, use AppArmor profiles to restrict Roundup capabilities:
 - [ ] Implement backup and disaster recovery procedures
 - [ ] Monitor for suspicious activity patterns
 
----
+______________________________________________________________________
 
 ## Testing Strategies
 
 ### BDD Testing with Behave
 
 **Test Structure:**
+
 ```
 features/
 ├── cmdb/
@@ -1388,6 +1468,7 @@ features/
 ```
 
 **Feature File Example:**
+
 ```gherkin
 @web-ui @cmdb
 Feature: CI Creation
@@ -1409,6 +1490,7 @@ Feature: CI Creation
 ```
 
 **Step Definition Example:**
+
 ```python
 # features/steps/ci_steps.py
 from behave import given, when, then
@@ -1443,6 +1525,7 @@ def step_verify_ci_exists(context, name):
 ### Unit Testing with pytest
 
 **Test Detector Logic:**
+
 ```python
 # tests/test_ci_detector.py
 import pytest
@@ -1478,25 +1561,26 @@ def test_ci_name_uniqueness():
 For each feature, test **all three interfaces:**
 
 1. **Web UI (Playwright)** - User workflows
-2. **REST API** - Programmatic access
-3. **CLI** - `roundup-admin` commands
+1. **REST API** - Programmatic access
+1. **CLI** - `roundup-admin` commands
 
 **Example Test Matrix:**
 
-| Feature | Web UI | REST API | CLI |
-|---------|--------|----------|-----|
-| Create CI | ✓ | ✓ | ✓ |
-| Search CI | ✓ | ✓ | ✓ |
-| Link CI to Issue | ✓ | ✓ | ✓ |
-| CI Relationships | ✓ | ✓ | ✓ |
+| Feature          | Web UI | REST API | CLI |
+| ---------------- | ------ | -------- | --- |
+| Create CI        | ✓      | ✓        | ✓   |
+| Search CI        | ✓      | ✓        | ✓   |
+| Link CI to Issue | ✓      | ✓        | ✓   |
+| CI Relationships | ✓      | ✓        | ✓   |
 
----
+______________________________________________________________________
 
 ## Performance Optimization
 
 ### Database Query Optimization
 
 1. **Use Filters Instead of List + Loop:**
+
    ```python
    # Bad: Enumerate all items
    all_cis = db.ci.list()
@@ -1506,7 +1590,8 @@ For each feature, test **all three interfaces:**
    active_cis = db.ci.filter(None, {'is_active': True})
    ```
 
-2. **Cache Expensive Lookups:**
+1. **Cache Expensive Lookups:**
+
    ```python
    # Bad: Repeated lookups in loop
    for ci_id in ci_list:
@@ -1521,7 +1606,8 @@ For each feature, test **all three interfaces:**
        # Use ci.name, type_node.name
    ```
 
-3. **Set Order Properties:**
+1. **Set Order Properties:**
+
    ```python
    # In schema.py
    ci.setorderprop('name')  # Define default sort
@@ -1532,6 +1618,7 @@ For each feature, test **all three interfaces:**
 ### Full-Text Search
 
 1. **Index Selectively:**
+
    ```python
    # Schema.py - only index searchable text
    name=String(indexme='yes')           # User searches by name
@@ -1539,7 +1626,8 @@ For each feature, test **all three interfaces:**
    internal_id=String(indexme='no')     # No need to search UUIDs
    ```
 
-2. **Configure Native FTS:**
+1. **Configure Native FTS:**
+
    - SQLite FTS5: Phrase searches, proximity, boolean
    - PostgreSQL: Production-scale full-text search
    - See [Admin Guide - Native FTS](https://www.roundup-tracker.org/docs/admin_guide.html)
@@ -1547,10 +1635,12 @@ For each feature, test **all three interfaces:**
 ### Template Performance
 
 1. **Conditional Rendering:**
+
    - Use `tal:condition` before expensive operations
    - Don't render hidden tables/lists
 
-2. **Batching for Large Results:**
+1. **Batching for Large Results:**
+
    ```html
    <!-- Use batch helper for pagination -->
    <tr tal:repeat="i batch">
@@ -1561,7 +1651,8 @@ For each feature, test **all three interfaces:**
    <div tal:replace="structure batch/navigation" />
    ```
 
-3. **Minimize Database Calls in Templates:**
+1. **Minimize Database Calls in Templates:**
+
    ```html
    <!-- Bad: Repeated db lookups -->
    <td tal:content="python:db.user.get(i.assignedto, 'username')">user</td>
@@ -1577,10 +1668,12 @@ For each feature, test **all three interfaces:**
 ### Detector Performance
 
 1. **Avoid User Enumeration:**
+
    - Don't loop through `db.user.list()` in detectors
    - Use filters to query specific users
 
-2. **Batch Related Updates:**
+1. **Batch Related Updates:**
+
    ```python
    # In reactor
    def update_related_items(db, cl, nodeid, olddata):
@@ -1591,7 +1684,8 @@ For each feature, test **all three interfaces:**
            db.ci.set(rel_id, last_modified=Date())
    ```
 
-3. **Use Appropriate Priorities:**
+1. **Use Appropriate Priorities:**
+
    - Lower priority numbers run first
    - Use for detector dependencies, not performance
 
@@ -1602,16 +1696,19 @@ For each feature, test **all three interfaces:**
 Batch editing allows simultaneous modification of multiple items without repetitive data entry:
 
 **Workflow:**
+
 1. **Search Page:** Users enter modification details in "Edit Fields" section
-2. **Enter Search Criteria:** Specify which items to modify
-3. **Results Page:** System processes batch edits on matched items
+1. **Enter Search Criteria:** Specify which items to modify
+1. **Results Page:** System processes batch edits on matched items
 
 **Implementation Requirements:**
+
 - `issue.batch_search.html` - Initial search and edit interface
 - `issue.batch.html` - Results/confirmation page
 - `batch_editing.py` extension with `batch_validate` class
 
 **Example Template Structure:**
+
 ```html
 <!-- issue.batch_search.html -->
 <form action="issue" method="POST">
@@ -1635,11 +1732,13 @@ Batch editing allows simultaneous modification of multiple items without repetit
 ```
 
 **Validation:**
+
 - Require at least one edit field contains data
 - Confirm batch scope before applying changes
 - Provide preview/confirmation step for large batches
 
 **Performance Considerations:**
+
 - Limit batch size to prevent timeouts
 - Use database transactions for atomicity
 - Consider background processing for very large batches
@@ -1652,6 +1751,7 @@ Batch editing allows simultaneous modification of multiple items without repetit
 Regular expression searches enable sophisticated pattern matching across tracker data:
 
 **Implementation:**
+
 ```python
 # In extensions/regex_search.py
 from roundup.cgi.actions import SearchAction
@@ -1698,6 +1798,7 @@ class RegExpSearchAction(SearchAction):
 ```
 
 **Template Integration:**
+
 ```html
 <!-- Add to search template -->
 <div>
@@ -1717,23 +1818,26 @@ document.getElementById('use_regex').addEventListener('change', function() {
 ```
 
 **Performance Warning:**
+
 - Regex searches can be slow on large trackers
 - Cannot be saved as named queries
 - Consider limiting to specific fields
 - Use database full-text search for simple keyword matching
 
 **Best Practices:**
+
 - Validate regex patterns before execution
 - Set reasonable timeouts for regex searches
 - Provide examples and syntax help in UI
 - Consider caching frequent regex patterns
 - Use anchors (`^`, `$`) to improve performance
 
----
+______________________________________________________________________
 
 ## References
 
 **Official Documentation:**
+
 - **Main Docs:** https://www.roundup-tracker.org/docs.html
 - **Roundup Version:** 2.5.0
 - **Customization Guide:** https://www.roundup-tracker.org/docs/customizing.html
@@ -1742,6 +1846,7 @@ document.getElementById('use_regex').addEventListener('change', function() {
 - **REST API Documentation:** https://www.roundup-tracker.org/docs/rest.html
 
 **Community Resources:**
+
 - **Roundup Wiki:** https://wiki.roundup-tracker.org
   - [CustomisationExamples](https://wiki.roundup-tracker.org/CustomisationExamples) - User-contributed patterns
   - [LoopCheck](https://wiki.roundup-tracker.org/LoopCheck) - Circular reference prevention
@@ -1756,15 +1861,16 @@ document.getElementById('use_regex').addEventListener('change', function() {
   - [Jinja2](https://wiki.roundup-tracker.org/Jinja2) - Alternative templating engine
 - **Issue Tracker:** https://issues.roundup-tracker.org
 
----
+______________________________________________________________________
 
 ## Document History
 
-| Date | Version | Changes |
-|------|---------|---------|
-| 2025-01-17 | 1.0 | Initial comprehensive best practices document |
-| 2025-01-17 | 1.1 | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices |
+| Date       | Version | Changes                                                                                                                                                                                                                        |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2025-01-17 | 1.0     | Initial comprehensive best practices document                                                                                                                                                                                  |
+| 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices |
+| 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                         |
 
----
+______________________________________________________________________
 
 **For questions or improvements to this document, please create an issue in the project tracker.**
