@@ -1,0 +1,19 @@
+<!-- SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com> -->
+<!-- SPDX-License-Identifier: MIT -->
+<tal:block metal:use-macro="templates/page/macros/icing">
+<title metal:fill-slot="head_title">
+<span tal:replace="config/TRACKER_NAME" /> - CI Relationship Created
+</title>
+
+<tal:block metal:fill-slot="body_title">CI Relationship Created</tal:block>
+
+<td class="content" metal:fill-slot="content">
+  <p i18n:translate="">
+    The CI relationship has been created successfully.
+  </p>
+
+  <p>
+    <a tal:attributes="href string:ci" i18n:translate="">Return to CI List</a>
+  </p>
+</td>
+</tal:block>

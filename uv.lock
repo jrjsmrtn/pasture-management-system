@@ -731,7 +731,7 @@ requires-dist = [
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.0.0" },
     { name = "pytest-xdist", marker = "extra == 'dev'", specifier = ">=3.6.0" },
     { name = "requests", specifier = ">=2.31.0" },
-    { name = "roundup", specifier = ">=2.4.0" },
+    { name = "roundup", specifier = ">=2.5.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.14.5" },
 ]
 provides-extras = ["dev"]

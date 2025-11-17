@@ -76,9 +76,11 @@ def step_view_issue_details(context):
 def step_click_button(context, button_text):
     """Click a button or link with specific text."""
     # Try multiple selectors: button, input[type=submit], link
+    # Note: For submit buttons, try both exact match and partial match (contains text)
     selectors = [
         f'button:has-text("{button_text}")',
         f'input[type="submit"][value="{button_text}"]',
+        f'input[type="submit"]:has-text("{button_text}")',  # Partial match for submit
         f'a:has-text("{button_text}")',
         f'input[type="button"][value="{button_text}"]',
     ]

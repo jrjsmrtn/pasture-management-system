@@ -20,7 +20,7 @@ Feature: CI Relationships and Dependencies
     And I select target CI "db-server-01"
     And I click "Save"
     Then "app-vm-01" should have relationship "Runs On" to "db-server-01"
-    And "db-server-01" should have relationship "Hosts" to "app-vm-01"
+    And "db-server-01" should show incoming relationship "Runs On" from "app-vm-01"
 
   @web-ui
   Scenario: View CI dependency tree

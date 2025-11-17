@@ -14,7 +14,8 @@ from requests.auth import HTTPBasicAuth
 @when('I navigate to "CMDB"')
 def step_navigate_to_cmdb(context):
     """Navigate to the CMDB page."""
-    context.page.goto(f"{context.tracker_url}/ci")
+    # Click the CMDB link to preserve session (don't use goto which loses cookies)
+    context.page.click('a:has-text("View Configuration Items")')
     context.page.wait_for_load_state("networkidle")
 
 
@@ -70,7 +71,8 @@ def step_select_ci_criticality(context, criticality):
 def step_enter_ci_name(context, name):
     """Enter CI name."""
     context.page.fill("input[name='name']", name)
-    context.ci_name = name  # Store for later verification
+    # Store the CI name for later verification
+    context.ci_name = name
 
 
 @when('I enter location "{location}"')
@@ -118,22 +120,24 @@ def step_enter_capacity_gb(context, capacity):
 @then("the CI should appear in the CMDB")
 def step_verify_ci_in_list(context):
     """Verify CI appears in the CMDB list."""
-    # Navigate to CI list
-    context.page.goto(f"{context.tracker_url}/ci")
+    # Click the "View Configuration Items" link to navigate to CI list
+    # (using goto loses session in some cases)
+    context.page.click('a:has-text("View Configuration Items")')
     context.page.wait_for_load_state("networkidle")
 
     # Check for CI name in the list
     ci_name = getattr(context, "ci_name", None)
-    if ci_name:
-        content = context.page.content()
-        assert ci_name in content, f"CI '{ci_name}' not found in CMDB list"
+    assert ci_name, "CI name not set in context"
+
+    content = context.page.content()
+    assert ci_name in content, f"CI '{ci_name}' not found in CMDB list"
 
 
 @then('the CI "{name}" should exist')
 def step_verify_ci_exists(context, name):
     """Verify a CI with given name exists."""
-    # Navigate to CI list
-    context.page.goto(f"{context.tracker_url}/ci")
+    # Click the "View Configuration Items" link to navigate to CI list
+    context.page.click('a:has-text("View Configuration Items")')
     context.page.wait_for_load_state("networkidle")
 
     content = context.page.content()
