@@ -14,6 +14,7 @@ This document identifies refactoring opportunities and improvements based on Rou
 ## Executive Summary
 
 The CMDB implementation (Sprint 4) is functional and well-structured. However, several optimization opportunities exist that would:
+
 - Improve performance and user experience
 - Enhance security posture
 - Align with Roundup community best practices
@@ -26,7 +27,7 @@ The CMDB implementation (Sprint 4) is functional and well-structured. However, s
 - 🟢 **Medium** - Code quality and maintainability
 - 🔵 **Low** - Nice-to-have enhancements
 
----
+______________________________________________________________________
 
 ## 1. Schema Optimizations
 
@@ -35,6 +36,7 @@ The CMDB implementation (Sprint 4) is functional and well-structured. However, s
 **Issue:** Many classes lack `setlabelprop()` and `setorderprop()` definitions.
 
 **Current State:**
+
 ```python
 # tracker/schema.py
 ci = Class(db, "ci", name=String(), ...)
@@ -42,11 +44,13 @@ ci = Class(db, "ci", name=String(), ...)
 ```
 
 **Impact:**
+
 - Dropdown menus may show IDs instead of meaningful names
 - Default sorting by ID is inefficient
 - Poor user experience in CI selection
 
 **Recommendation:**
+
 ```python
 # Add to schema.py after each class definition
 ci.setlabelprop("name")      # Display CI name in dropdowns
@@ -63,13 +67,14 @@ cirelationship.setorderprop("source_ci")    # Sort by source CI
 
 **Effort:** Low (15 minutes)
 
----
+______________________________________________________________________
 
 ### 🟡 Missing Selective Full-Text Indexing
 
 **Issue:** No String properties have `indexme='yes'` specified.
 
 **Current State:**
+
 ```python
 ci = Class(db, "ci",
     name=String(),           # Should be indexed
@@ -81,11 +86,13 @@ ci = Class(db, "ci",
 ```
 
 **Impact:**
+
 - Full-text search may not work as expected
 - Or ALL string fields are indexed (performance overhead)
 - Inefficient search queries
 
 **Recommendation:**
+
 ```python
 ci = Class(db, "ci",
     name=String(indexme='yes'),           # User searches by name
@@ -107,17 +114,19 @@ change = IssueClass(db, "change",
 
 **Effort:** Low (30 minutes)
 
----
+______________________________________________________________________
 
 ### 🟢 Consider CI Parent-Child Hierarchy
 
 **Issue:** No hierarchical CI relationships (parent-child).
 
 **Current State:**
+
 - Only peer-to-peer relationships via `cirelationship`
 - No built-in parent-child modeling
 
 **Potential Enhancement:**
+
 ```python
 ci = Class(db, "ci",
     # ... existing fields ...
@@ -127,11 +136,13 @@ ci = Class(db, "ci",
 ```
 
 **Benefits:**
+
 - Automatic bidirectional relationship maintenance
 - Useful for: VMs → Host, Apps → Server, Components → System
 - Simpler queries for hierarchical structures
 
 **Trade-offs:**
+
 - Current `cirelationship` approach is more flexible
 - May not be needed if all relationships are typed
 
@@ -141,7 +152,7 @@ ci = Class(db, "ci",
 
 **Recommendation:** Defer to Sprint 5+ unless specific use case emerges
 
----
+______________________________________________________________________
 
 ## 2. Detector Improvements
 
@@ -150,6 +161,7 @@ ci = Class(db, "ci",
 **Issue:** Current `ci_relationship_validator.py` uses custom pattern instead of canonical wiki pattern.
 
 **Current Implementation:**
+
 ```python
 def has_circular_dependency(db, source_ci, target_ci, visited=None):
     if visited is None:
@@ -158,6 +170,7 @@ def has_circular_dependency(db, source_ci, target_ci, visited=None):
 ```
 
 **Wiki Best Practice:**
+
 ```python
 def check_loop(db, cl, nodeid, prop, attr, ids=None):
     """Canonical loop detection from Roundup wiki."""
@@ -165,12 +178,14 @@ def check_loop(db, cl, nodeid, prop, attr, ids=None):
 ```
 
 **Analysis:**
+
 - ✅ **Current code works correctly**
 - ✅ **Current code is well-documented**
 - ⚠️ Wiki pattern provides better error messages (shows full cycle path)
 - ⚠️ Wiki pattern is more generic (works for Link and Multilink)
 
 **Recommendation:**
+
 - **Keep current implementation** (it works well for your use case)
 - **OR** Refactor to wiki pattern for:
   - Better error messages showing full dependency chain
@@ -178,6 +193,7 @@ def check_loop(db, cl, nodeid, prop, attr, ids=None):
   - Alignment with community standards
 
 **If Refactoring:**
+
 ```python
 # In tracker/lib/relationship_utils.py (new shared module)
 from roundup.hyperdb import Link, Multilink
@@ -228,18 +244,20 @@ def validate_ci_relationship(db, cl, nodeid, newvalues):
 
 **Decision:** **Recommend keeping current implementation unless error messages become a pain point**
 
----
+______________________________________________________________________
 
 ### 🟢 Add Email Notification Reactor
 
 **Issue:** No automated email notifications for critical events.
 
 **Potential Use Cases:**
+
 - Notify admins when new CIs are created
 - Notify CI owners when relationships change
 - Notify change owners when change status transitions
 
 **Example Implementation:**
+
 ```python
 # In tracker/detectors/ci_notifications.py
 from roundup.exceptions import DetectorError
@@ -290,17 +308,19 @@ def init(db):
 
 **Recommendation:** Defer to Sprint 5+ (Reporting and Analytics sprint may include notification requirements)
 
----
+______________________________________________________________________
 
 ### 🟢 Add Nosy List Management for Changes
 
 **Issue:** Change class has nosy list (from IssueClass) but no selective notification logic.
 
 **Current Behavior:**
+
 - All nosy list members notified on every change
 - Potential for notification fatigue
 
 **Recommendation:**
+
 ```python
 # In tracker/detectors/change_notifications.py
 def selective_change_notification(db, cl, nodeid, oldvalues):
@@ -335,7 +355,7 @@ def init(db):
 
 **Recommendation:** Consider for Sprint 5+ if users report notification issues
 
----
+______________________________________________________________________
 
 ## 3. Template Optimizations
 
@@ -344,6 +364,7 @@ def init(db):
 **Issue:** `ci.item.html` shows ALL type-specific fields for all CI types.
 
 **Current State:**
+
 ```html
 <!-- Lines 77-100+ in ci.item.html -->
 <!-- Server/VM specific fields: show all when creating new, filter by type when editing -->
@@ -356,11 +377,13 @@ def init(db):
 ```
 
 **Impact:**
+
 - Confusing UX: Network devices see "CPU Cores", Storage sees "Ports"
 - Form validation complexity
 - Cluttered interface
 
 **Recommendation:**
+
 ```html
 <!-- Conditional field groups based on CI type -->
 <tal:block define="ci_type python:context.type.plain() if context.id else None">
@@ -418,18 +441,20 @@ def init(db):
 
 **Recommendation:** **High priority for Sprint 5 - significantly improves UX**
 
----
+______________________________________________________________________
 
 ### 🟡 CI Index Page Performance
 
 **Issue:** Need to review `ci.index.html` for batching and query optimization.
 
 **Check Points:**
+
 1. ✅ Is batching enabled for large CI lists?
-2. ✅ Are related lookups cached (e.g., CI type, status)?
-3. ✅ Is pagination implemented?
+1. ✅ Are related lookups cached (e.g., CI type, status)?
+1. ✅ Is pagination implemented?
 
 **Example Optimization:**
+
 ```html
 <!-- Use tal:define to cache lookups -->
 <tr tal:repeat="ci batch"
@@ -449,7 +474,7 @@ def init(db):
 
 **Recommendation:** Check during Sprint 5 testing with larger CI datasets
 
----
+______________________________________________________________________
 
 ## 4. Security Hardening
 
@@ -458,18 +483,21 @@ def init(db):
 **Issue:** Using default/example secret key in `tracker/config.ini`.
 
 **Current State:**
+
 ```ini
 # tracker/config.ini:595
 secret_key = nvmYevpmN/Z72sllnR8mRPhtkbZmJPpgIDolZPGYHlY=
 ```
 
 **Impact:**
+
 - **Critical security vulnerability**
 - Compromised ETag validation
 - Compromised JWT validation
 - Anyone with access to default can forge tokens
 
 **Recommendation:**
+
 ```bash
 # Generate unique secret key
 python3 -c "import secrets; print(secrets.token_urlsafe(32))"
@@ -485,17 +513,19 @@ secret_key = <UNIQUE_GENERATED_VALUE_HERE>
 
 **Recommendation:** **CRITICAL - Do before any external access or production deployment**
 
----
+______________________________________________________________________
 
 ### 🔴 Enable API Rate Limiting
 
 **Issue:** No rate limiting configured for REST API.
 
 **Current State:**
+
 - No `api_failed_login_limit` configured
 - Vulnerable to brute-force attacks
 
 **Recommendation:**
+
 ```ini
 # Add to tracker/config.ini [web] section
 # Limit failed API login attempts
@@ -511,17 +541,19 @@ api_failed_login_delay = 300
 
 **Recommendation:** **CRITICAL - Add before any external API access**
 
----
+______________________________________________________________________
 
 ### 🟡 Add Content Security Policy
 
 **Issue:** No CSP headers configured.
 
 **Impact:**
+
 - Vulnerable to XSS attacks
 - No defense-in-depth against injection
 
 **Recommendation:**
+
 ```python
 # Create tracker/extensions/security_headers.py
 def add_security_headers(client):
@@ -555,13 +587,14 @@ def init(instance):
 
 **Recommendation:** Plan for Sprint 5+ security hardening
 
----
+______________________________________________________________________
 
 ### 🟢 Add Spam Prevention Detector
 
 **Issue:** No spam filtering for messages or issue creation.
 
 **Recommendation:**
+
 ```python
 # Create tracker/detectors/spam_filter.py
 from roundup.exceptions import Reject
@@ -593,7 +626,7 @@ def init(db):
 
 **Recommendation:** Add if tracker becomes publicly accessible
 
----
+______________________________________________________________________
 
 ## 5. Configuration Improvements
 
@@ -602,12 +635,14 @@ def init(db):
 **Issue:** No FTS indexer configured.
 
 **Current State:**
+
 ```ini
 # tracker/config.ini:137
 indexer =
 ```
 
 **Recommendation:**
+
 ```ini
 # For production (PostgreSQL backend)
 indexer = native-fts
@@ -620,6 +655,7 @@ indexer_language = english
 ```
 
 **Benefits:**
+
 - Phrase searches
 - Boolean operators
 - Proximity queries
@@ -631,7 +667,7 @@ indexer_language = english
 
 **Recommendation:** Consider for Sprint 5+ when search becomes critical
 
----
+______________________________________________________________________
 
 ## 6. Code Organization
 
@@ -640,6 +676,7 @@ indexer_language = english
 **Issue:** No shared module for reusable detector logic.
 
 **Recommendation:**
+
 ```
 tracker/
 ├── lib/                      # New directory
@@ -654,6 +691,7 @@ tracker/
 ```
 
 **Benefits:**
+
 - DRY (Don't Repeat Yourself)
 - Easier testing of utility functions
 - Better code organization
@@ -663,7 +701,7 @@ tracker/
 
 **Recommendation:** Consider for Sprint 6+ refactoring sprint
 
----
+______________________________________________________________________
 
 ## 7. Testing Enhancements
 
@@ -672,6 +710,7 @@ tracker/
 **Issue:** Complex detector logic not covered by unit tests.
 
 **Recommendation:**
+
 ```python
 # Create tests/test_ci_relationship_validator.py
 import pytest
@@ -738,13 +777,14 @@ def test_self_referencing_relationship():
 
 **Recommendation:** Add in Sprint 5 alongside other unit test expansion
 
----
+______________________________________________________________________
 
 ### 🟡 Add BDD Scenarios for Circular Reference Prevention
 
 **Issue:** No BDD coverage for circular dependency detection.
 
 **Recommendation:**
+
 ```gherkin
 # features/cmdb/ci_relationship_validation.feature
 @cmdb @validation
@@ -785,7 +825,7 @@ Feature: CI Relationship Validation
 
 **Recommendation:** Add in Sprint 5 for comprehensive CMDB testing
 
----
+______________________________________________________________________
 
 ## 8. Documentation
 
@@ -794,6 +834,7 @@ Feature: CI Relationship Validation
 **Issue:** Detector logic could benefit from more detailed docstrings.
 
 **Example Enhancement:**
+
 ```python
 # tracker/detectors/ci_relationship_validator.py
 def has_circular_dependency(db, source_ci, target_ci, visited=None):
@@ -828,37 +869,37 @@ def has_circular_dependency(db, source_ci, target_ci, visited=None):
 
 **Recommendation:** Add during Sprint 5 cleanup
 
----
+______________________________________________________________________
 
 ## Implementation Priority
 
 ### Immediate (Before External Access)
 
 1. 🔴 **Change default secret_key** - 5 minutes
-2. 🔴 **Enable API rate limiting** - 2 minutes
+1. 🔴 **Enable API rate limiting** - 2 minutes
 
 ### Sprint 5 (Reporting and Analytics)
 
 1. 🟡 **Add label and order properties to schema** - 15 minutes
-2. 🟡 **Add selective full-text indexing** - 30 minutes
-3. 🟡 **Implement CI form conditional rendering** - 2-3 hours
-4. 🟡 **Add unit tests for complex detectors** - 2-3 hours
-5. 🟡 **Add BDD scenarios for validation** - 2 hours
-6. 🟡 **Review CI index page performance** - 1 hour
+1. 🟡 **Add selective full-text indexing** - 30 minutes
+1. 🟡 **Implement CI form conditional rendering** - 2-3 hours
+1. 🟡 **Add unit tests for complex detectors** - 2-3 hours
+1. 🟡 **Add BDD scenarios for validation** - 2 hours
+1. 🟡 **Review CI index page performance** - 1 hour
 
 ### Sprint 6+ (Future Enhancements)
 
 1. 🟢 **Consider parent-child CI hierarchy** - 2 hours
-2. 🟢 **Add email notification reactors** - 2-3 hours
-3. 🟢 **Add nosy list selective notifications** - 1 hour
-4. 🟢 **Add Content Security Policy** - 2 hours
-5. 🟢 **Add spam prevention** - 1 hour
-6. 🟢 **Enable native FTS** - 30 minutes
-7. 🟢 **Create shared utilities module** - 2-3 hours
-8. 🟢 **Enhance inline documentation** - 1 hour
-9. 🔵 **Refactor to canonical loop detection** - 1-2 hours (optional)
+1. 🟢 **Add email notification reactors** - 2-3 hours
+1. 🟢 **Add nosy list selective notifications** - 1 hour
+1. 🟢 **Add Content Security Policy** - 2 hours
+1. 🟢 **Add spam prevention** - 1 hour
+1. 🟢 **Enable native FTS** - 30 minutes
+1. 🟢 **Create shared utilities module** - 2-3 hours
+1. 🟢 **Enhance inline documentation** - 1 hour
+1. 🔵 **Refactor to canonical loop detection** - 1-2 hours (optional)
 
----
+______________________________________________________________________
 
 ## Summary
 
@@ -869,7 +910,7 @@ def has_circular_dependency(db, source_ci, target_ci, visited=None):
 
 **Estimated Effort for Sprint 5 Priorities:** ~12-14 hours
 
----
+______________________________________________________________________
 
 ## References
 
@@ -877,6 +918,6 @@ def has_circular_dependency(db, source_ci, target_ci, visited=None):
 - [Roundup Wiki - CustomisationExamples](https://wiki.roundup-tracker.org/CustomisationExamples)
 - [Roundup Official Documentation](https://www.roundup-tracker.org/docs.html)
 
----
+______________________________________________________________________
 
 **For questions or discussion, create an issue or bring to Sprint Planning.**

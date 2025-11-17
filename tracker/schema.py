@@ -109,7 +109,7 @@ msg = FileClass(
     author=Link("user", do_journal="no"),
     recipients=Multilink("user", do_journal="no"),
     date=Date(),
-    summary=String(indexme='yes'),  # Summary is searchable
+    summary=String(indexme="yes"),  # Summary is searchable
     files=Multilink("file"),
     messageid=String(),
     inreplyto=String(),
@@ -144,10 +144,10 @@ issue.setorderprop("id")
 change = IssueClass(
     db,
     "change",
-    description=String(indexme='yes'),  # Detailed description - searchable
-    justification=String(indexme='yes'),  # Business justification - searchable
-    impact=String(indexme='yes'),  # Impact assessment - searchable
-    risk=String(indexme='yes'),  # Risk assessment - searchable
+    description=String(indexme="yes"),  # Detailed description - searchable
+    justification=String(indexme="yes"),  # Business justification - searchable
+    impact=String(indexme="yes"),  # Impact assessment - searchable
+    risk=String(indexme="yes"),  # Risk assessment - searchable
     assignedto=Link("user"),  # Change owner
     priority=Link("changepriority"),  # Change priority
     category=Link("changecategory"),  # Change category
@@ -163,13 +163,13 @@ change.setorderprop("id")
 ci = Class(
     db,
     "ci",
-    name=String(indexme='yes'),  # CI name (required) - searchable
+    name=String(indexme="yes"),  # CI name (required) - searchable
     type=Link("citype"),  # CI type (server, network, storage, etc.)
     status=Link("cistatus"),  # Lifecycle status
-    location=String(indexme='yes'),  # Physical/logical location - searchable
+    location=String(indexme="yes"),  # Physical/logical location - searchable
     owner=Link("user"),  # CI owner/responsible person
     criticality=Link("cicriticality"),  # Business criticality
-    description=String(indexme='yes'),  # CI description - searchable
+    description=String(indexme="yes"),  # CI description - searchable
     # Server-specific attributes
     cpu_cores=Number(),  # Number of CPU cores
     ram_gb=Number(),  # RAM in GB
@@ -181,7 +181,7 @@ ci = Class(
     capacity_gb=Number(),  # Storage capacity in GB
     # Software/Service attributes
     version=String(),  # Software version
-    vendor=String(indexme='yes'),  # Vendor/manufacturer - searchable
+    vendor=String(indexme="yes"),  # Vendor/manufacturer - searchable
     # Relationships
     related_issues=Multilink("issue"),  # Issues affecting this CI
     related_changes=Multilink("change"),  # Changes targeting this CI
@@ -196,7 +196,7 @@ cirelationship = Class(
     source_ci=Link("ci"),  # Source CI
     relationship_type=Link("cirelationshiptype"),  # Type of relationship
     target_ci=Link("ci"),  # Target CI
-    description=String(indexme='yes'),  # Optional description - searchable
+    description=String(indexme="yes"),  # Optional description - searchable
 )
 cirelationship.setlabelprop("id")
 cirelationship.setorderprop("id")
