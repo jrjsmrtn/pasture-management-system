@@ -4,7 +4,7 @@
 # Pasture Management System - Python Dependencies
 
 # Core Issue Tracker
-roundup>=2.4.0
+roundup>=2.5.0
 
 # BDD Testing Framework
 behave>=1.2.6

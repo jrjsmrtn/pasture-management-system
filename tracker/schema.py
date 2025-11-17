@@ -11,49 +11,71 @@
 # Priorities
 pri = Class(db, "priority", name=String(), order=Number())
 pri.setkey("name")
+pri.setlabelprop("name")
+pri.setorderprop("order")
 
 # Statuses
 stat = Class(db, "status", name=String(), order=Number())
 stat.setkey("name")
+stat.setlabelprop("name")
+stat.setorderprop("order")
 
 # Keywords
 keyword = Class(db, "keyword", name=String())
 keyword.setkey("name")
+keyword.setlabelprop("name")
+keyword.setorderprop("name")
 
 # User-defined saved searches
 query = Class(db, "query", klass=String(), name=String(), url=String(), private_for=Link("user"))
+query.setlabelprop("name")
+query.setorderprop("name")
 
 # Change Management Classes
 
 # Change priorities (separate from issue priorities for flexibility)
 changepriority = Class(db, "changepriority", name=String(), order=Number())
 changepriority.setkey("name")
+changepriority.setlabelprop("name")
+changepriority.setorderprop("order")
 
 # Change categories for classification
 changecategory = Class(db, "changecategory", name=String(), order=Number())
 changecategory.setkey("name")
+changecategory.setlabelprop("name")
+changecategory.setorderprop("order")
 
 # Change statuses for ITIL workflow
 changestatus = Class(db, "changestatus", name=String(), order=Number())
 changestatus.setkey("name")
+changestatus.setlabelprop("name")
+changestatus.setorderprop("order")
 
 # CMDB (Configuration Management Database) Classes
 
 # CI types for classification
 citype = Class(db, "citype", name=String(), order=Number())
 citype.setkey("name")
+citype.setlabelprop("name")
+citype.setorderprop("order")
 
 # CI statuses for lifecycle management
 cistatus = Class(db, "cistatus", name=String(), order=Number())
 cistatus.setkey("name")
+cistatus.setlabelprop("name")
+cistatus.setorderprop("order")
 
 # CI criticality levels
 cicriticality = Class(db, "cicriticality", name=String(), order=Number())
 cicriticality.setkey("name")
+cicriticality.setlabelprop("name")
+cicriticality.setorderprop("order")
 
 # CI relationship types
 cirelationshiptype = Class(db, "cirelationshiptype", name=String(), order=Number())
 cirelationshiptype.setkey("name")
+cirelationshiptype.setlabelprop("name")
+cirelationshiptype.setorderprop("order")
 
 # add any additional database schema configuration here
 
@@ -72,6 +94,8 @@ user = Class(
     timezone=String(),
 )
 user.setkey("username")
+user.setlabelprop("username")
+user.setorderprop("username")
 db.security.addPermission(
     name="Register", klass="user", description="User is allowed to register new user"
 )
@@ -85,13 +109,17 @@ msg = FileClass(
     author=Link("user", do_journal="no"),
     recipients=Multilink("user", do_journal="no"),
     date=Date(),
-    summary=String(),
+    summary=String(indexme='yes'),  # Summary is searchable
     files=Multilink("file"),
     messageid=String(),
     inreplyto=String(),
 )
+msg.setlabelprop("summary")
+msg.setorderprop("date")
 
 file = FileClass(db, "file", name=String())
+file.setlabelprop("name")
+file.setorderprop("name")
 
 # IssueClass automatically gets these properties in addition to the Class ones:
 #   title = String()
@@ -108,16 +136,18 @@ issue = IssueClass(
     status=Link("status"),
     affected_cis=Multilink("ci"),  # CIs affected by this issue
 )
+issue.setlabelprop("title")
+issue.setorderprop("id")
 
 # Change Request class - ITIL Change Management
 # Inherits: title, messages, files, nosy from IssueClass
 change = IssueClass(
     db,
     "change",
-    description=String(),  # Detailed description of the change
-    justification=String(),  # Business justification/reason
-    impact=String(),  # Impact assessment
-    risk=String(),  # Risk assessment
+    description=String(indexme='yes'),  # Detailed description - searchable
+    justification=String(indexme='yes'),  # Business justification - searchable
+    impact=String(indexme='yes'),  # Impact assessment - searchable
+    risk=String(indexme='yes'),  # Risk assessment - searchable
     assignedto=Link("user"),  # Change owner
     priority=Link("changepriority"),  # Change priority
     category=Link("changecategory"),  # Change category
@@ -125,35 +155,39 @@ change = IssueClass(
     related_issues=Multilink("issue"),  # Issues this change addresses
     target_cis=Multilink("ci"),  # CIs affected by this change
 )
+change.setlabelprop("title")
+change.setorderprop("id")
 
 # Configuration Item class - CMDB
 # Base CI with common attributes
 ci = Class(
     db,
     "ci",
-    name=String(),  # CI name (required)
+    name=String(indexme='yes'),  # CI name (required) - searchable
     type=Link("citype"),  # CI type (server, network, storage, etc.)
     status=Link("cistatus"),  # Lifecycle status
-    location=String(),  # Physical/logical location
+    location=String(indexme='yes'),  # Physical/logical location - searchable
     owner=Link("user"),  # CI owner/responsible person
     criticality=Link("cicriticality"),  # Business criticality
-    description=String(),  # CI description
+    description=String(indexme='yes'),  # CI description - searchable
     # Server-specific attributes
     cpu_cores=Number(),  # Number of CPU cores
     ram_gb=Number(),  # RAM in GB
     os=String(),  # Operating system
-    ip_address=String(),  # IP address
+    ip_address=String(),  # IP address - not indexed for FTS
     # Network device attributes
     ports=Number(),  # Number of ports
     # Storage attributes
     capacity_gb=Number(),  # Storage capacity in GB
     # Software/Service attributes
     version=String(),  # Software version
-    vendor=String(),  # Vendor/manufacturer
+    vendor=String(indexme='yes'),  # Vendor/manufacturer - searchable
     # Relationships
     related_issues=Multilink("issue"),  # Issues affecting this CI
     related_changes=Multilink("change"),  # Changes targeting this CI
 )
+ci.setlabelprop("name")
+ci.setorderprop("name")
 
 # CI Relationship class - for modeling dependencies
 cirelationship = Class(
@@ -162,8 +196,10 @@ cirelationship = Class(
     source_ci=Link("ci"),  # Source CI
     relationship_type=Link("cirelationshiptype"),  # Type of relationship
     target_ci=Link("ci"),  # Target CI
-    description=String(),  # Optional description
+    description=String(indexme='yes'),  # Optional description - searchable
 )
+cirelationship.setlabelprop("id")
+cirelationship.setorderprop("id")
 
 #
 # TRACKER SECURITY SETTINGS
