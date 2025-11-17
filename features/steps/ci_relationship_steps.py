@@ -119,7 +119,13 @@ def step_select_target_ci(context, target_name):
     except Exception:
         # For change form - uses multilink text input field
         # Multilink fields are text inputs where you enter comma-separated IDs
-        context.page.fill("input[name='target_cis']", target_id)
+        # Get current value and append if not empty
+        current_value = context.page.input_value("input[name='target_cis']")
+        if current_value:
+            new_value = f"{current_value},{target_id}"
+        else:
+            new_value = target_id
+        context.page.fill("input[name='target_cis']", new_value)
 
 
 @when('I click "Save"')

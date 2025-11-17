@@ -143,7 +143,7 @@
         <li tal:repeat="rel_id dependents">
          <tal:block tal:define="rel python:db.cirelationship.getnode(rel_id);
                                 source_ci python:db.ci.getnode(rel.source_ci)">
-          <a tal:attributes="href string:ci${source_ci.id}"
+          <a tal:attributes="href string:ci${source_ci/id}"
              tal:content="source_ci/name">dependent CI</a>
           (<tal:x tal:replace="python:db.cirelationshiptype.get(rel.relationship_type, 'name')">relationship</tal:x>)
          </tal:block>
