@@ -58,7 +58,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Performance benefits: Faster sorting, better search precision
   - UX benefits: Consistent list displays, meaningful default ordering
 
-### Sprint 5 Progress (21/41 story points)
+### Sprint 5 Progress (21/41 story points - Story 3 in progress)
+
+#### Added
+
+- **CI Relationship Validation** (Story 3 - IN PROGRESS):
+  - Circular dependency detector with recursive cycle detection
+  - Self-referencing relationship prevention
+  - Duplicate relationship validation
+  - Structured logging throughout detector (`logging` module)
+  - Custom action handler for proper error display (`tracker/extensions/cirelationship_actions.py`)
+  - Comprehensive debugging and investigation documentation
 
 #### Added
 
@@ -112,14 +122,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed from expecting "Hosts" to "Runs On" in incoming relationships
   - Note: Inverse relationship type mapping identified as future UX enhancement
 
+### Improved
+
+- **Detector Exception Handling**:
+
+  - Changed from `ValueError` to `Reject` exception (Roundup best practice)
+  - Ensures proper transaction rollback on validation failures
+  - Provides better error messaging to users
+
+- **Debugging Capabilities**:
+
+  - Added structured logging to CI relationship validator
+  - Enhanced BDD test debugging output
+  - Comprehensive error context in log messages
+
 ### Technical Debt Identified
+
+1. ✅ **Email Configuration**: Development environment needs email mocking (RESOLVED)
+
+   - **Problem**: Server startup fails when trying to send error emails to localhost:25
+   - **Solution Implemented**: Configured `mail_debug = /tmp/roundup-mail-debug.log` in `tracker/config.ini`
+   - **Additional Fix**: Set `debug = yes` in `[web]` section to display tracebacks for debugging
+   - **Impact**: Development server now starts successfully without SMTP server
 
 1. **Template Complexity**: ci.item.html has grown to 230+ lines
 
    - Consider extracting relationship section to separate template
    - Use TAL macros for reusable components
 
-1. **Detector Loading**: Needs verification that ci_relationship_validator is registered
+1. **Custom Action Error Handling**: Roundup's NewItemAction doesn't redirect with errors
+
+   - Created custom action handler for cirelationship
+   - Pattern may need to be applied to other classes
 
 1. **Remove Relationship Navigation**: @action=retire redirect behavior unclear
 
@@ -130,9 +164,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ✅ Link virtual machine to physical server (10 steps)
   - ✅ View CI dependency tree (6 steps)
   - ✅ View all relationships for a CI (10 steps)
-  - ⏳ Prevent circular dependency (detector verification needed)
+  - 🔄 Prevent circular dependency (detector works via CLI, web UI error display in progress)
   - ⏳ Remove CI relationship (navigation issue)
   - ⏳ API scenarios (deferred to Story 4)
+
+### Investigation & Learning
+
+**Roundup Error Handling Deep Dive** (2025-11-17 Session 1):
+
+- Discovered that `NewItemAction` in Roundup catches `Reject` exceptions but doesn't redirect to show errors
+- Error messages are request-scoped (`self._error_message = []`) and don't persist across redirects
+- Solution: Custom action handlers that explicitly redirect with `?@error_message=...` parameter
+- Verified detector functionality via CLI (works perfectly)
+- Added comprehensive structured logging for debugging
+- Pattern identified for future custom form handlers
+
+**Database Management & Troubleshooting** (2025-11-17 Session 2):
+
+- Discovered database corruption issue: `sqlite3.OperationalError: table otks already exists`
+- Root cause: Database schema version tracking out of sync after multiple server restarts
+- Solution: Delete database and reinitialize with `roundup-admin -i . initialise admin`
+- Key insight: BDD testing should always start with fresh database for consistency
+- Updated CLAUDE.md with:
+  - Database initialization commands (admin password on command line)
+  - Troubleshooting section for common database issues
+  - Complete server restart sequence with database reset
+  - Best practice: Use `pms=.` when in tracker directory, `pms=tracker` from project root
 
 ## [0.5.0] - 2025-11-16
 

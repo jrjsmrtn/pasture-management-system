@@ -59,7 +59,9 @@ Following [Diátaxis](https://diataxis.fr/):
 **Core Platform**:
 
 - Python 3.9+
-- Roundup Issue Tracker Toolkit
+- Roundup Issue Tracker Toolkit 2.5.0+
+  - See [Roundup Development Best Practices](docs/reference/roundup-development-practices.md) for comprehensive development guidance
+  - Official documentation: https://www.roundup-tracker.org/docs.html
 
 **BDD/Testing**:
 
@@ -93,6 +95,45 @@ pip install -r requirements.txt
 # Install pre-commit hooks
 pre-commit install
 pre-commit install --hook-type pre-push
+```
+
+### Roundup Server Management
+
+```bash
+# Database initialization (for clean start or testing)
+# From project root:
+cd tracker
+rm -rf db/*
+uv run roundup-admin -i . initialise admin   # admin password provided on command line
+cd ..
+
+# Start the Roundup server (foreground - for testing/debugging)
+uv run roundup-server -p 9080 pms=tracker
+
+# Start in background (for BDD tests)
+uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
+
+# Stop all Roundup servers
+pkill -f "roundup-server"
+
+# Verify server is running
+curl -s http://localhost:9080/pms/ | grep -q "Roundup" && echo "Server is running" || echo "Server is not running"
+
+# IMPORTANT: Server Management Best Practices
+# 1. Always use pkill to stop before starting a new instance
+# 2. Wait 2 seconds after pkill before starting new server
+# 3. Detectors are loaded on server startup - restart after detector changes
+# 4. Template changes are cached - restart server to see template updates
+# 5. For BDD testing: delete and reinitialize database for clean state
+
+# Complete restart sequence (recommended)
+pkill -f "roundup-server" && sleep 2 && uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
+
+# Troubleshooting: Database corruption (e.g., "table otks already exists")
+# This happens when database schema version tracking is out of sync
+# Solution: Delete and reinitialize the database
+cd tracker && rm -rf db/* && uv run roundup-admin -i . initialise admin && cd .. && \
+pkill -f "roundup-server" && sleep 2 && uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
 ```
 
 ### Code Quality

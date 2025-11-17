@@ -24,6 +24,8 @@ def step_create_ci_with_name_type(context, name, ci_type):
 
     # Create CI via roundup-admin
     cmd = [
+        "uv",
+        "run",
         "roundup-admin",
         "-i",
         "tracker",
@@ -62,15 +64,26 @@ def step_view_ci(context, name):
         # Try to find it
         raise ValueError(f"CI '{name}' not found in context")
 
-    context.page.goto(f"{context.tracker_url}/ci{ci_id}")
+    # Navigate by clicking link to preserve session (not using goto)
+    context.page.click('a:has-text("View Configuration Items")')
+    context.page.wait_for_load_state("networkidle")
+
+    # Click on the CI name to view it
+    context.page.click(f'a:has-text("{name}")')
     context.page.wait_for_load_state("networkidle")
     context.current_ci = name
+
+    # Debug: print current URL and check for Add Relationship link
+    print(f"\nDEBUG: Current URL: {context.page.url}")
+    link_selector = 'a:has-text("Add Relationship")'
+    link_count = context.page.locator(link_selector).count()
+    print(f"DEBUG: Page has 'Add Relationship' link: {link_count > 0}")
 
 
 @when('I click "Add Relationship"')
 def step_click_add_relationship(context):
     """Click Add Relationship button."""
-    context.page.click("text=Add Relationship")
+    context.page.click('a:has-text("Add Relationship")')
     context.page.wait_for_load_state("networkidle")
 
 
@@ -110,22 +123,89 @@ def step_select_target_ci(context, target_name):
 @when('I click "Save"')
 def step_click_save(context):
     """Click Save button."""
-    context.page.click('input[type="submit"]')
+    # Debug: Check form values before submitting
+    source_ci_value = context.page.locator('select[name="source_ci"]').input_value()
+    rel_type_value = context.page.locator('select[name="relationship_type"]').input_value()
+    target_ci_value = context.page.locator('select[name="target_ci"]').input_value()
+    print("\nDEBUG: Form values before submit:")
+    print(f"DEBUG: source_ci = {source_ci_value}")
+    print(f"DEBUG: relationship_type = {rel_type_value}")
+    print(f"DEBUG: target_ci = {target_ci_value}")
+
+    # Take screenshot before submitting
+    timestamp = "before_submit"
+    context.page.screenshot(path=f"screenshots/relationship_form_{timestamp}.png")
+    print(f"DEBUG: Screenshot saved: screenshots/relationship_form_{timestamp}.png")
+
+    # Click the correct submit button - need to be specific to avoid clicking sidebar buttons
+    # Look for the submit button with value containing "Submit" or "Changes"
+    submit_selector = 'input[type="submit"][value*="Submit"]'
+    context.page.click(submit_selector)
+    context.page.wait_for_load_state("networkidle")
+
+    # Take screenshot after submit
+    timestamp = "after_submit"
+    context.page.screenshot(path=f"screenshots/relationship_form_{timestamp}.png")
+    print(f"DEBUG: URL after submit: {context.page.url}")
+
+    # After saving, we're on a confirmation page without navigation
+    # Use browser back button twice to get back to CI page:
+    # Back once to relationship form, back again to CI
+    context.page.go_back()
+    context.page.wait_for_load_state("networkidle")
+    context.page.go_back()
+    context.page.wait_for_load_state("networkidle")
+
+    # Reload the page to get fresh data (not cached)
+    context.page.reload()
     context.page.wait_for_load_state("networkidle")
 
 
 @then('"{source}" should have relationship "{rel_type}" to "{target}"')
 def step_verify_relationship_exists(context, source, rel_type, target):
     """Verify that a relationship exists between two CIs."""
-    # Navigate to source CI
-    ci_id = context.ci_map.get(source)
-    context.page.goto(f"{context.tracker_url}/ci{ci_id}")
-    context.page.wait_for_load_state("networkidle")
+    # Navigate to the source CI page if we're not already there
+    if not hasattr(context, "current_ci") or context.current_ci != source:
+        # Navigate to CI list
+        context.page.click('a:has-text("View Configuration Items")')
+        context.page.wait_for_load_state("networkidle")
 
-    # Check for relationship in the page
+        # Click on the source CI name to view it
+        context.page.click(f'a:has-text("{source}")')
+        context.page.wait_for_load_state("networkidle")
+        context.current_ci = source
+
+    # Verify the relationship is displayed on this page
     content = context.page.content()
-    assert rel_type in content, f"Relationship type '{rel_type}' not found on page"
-    assert target in content, f"Target CI '{target}' not found on page"
+    assert rel_type in content, (
+        f"Relationship type '{rel_type}' not found on page for CI '{source}'"
+    )
+    assert target in content, f"Target CI '{target}' not found on page for CI '{source}'"
+
+
+@then('"{target}" should show incoming relationship "{rel_type}" from "{source}"')
+def step_verify_incoming_relationship(context, target, rel_type, source):
+    """Verify that an incoming relationship is displayed on the target CI page."""
+    # Navigate to the target CI page if we're not already there
+    if not hasattr(context, "current_ci") or context.current_ci != target:
+        # Navigate to CI list
+        context.page.click('a:has-text("View Configuration Items")')
+        context.page.wait_for_load_state("networkidle")
+
+        # Click on the target CI name to view it
+        context.page.click(f'a:has-text("{target}")')
+        context.page.wait_for_load_state("networkidle")
+        context.current_ci = target
+
+    # Verify the incoming relationship is displayed in the "Referenced By" section
+    content = context.page.content()
+    assert "Referenced By" in content, (
+        f"'Referenced By' section not found on page for CI '{target}'"
+    )
+    assert rel_type in content, (
+        f"Relationship type '{rel_type}' not found on page for CI '{target}'"
+    )
+    assert source in content, f"Source CI '{source}' not found on page for CI '{target}'"
 
 
 @given('a CI "{source}" depends on "{target}"')
@@ -209,7 +289,31 @@ def step_try_add_dependency(context, target):
         step_click_add_relationship(context)
         step_select_relationship_type(context, "Depends On")
         step_select_target_ci(context, target)
+
+        # Debug: Check page before submit
+        print(f"DEBUG: URL before submit: {context.page.url}")
+
         step_click_save(context)
+
+        # Debug: Check page after submit
+        print(f"DEBUG: URL after submit: {context.page.url}")
+        print(f"DEBUG: Page title: {context.page.title()}")
+
+        # Check if error message appears anywhere in the HTML
+        html = context.page.content()
+        if "Circular" in html or "circular" in html:
+            print("DEBUG: Found 'circular' in HTML!")
+            # Find the context
+            idx = html.lower().find("circular")
+            print(f"DEBUG: Context: ...{html[max(0, idx - 100) : idx + 100]}...")
+        else:
+            print("DEBUG: NO 'circular' text found in HTML")
+            print(f"DEBUG: HTML length: {len(html)} chars")
+
+        if "Error" in html or "error-message" in html:
+            print("DEBUG: Found error-related content in HTML")
+        else:
+            print("DEBUG: No error-related content found")
     except Exception as e:
         context.last_error = str(e)
 
@@ -279,15 +383,18 @@ def step_click_remove_relationship(context, target):
     """Click Remove button for a specific relationship."""
     # Find and click the remove link for this relationship
     # This is a simplified version - actual implementation would be more precise
+    # Set up dialog handler before clicking
+    context.page.once("dialog", lambda dialog: dialog.accept())
     context.page.click("text=Remove")
+    context.page.wait_for_load_state("networkidle")
 
 
 @when("I confirm removal")
 def step_confirm_removal(context):
     """Confirm the removal in dialog."""
-    # Handle JavaScript confirm dialog
-    context.page.on("dialog", lambda dialog: dialog.accept())
-    context.page.wait_for_timeout(500)
+    # Dialog is already handled in the Remove click step
+    # This step is just for readability in the scenario
+    pass
 
 
 @then('"{ci_name}" should have no relationships')

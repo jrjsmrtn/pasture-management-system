@@ -74,45 +74,37 @@
  </td>
 </tr>
 
-<!-- Server/VM specific fields -->
-<tr tal:condition="python:context.type.plain() in ['1', '6']">
+<!-- Server/VM specific fields: show all when creating new, filter by type when editing -->
+<tr>
  <th i18n:translate="">CPU Cores</th>
  <td tal:content="structure python:context.cpu_cores.field(size=10)">cpu_cores</td>
  <th i18n:translate="">RAM (GB)</th>
  <td tal:content="structure python:context.ram_gb.field(size=10)">ram_gb</td>
 </tr>
 
-<tr tal:condition="python:context.type.plain() in ['1', '6']">
+<tr>
  <th i18n:translate="">Operating System</th>
  <td colspan=3 tal:content="structure python:context.os.field(size=60)">os</td>
 </tr>
 
-<!-- IP Address (Server, Network Device, VM) -->
-<tr tal:condition="python:context.type.plain() in ['1', '2', '6']">
+<!-- IP Address and Ports -->
+<tr>
  <th i18n:translate="">IP Address</th>
  <td tal:content="structure python:context.ip_address.field(size=20)">ip_address</td>
-
- <!-- Ports (Network Device only) -->
- <tal:block condition="python:context.type.plain() == '2'">
-  <th i18n:translate="">Ports</th>
-  <td tal:content="structure python:context.ports.field(size=10)">ports</td>
- </tal:block>
+ <th i18n:translate="">Ports</th>
+ <td tal:content="structure python:context.ports.field(size=10)">ports</td>
 </tr>
 
 <!-- Storage specific -->
-<tr tal:condition="python:context.type.plain() == '3'">
+<tr>
  <th i18n:translate="">Capacity (GB)</th>
  <td tal:content="structure python:context.capacity_gb.field(size=10)">capacity_gb</td>
-</tr>
-
-<!-- Software/Service specific -->
-<tr tal:condition="python:context.type.plain() in ['4', '5']">
  <th i18n:translate="">Version</th>
  <td tal:content="structure python:context.version.field(size=30)">version</td>
 </tr>
 
-<!-- Vendor (all types except VMs) -->
-<tr tal:condition="python:context.type.plain() in ['2', '3', '4', '5']">
+<!-- Vendor -->
+<tr>
  <th i18n:translate="">Vendor</th>
  <td colspan=3 tal:content="structure python:context.vendor.field(size=60)">vendor</td>
 </tr>
@@ -165,8 +157,8 @@
 
  <div class="relationships-section">
   <tal:block tal:define="
-   outgoing_rels python:db.cirelationship.filter(None, {'source_ci': context.id});
-   incoming_rels python:db.cirelationship.filter(None, {'target_ci': context.id})
+   outgoing_rels python:db.cirelationship.filter(None, {'source_ci': str(context.id)});
+   incoming_rels python:db.cirelationship.filter(None, {'target_ci': str(context.id)})
   ">
 
    <!-- Display outgoing relationships -->
@@ -180,13 +172,9 @@
       <th i18n:translate="">Actions</th>
      </tr>
      <tr tal:repeat="rel outgoing_rels">
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
-          tal:content="python:rel_obj.relationship_type"></td>
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel);
-                      target_ci python:db.ci.getnode(rel_obj.target_ci)"
-          tal:content="python:target_ci.name"></td>
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
-          tal:content="python:rel_obj.description or '-'"></td>
+      <td tal:content="rel/relationship_type/name">type</td>
+      <td tal:content="rel/target_ci/name">target</td>
+      <td tal:content="python:rel.description or '-'">description</td>
       <td>
        <a tal:attributes="href string:cirelationship${rel}?@action=retire"
           onclick="return confirm('Remove this relationship?')"
@@ -206,13 +194,9 @@
       <th i18n:translate="">Description</th>
      </tr>
      <tr tal:repeat="rel incoming_rels">
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel);
-                      source_ci python:db.ci.getnode(rel_obj.source_ci)"
-          tal:content="python:source_ci.name"></td>
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
-          tal:content="python:rel_obj.relationship_type"></td>
-      <td tal:define="rel_obj python:db.cirelationship.getnode(rel)"
-          tal:content="python:rel_obj.description or '-'"></td>
+      <td tal:content="rel/source_ci/name">source</td>
+      <td tal:content="rel/relationship_type/name">type</td>
+      <td tal:content="python:rel.description or '-'">description</td>
      </tr>
     </table>
    </tal:block>

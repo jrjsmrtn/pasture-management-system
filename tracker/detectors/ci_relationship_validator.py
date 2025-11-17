@@ -8,6 +8,11 @@ Validates CI relationships to prevent circular dependencies and ensure
 data integrity in the CMDB.
 """
 
+import logging
+from roundup.exceptions import Reject
+
+logger = logging.getLogger(__name__)
+
 
 def has_circular_dependency(db, source_ci, target_ci, visited=None):
     """
@@ -66,10 +71,22 @@ def validate_ci_relationship(db, cl, nodeid, newvalues):
         nodeid: Node ID (None for new items)
         newvalues: Dictionary of new/changed values
     """
+    logger.info(
+        "CI relationship validator called",
+        extra={
+            "nodeid": nodeid,
+            "newvalues": newvalues,
+            "action": "create" if nodeid is None else "update",
+        },
+    )
+
     # Only validate on create or when relationship changes
     if nodeid and not (
         "source_ci" in newvalues or "target_ci" in newvalues or "relationship_type" in newvalues
     ):
+        logger.debug(
+            "Skipping validation - no relationship field changes", extra={"nodeid": nodeid}
+        )
         return
 
     # Get the relationship values
@@ -86,20 +103,45 @@ def validate_ci_relationship(db, cl, nodeid, newvalues):
 
     # Ensure required fields are present
     if not source_ci or not target_ci or not relationship_type:
-        raise ValueError("source_ci, target_ci, and relationship_type are required fields")
+        raise Reject("source_ci, target_ci, and relationship_type are required fields")
 
     # Check for self-referencing relationship
+    logger.debug("Checking self-reference", extra={"source_ci": source_ci, "target_ci": target_ci})
     if source_ci == target_ci:
-        raise ValueError("A CI cannot have a relationship with itself")
+        logger.warning(
+            "Validation failed: self-referencing relationship",
+            extra={"source_ci": source_ci, "target_ci": target_ci, "validation": "self_reference"},
+        )
+        raise Reject("A CI cannot have a relationship with itself")
 
     # Check for circular dependencies
+    logger.debug(
+        "Checking circular dependency", extra={"source_ci": source_ci, "target_ci": target_ci}
+    )
     if has_circular_dependency(db, source_ci, target_ci):
-        raise ValueError(
+        logger.warning(
+            "Validation failed: circular dependency detected",
+            extra={
+                "source_ci": source_ci,
+                "target_ci": target_ci,
+                "validation": "circular_dependency",
+            },
+        )
+        raise Reject(
             "Circular dependency detected. This relationship would create a cycle "
             "in the dependency graph."
         )
+    logger.debug("No circular dependency found")
 
     # Check for duplicate relationships (same source, target, and type)
+    logger.debug(
+        "Checking for duplicate relationships",
+        extra={
+            "source_ci": source_ci,
+            "target_ci": target_ci,
+            "relationship_type": relationship_type,
+        },
+    )
     existing_rels = db.cirelationship.filter(
         None,
         {"source_ci": source_ci, "target_ci": target_ci, "relationship_type": relationship_type},
@@ -110,7 +152,26 @@ def validate_ci_relationship(db, cl, nodeid, newvalues):
         existing_rels = [rel for rel in existing_rels if rel != nodeid]
 
     if existing_rels:
-        raise ValueError("A relationship with the same source, target, and type already exists")
+        logger.warning(
+            "Validation failed: duplicate relationship",
+            extra={
+                "source_ci": source_ci,
+                "target_ci": target_ci,
+                "relationship_type": relationship_type,
+                "existing_rels": existing_rels,
+                "validation": "duplicate",
+            },
+        )
+        raise Reject("A relationship with the same source, target, and type already exists")
+
+    logger.info(
+        "Validation passed - relationship is valid",
+        extra={
+            "source_ci": source_ci,
+            "target_ci": target_ci,
+            "relationship_type": relationship_type,
+        },
+    )
 
 
 def init(db):
