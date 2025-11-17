@@ -401,14 +401,54 @@ def check_permissions(db, cl, nodeid, newdata):
 **Validation errors:**
 
 ```python
+from roundup.exceptions import Reject
+
 def validate_state_transition(db, cl, nodeid, newdata):
     if 'status' in newdata:
         old_status = db.issue.get(nodeid, 'status')
         new_status = newdata['status']
 
         if not is_valid_transition(old_status, new_status):
-            raise ValueError(f"Invalid status transition from {old_status} to {new_status}")
+            # BEST PRACTICE: Use Reject instead of ValueError
+            # - Provides better transaction rollback
+            # - Works properly with custom action handlers
+            # - Better error message handling in web UI
+            raise Reject(f"Invalid status transition from {old_status} to {new_status}")
 ```
+
+**IMPORTANT: Reject vs ValueError**
+
+**Pattern Discovered** (Sprint 5, 2025-11-17):
+
+Always use `Reject` exception in auditor detectors, not `ValueError`:
+
+```python
+from roundup.exceptions import Reject
+
+# ❌ AVOID - ValueError
+def audit_ci(db, cl, nodeid, newvalues):
+    if not newvalues.get("name"):
+        raise ValueError("Name is required")  # Works via CLI, poor web UI UX
+
+# ✅ PREFER - Reject
+def audit_ci(db, cl, nodeid, newvalues):
+    if not newvalues.get("name"):
+        raise Reject("Name is required")  # Works everywhere, better UX
+```
+
+**Why Reject is Better**:
+
+1. **Proper Transaction Handling**: Ensures clean rollback on validation failure
+1. **Web UI Integration**: Works with Roundup's error message system
+1. **Custom Action Support**: Required for custom action handlers to catch errors properly
+1. **Consistent Behavior**: Same behavior across CLI, web UI, and API
+1. **Better Error Messages**: Roundup handles `Reject` exceptions specially for user display
+
+**When to Use Each**:
+
+- `Reject` - All validation failures in auditors (✅ **preferred**)
+- `ValueError` - Internal logic errors, not user-facing validation (rare)
+- `Unauthorized` - Permission/security violations
 
 **Unauthorized actions:**
 
@@ -668,6 +708,82 @@ Roundup uses TAL (Template Attribute Language) for dynamic HTML generation.
 <div tal:replace="structure python:context.nosy.menu(display='checklist')" />
 ```
 
+#### TAL Path Expressions for Relationships
+
+**Pattern Discovered** (Sprint 5, 2025-11-17):
+
+Use TAL path expressions instead of Python database calls for traversing relationships:
+
+```html
+<!-- ❌ AVOID - Python database calls in templates -->
+<tal:block tal:repeat="rel python:db._db.getnode('ci', context.id).get('relationships', [])">
+  <td tal:content="python:db.cirelationship.get(rel, 'name')">Name</td>
+  <!-- Causes AttributeError: getnode and type errors -->
+</tal:block>
+
+<!-- ✅ PREFER - TAL path expressions -->
+<tal:block tal:repeat="rel context/relationships">
+  <td tal:content="rel/relationship_type/name">Type</td>
+  <td tal:content="rel/target_ci/name">Target</td>
+  <td tal:content="rel/target_ci/status/name">Status</td>
+</tal:block>
+```
+
+**Why TAL Path Expressions are Better**:
+
+1. **Automatic Relationship Traversal**: TAL handles Roundup's internal wrapping automatically
+1. **Cleaner Templates**: No Python code in templates (better separation of concerns)
+1. **Better Error Handling**: TAL provides clear errors for missing properties
+1. **More Maintainable**: Simpler syntax, easier to read and debug
+1. **Performance**: TAL optimizer can cache path lookups
+
+**Path Expression Syntax**:
+
+| Pattern                     | Description                        | Example                             |
+| --------------------------- | ---------------------------------- | ----------------------------------- |
+| `object/property`           | Access property                    | `context/name`                      |
+| `object/link/property`      | Traverse Link                      | `context/owner/username`            |
+| `object/link/link/property` | Multi-level traversal              | `context/issue/assignedto/realname` |
+| `object/multilink`          | Access Multilink (returns list)    | `context/relationships`             |
+| `item/link/property`        | In repeat, traverse from each item | `rel/target_ci/name`                |
+
+**Complex Example - Bidirectional Relationships**:
+
+```html
+<!-- Display outgoing relationships (this CI → others) -->
+<h3>Dependencies</h3>
+<table>
+  <tr tal:repeat="rel context/outgoing_relationships">
+    <td tal:content="rel/relationship_type/name">Relationship</td>
+    <td>
+      <a tal:attributes="href string:ci${rel/target_ci/id}"
+         tal:content="rel/target_ci/name">Target CI</a>
+    </td>
+    <td tal:content="rel/target_ci/status/name">Status</td>
+  </tr>
+</table>
+
+<!-- Display incoming relationships (others → this CI) -->
+<h3>Referenced By</h3>
+<table>
+  <tr tal:repeat="rel context/incoming_relationships">
+    <td tal:content="rel/relationship_type/name">Relationship</td>
+    <td>
+      <a tal:attributes="href string:ci${rel/source_ci/id}"
+         tal:content="rel/source_ci/name">Source CI</a>
+    </td>
+    <td tal:content="rel/source_ci/criticality/name">Criticality</td>
+  </tr>
+</table>
+```
+
+**Best Practices**:
+
+- ✅ Use TAL path expressions for all relationship traversals
+- ✅ Avoid `python:` expressions unless complex logic required
+- ✅ Use `python:` only for calculations, not database access
+- ✅ Keep templates declarative, not imperative
+
 ### Form Handling and Validation
 
 #### Required Fields
@@ -828,6 +944,268 @@ Create wizard-style interfaces:
    - Template changes are **cached** by server
    - **Restart server** to see template updates
    - Use `roundup-server` restart sequence (see [Server Management](#server-management))
+
+______________________________________________________________________
+
+## Custom Action Handlers
+
+**Pattern Discovered** (Sprint 5, 2025-11-17):
+
+Custom action handlers solve a critical limitation in Roundup's web UI error handling: by default, validation errors from auditor detectors are not properly displayed to users in the web interface.
+
+### The Problem
+
+Roundup's default `NewItemAction.handle()` method:
+
+1. Catches `Reject` exceptions from auditors
+1. Calls `add_error_message()` to store the error
+1. **Returns immediately** without rendering a page
+1. Error messages are request-scoped and lost
+
+**Result**: Users see blank pages or redirects without error feedback.
+
+### The Solution: Custom Action Handler
+
+Extend `NewItemAction` to catch `Reject` exceptions and redirect with error messages in the URL.
+
+#### Implementation Pattern
+
+**File**: `tracker/extensions/cirelationship_actions.py`
+
+```python
+# SPDX-FileCopyrightText: 2025 Your Name <your@email.com>
+# SPDX-License-Identifier: MIT
+
+"""Custom actions for proper error handling in web UI forms."""
+
+import logging
+
+try:
+    import urllib.parse as urllib_
+except ImportError:
+    import urllib as urllib_  # Python 2 compatibility
+
+from roundup.cgi import exceptions
+from roundup.cgi.actions import NewItemAction
+from roundup.exceptions import Reject
+
+logger = logging.getLogger(__name__)
+
+
+class CIRelationshipNewAction(NewItemAction):
+    """Custom new item action that handles validation errors properly."""
+
+    def handle(self):
+        """Create new item with proper error display on validation failure."""
+
+        # Ensure modification comes via POST
+        if self.client.env["REQUEST_METHOD"] != "POST":
+            raise Reject(self._("Invalid request"))
+
+        # Parse props from form
+        try:
+            props, links = self.client.parsePropsFromForm(create=1)
+        except (ValueError, KeyError) as message:
+            self.client.add_error_message(self._("Error: %s") % str(message))
+            return
+
+        # Handle the props - this is where auditors run
+        try:
+            messages = self._editnodes(props, links)
+        except (ValueError, KeyError, IndexError, Reject) as message:
+            error_msg = str(message)
+            logger.warning(f"Item creation failed: {error_msg}")
+
+            # Get source_ci to redirect back to the right page
+            source_ci = props.get(("cirelationship", None), {}).get("source_ci")
+            if source_ci:
+                # Redirect back to source CI with error message in URL
+                url = f"{self.base}ci{source_ci}?@error_message={urllib_.quote(error_msg)}"
+            else:
+                # Fallback: redirect to class list
+                url = f"{self.base}{self.classname}?@error_message={urllib_.quote(error_msg)}"
+
+            # Redirect with error message
+            raise exceptions.Redirect(url)
+
+        # Commit transaction
+        self.db.commit()
+
+        # Redirect to success page
+        if "__redirect_to" in self.form:
+            redirect_url = self.examine_url(self.form["__redirect_to"].value)
+            raise exceptions.Redirect(
+                f"{redirect_url}&@ok_message={urllib_.quote(messages)}"
+            )
+
+        # Default: redirect to new item's page
+        raise exceptions.Redirect(
+            f"{self.base}{self.classname}{self.nodeid}"
+            f"?@ok_message={urllib_.quote(messages)}"
+            f"&@template={urllib_.quote(self.template)}"
+        )
+
+
+def init(instance):
+    """Register custom actions with the tracker."""
+    instance.registerAction("cirelationship_new", CIRelationshipNewAction)
+```
+
+#### Template Integration
+
+Update your form template to use the custom action:
+
+```html
+<!-- tracker/html/cirelationship.item.html -->
+<form method="POST" enctype="multipart/form-data"
+      tal:attributes="action context/designator">
+
+  <!-- Use custom action instead of default "new" -->
+  <input type="hidden" name="@action" value="cirelationship_new" />
+
+  <!-- Rest of form fields -->
+  <input type="hidden" name="source_ci" tal:attributes="value request/form/source_ci" />
+  <select name="relationship_type" tal:replace="structure context/relationship_type/menu" />
+  <select name="target_ci" tal:replace="structure context/target_ci/menu" />
+
+  <input type="submit" value="Create Relationship" />
+</form>
+```
+
+#### Display Error Messages
+
+In your target template (e.g., `ci.item.html`), display the error message:
+
+```html
+<!-- Display error message if present -->
+<div class="error" tal:condition="request/form/@error_message"
+     tal:content="request/form/@error_message">
+  Error message here
+</div>
+
+<!-- Display success message if present -->
+<div class="ok-message" tal:condition="request/form/@ok_message"
+     tal:content="request/form/@ok_message">
+  Success message here
+</div>
+```
+
+### Pattern Benefits
+
+1. **Better UX**: Users see clear error messages
+1. **Proper Error Handling**: Works with `Reject` exceptions from auditors
+1. **Flexible**: Can redirect to different pages based on context
+1. **Logging**: Structured logging for debugging
+1. **Python 2/3 Compatible**: Handles urllib differences
+
+### When to Use Custom Actions
+
+Use custom action handlers when:
+
+- ✅ Form has complex validation via auditor detectors
+- ✅ Need to show validation errors to users
+- ✅ Want to redirect to specific pages on error
+- ✅ Need structured logging for form submissions
+- ✅ Have multi-step workflows requiring error handling
+
+**Standard Actions Work For**:
+
+- Simple forms without complex validation
+- Forms where default error handling is acceptable
+- CLI/API operations (errors display correctly)
+
+### Registration
+
+Custom actions must be registered in `tracker/extensions/__init__.py`:
+
+```python
+def init(db):
+    """Initialize all extensions."""
+
+    # Import custom action modules
+    from extensions import cirelationship_actions
+
+    # Register custom actions
+    cirelationship_actions.init(db.instance)
+
+    # ... other initialization ...
+```
+
+### Advanced Pattern: Generic Error Handler
+
+Create a reusable base class for all custom actions:
+
+```python
+class ImprovedNewItemAction(NewItemAction):
+    """Base class for new item actions with improved error handling."""
+
+    def get_error_redirect_url(self, props, error_msg):
+        """Override this to customize error redirect behavior."""
+        # Default: redirect to class list with error
+        return f"{self.base}{self.classname}?@error_message={urllib_.quote(error_msg)}"
+
+    def handle(self):
+        """Handle with improved error display."""
+        # ... standard POST check ...
+
+        try:
+            props, links = self.client.parsePropsFromForm(create=1)
+        except (ValueError, KeyError) as message:
+            self.client.add_error_message(self._("Error: %s") % str(message))
+            return
+
+        try:
+            messages = self._editnodes(props, links)
+        except (ValueError, KeyError, IndexError, Reject) as message:
+            error_msg = str(message)
+            logger.warning(f"{self.classname} creation failed: {error_msg}")
+
+            # Get custom redirect URL
+            url = self.get_error_redirect_url(props, error_msg)
+            raise exceptions.Redirect(url)
+
+        # ... commit and success redirect ...
+
+
+class CIRelationshipNewAction(ImprovedNewItemAction):
+    """CI Relationship specific action."""
+
+    def get_error_redirect_url(self, props, error_msg):
+        """Redirect to source CI on error."""
+        source_ci = props.get(("cirelationship", None), {}).get("source_ci")
+        if source_ci:
+            return f"{self.base}ci{source_ci}?@error_message={urllib_.quote(error_msg)}"
+        return super().get_error_redirect_url(props, error_msg)
+```
+
+### Debugging Custom Actions
+
+Add logging to troubleshoot custom action behavior:
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+class DebugNewAction(NewItemAction):
+    def handle(self):
+        logger.info(f"Action called: {self.classname}, Method: {self.client.env['REQUEST_METHOD']}")
+        logger.debug(f"Form data: {dict(self.form)}")
+
+        try:
+            result = super().handle()
+            logger.info(f"Action succeeded: {self.classname}{self.nodeid}")
+            return result
+        except Exception as e:
+            logger.error(f"Action failed: {e}", exc_info=True)
+            raise
+```
+
+### References
+
+- **Investigation Documentation**: `docs/reference/roundup-error-handling-web-ui.md`
+- **Roundup Actions Source**: `roundup/cgi/actions.py`
+- **Roundup Client Source**: `roundup/cgi/client.py`
 
 ______________________________________________________________________
 
@@ -1865,11 +2243,12 @@ ______________________________________________________________________
 
 ## Document History
 
-| Date       | Version | Changes                                                                                                                                                                                                                        |
-| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2025-01-17 | 1.0     | Initial comprehensive best practices document                                                                                                                                                                                  |
-| 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices |
-| 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                         |
+| Date       | Version | Changes                                                                                                                                                                                                                                                                                                          |
+| ---------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2025-01-17 | 1.0     | Initial comprehensive best practices document                                                                                                                                                                                                                                                                    |
+| 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices                                                                                   |
+| 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                                                                                                           |
+| 2025-11-17 | 1.3     | **Sprint 5 Lessons Learned**: Added custom action handlers section (solving web UI error handling limitation), TAL path expressions for relationship traversal, Reject vs ValueError best practices, structured logging patterns. Discoveries from production implementation providing reusable Roundup patterns |
 
 ______________________________________________________________________
 
