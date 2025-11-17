@@ -86,3 +86,10 @@ repos:
         language: system
         pass_filenames: false
         stages: [pre-push]
+      - id: validate-templates
+        name: Roundup template validation
+        entry: bash -c 'echo "Starting Roundup server for template validation..." && pkill -f "roundup-server" 2>/dev/null; sleep 1 && uv run roundup-server -p 9080 pms=tracker >/dev/null 2>&1 & SERVER_PID=$!; sleep 3 && ./scripts/validate-templates.sh; RESULT=$?; kill $SERVER_PID 2>/dev/null; exit $RESULT'
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+        files: ^tracker/html/.*\.html$
