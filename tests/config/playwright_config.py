@@ -42,10 +42,11 @@ SCREENSHOT_CONFIG: dict[str, Any] = {
 }
 
 # Default timeouts (milliseconds)
+# Conservative values for small homelab databases
 TIMEOUTS = {
-    "default": 30000,  # 30 seconds default timeout
-    "navigation": 30000,  # Page navigation timeout
-    "action": 10000,  # Action timeout (click, fill, etc.)
+    "default": 5000,  # 5 seconds default timeout (was 30s)
+    "navigation": 10000,  # 10 seconds for page navigation (was 30s)
+    "action": 3000,  # 3 seconds for actions like click/fill (was 10s)
 }
 
 # Base URL for the tracker

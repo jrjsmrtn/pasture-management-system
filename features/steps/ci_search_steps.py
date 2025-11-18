@@ -12,6 +12,8 @@ from behave import given, then, when
 @given("the following CIs exist:")
 def step_create_multiple_cis(context):
     """Create multiple CIs from a table."""
+    import time
+
     if not hasattr(context, "ci_map"):
         context.ci_map = {}
 
@@ -50,8 +52,10 @@ def step_create_multiple_cis(context):
         ci_type = row["type"]
         type_id = type_mapping.get(ci_type, ci_type)
 
-        # Build command args
+        # Build command args (use uv run for consistent environment)
         cmd = [
+            "uv",
+            "run",
             "roundup-admin",
             "-i",
             "tracker",
@@ -83,7 +87,12 @@ def step_create_multiple_cis(context):
                 cmd.append(f"location={location}")
 
         # Create the CI
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        # IMPORTANT: Run from project root to ensure correct tracker directory
+        import os
+
+        project_root = os.getcwd()
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, cwd=project_root)
+
         assert result.returncode == 0, f"Failed to create CI: {result.stderr}"
 
         # Store CI ID
@@ -94,11 +103,18 @@ def step_create_multiple_cis(context):
 @when('I search for "{search_term}"')
 def step_search_for_term(context, search_term):
     """Enter search term in the search box."""
-    # Find and fill the search input
-    context.page.fill('input[name="@search_text"]', search_term)
-    # Submit the search form or click search button
-    context.page.click('input[type="submit"][value="Search"]')
+    from features.steps.web_ui_steps import check_for_templating_error
+
+    # Find and fill the CI search input (not the global header search)
+    context.page.fill('div.search-filters input[name="@search_text"]', search_term)
+    # Submit the search form - use the button inside the search-filters div
+    context.page.click('div.search-filters input[type="submit"][value="Search"]')
     context.page.wait_for_load_state("networkidle")
+    # Additional wait for TAL rendering
+    context.page.wait_for_timeout(500)
+
+    # Check for templating errors after search
+    check_for_templating_error(context.page, f"search for '{search_term}'")
 
 
 @when('I filter by type "{ci_type}"')

@@ -9,6 +9,45 @@ from playwright.sync_api import expect
 from tests.config.playwright_config import DEFAULT_TRACKER_URL
 
 
+def check_for_templating_error(page, step_description=""):
+    """
+    Check if the current page contains a Roundup templating error.
+
+    Roundup returns HTTP 200 even when TAL templates have errors,
+    so we must check the page content for error markers.
+
+    Args:
+        page: Playwright page object
+        step_description: Description of the step for error messages
+
+    Raises:
+        AssertionError: If a templating error is detected
+    """
+    body_text = page.locator("body").inner_text()
+
+    if "Templating Error" in body_text or "TAL" in body_text and "Error" in body_text:
+        # Capture screenshot for debugging
+        screenshot_path = f"screenshots/templating_error_{step_description.replace(' ', '_')}.png"
+        page.screenshot(path=screenshot_path)
+
+        # Get error details
+        error_type = ""
+        error_msg = ""
+        try:
+            error_type_elem = page.locator("h3:has-text('Error Type')")
+            if error_type_elem.count() > 0:
+                error_type = error_type_elem.locator("..").inner_text()
+        except Exception:
+            pass
+
+        raise AssertionError(
+            f"Roundup templating error detected after: {step_description}\n"
+            f"Screenshot saved to: {screenshot_path}\n"
+            f"Error details: {error_type[:500] if error_type else 'See screenshot'}\n"
+            f"Body preview: {body_text[:200]}"
+        )
+
+
 @given("the Roundup tracker is running")
 @given('the Roundup tracker is running at "{url}"')
 def step_tracker_running(context, url=None):
@@ -49,6 +88,7 @@ def step_login_as_user(context, username, password="admin"):
 
     # Navigate to the tracker
     context.page.goto(context.tracker_url)
+    check_for_templating_error(context.page, "navigate to tracker homepage")
 
     # Check if already logged in by looking for logout link
     logout_link = context.page.locator('a:has-text("Logout")')
@@ -66,6 +106,7 @@ def step_login_as_user(context, username, password="admin"):
 
     # Wait for successful login - check for user name or logout link
     context.page.wait_for_selector('a:has-text("Logout")', timeout=5000)
+    check_for_templating_error(context.page, "login")
 
 
 @when('I navigate to the "{page_name}" page')
@@ -75,10 +116,12 @@ def step_navigate_to_page(context, page_name):
         # In Roundup classic, new issue is at: /issue?@template=item
         context.page.goto(f"{context.tracker_url}issue?@template=item")
         context.page.wait_for_load_state("networkidle")
+        check_for_templating_error(context.page, f"navigate to {page_name}")
     elif page_name == "Issues":
         # In Roundup classic, issue list is at: /issue
         context.page.goto(f"{context.tracker_url}issue")
         context.page.wait_for_load_state("networkidle")
+        check_for_templating_error(context.page, f"navigate to {page_name}")
 
 
 @when("I enter the following issue details:")

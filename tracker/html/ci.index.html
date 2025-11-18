@@ -93,8 +93,8 @@
    dummy2 python:status_val and filterspec.update({'status': status_val}) or None;
    dummy3 python:crit_val and filterspec.update({'criticality': crit_val}) or None;
    all_ci_ids python:db.ci.filter(None, filterspec);
-   ci_ids python:[ci_id for ci_id in all_ci_ids if not search_val or search_val.lower() in (db.ci.getnode(ci_id).name.lower() + ' ' + (db.ci.getnode(ci_id).location or '')).lower()];
-   sorted_ids python:sorted(ci_ids, key=lambda x: (db.ci.getnode(x).get(sort_val[1:] if sort_val and sort_val.startswith('-') else sort_val or 'id') or '', x), reverse=bool(sort_val and sort_val.startswith('-')));
+   ci_ids python:utils.filter_ci_ids_by_search(db, all_ci_ids, search_val);
+   sorted_ids python:utils.sort_ci_ids(db, ci_ids, sort_val);
    batch python:utils.Batch(sorted_ids, request.pagesize, request.startwith);
    ">
   <p tal:condition="python:not sorted_ids">

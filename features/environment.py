@@ -19,6 +19,7 @@ from playwright.sync_api import Browser, BrowserContext, Page, sync_playwright
 
 from tests.config.playwright_config import (
     DEFAULT_TRACKER_URL,
+    TIMEOUTS,
     get_context_options,
     get_launch_options,
 )
@@ -70,6 +71,10 @@ def browser_context(context):
 
     # Create new page
     context.page = context.context.new_page()
+
+    # Set timeouts for faster failure on small databases
+    context.page.set_default_timeout(TIMEOUTS["default"])
+    context.page.set_default_navigation_timeout(TIMEOUTS["navigation"])
 
     yield context.context
 

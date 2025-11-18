@@ -10,13 +10,27 @@ import requests
 from behave import given, then, when
 from requests.auth import HTTPBasicAuth
 
+from features.steps.web_ui_steps import check_for_templating_error
+
 
 @when('I navigate to "CMDB"')
 def step_navigate_to_cmdb(context):
     """Navigate to the CMDB page."""
-    # Click the CMDB link to preserve session (don't use goto which loses cookies)
-    context.page.click('a:has-text("View Configuration Items")')
+    # Click the CMDB link to preserve session (don't use goto which loses cookies!)
+    # Wait for the link to be visible and clickable
+    cmdb_link = context.page.locator('a:has-text("View Configuration Items")')
+    cmdb_link.wait_for(state="visible", timeout=5000)
+
+    # Use click with navigation wait
+    with context.page.expect_navigation():
+        cmdb_link.click()
+
     context.page.wait_for_load_state("networkidle")
+    # Additional wait for TAL rendering (Roundup-specific timing)
+    context.page.wait_for_timeout(500)
+
+    # Check for templating errors
+    check_for_templating_error(context.page, "navigate to CMDB")
 
 
 @when('I select type "{ci_type}"')
