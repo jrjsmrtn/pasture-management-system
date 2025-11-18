@@ -127,8 +127,9 @@
       - Criticality: <strong tal:content="python:db.cicriticality.get(ci.criticality, 'name')">criticality</strong>
       <tal:block tal:define="crit_name python:db.cicriticality.get(ci.criticality, 'name')">
        <tal:block tal:condition="python:crit_name in ['High', 'Very High']">
-        <br><span style="color: #d32f2f; font-weight: bold;">
-         ⚠ WARNING: This change affects a <tal:x tal:replace="python:crit_name.lower()">criticality</tal:x> criticality component
+        <br><span style="color: #d32f2f; font-weight: bold;"
+                  tal:content="python:f'⚠ WARNING: This change affects a {crit_name.lower()} criticality component'">
+         warning message
         </span>
        </tal:block>
       </tal:block>
