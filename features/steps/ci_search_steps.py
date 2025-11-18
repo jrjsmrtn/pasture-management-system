@@ -115,9 +115,9 @@ def step_filter_by_type(context, ci_type):
     type_id = type_mapping.get(ci_type, ci_type)
 
     # Select the type filter
-    context.page.select_option('select[name=":filter:type"]', type_id)
-    # The page might auto-submit or we need to click apply
-    context.page.wait_for_timeout(500)
+    context.page.select_option('select[name="type"]', type_id)
+    # Wait for page load after auto-submit
+    context.page.wait_for_load_state("networkidle")
 
 
 @when('I filter by criticality "{criticality}"')
@@ -132,8 +132,8 @@ def step_filter_by_criticality(context, criticality):
     }
     crit_id = criticality_mapping.get(criticality, criticality)
 
-    context.page.select_option('select[name=":filter:criticality"]', crit_id)
-    context.page.wait_for_timeout(500)
+    context.page.select_option('select[name="criticality"]', crit_id)
+    context.page.wait_for_load_state("networkidle")
 
 
 @when('I filter CIs by status "{status}"')
@@ -150,8 +150,8 @@ def step_filter_cis_by_status(context, status):
     }
     status_id = status_mapping.get(status, status)
 
-    context.page.select_option('select[name=":filter:status"]', status_id)
-    context.page.wait_for_timeout(500)
+    context.page.select_option('select[name="status"]', status_id)
+    context.page.wait_for_load_state("networkidle")
 
 
 @when('I click quick filter "{filter_name}"')

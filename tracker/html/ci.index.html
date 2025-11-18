@@ -28,10 +28,10 @@
   <form method="GET" action="ci" style="margin: 0;">
 
    <!-- Search box -->
-   <div style="margin-bottom: 0.5em;">
+   <div style="margin-bottom: 0.5em;" tal:define="search_val python:request.form.getvalue('@search_text', '')">
     <label for="search_text">Search:</label>
     <input type="text" id="search_text" name="@search_text"
-           tal:attributes="value request/form/@search_text | nothing"
+           tal:attributes="value python:search_val or ''"
            placeholder="Search by name, location..." style="width: 300px; margin-right: 1em;">
     <input type="submit" value="Search">
    </div>
@@ -39,43 +39,43 @@
    <!-- Filter dropdowns -->
    <div style="margin-bottom: 0.5em;">
     <label for="filter_type">Type:</label>
-    <select id="filter_type" name=":filter:type" onchange="this.form.submit()" style="margin-right: 1em;">
+    <select id="filter_type" name="type" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Types</option>
-     <option value="1" tal:attributes="selected python:request.form.get(':filter:type') == '1'">Server</option>
-     <option value="2" tal:attributes="selected python:request.form.get(':filter:type') == '2'">Network Device</option>
-     <option value="3" tal:attributes="selected python:request.form.get(':filter:type') == '3'">Storage</option>
-     <option value="4" tal:attributes="selected python:request.form.get(':filter:type') == '4'">Software</option>
-     <option value="5" tal:attributes="selected python:request.form.get(':filter:type') == '5'">Service</option>
-     <option value="6" tal:attributes="selected python:request.form.get(':filter:type') == '6'">Virtual Machine</option>
+     <option value="1">Server</option>
+     <option value="2">Network Device</option>
+     <option value="3">Storage</option>
+     <option value="4">Software</option>
+     <option value="5">Service</option>
+     <option value="6">Virtual Machine</option>
     </select>
 
     <label for="filter_status">Status:</label>
-    <select id="filter_status" name=":filter:status" onchange="this.form.submit()" style="margin-right: 1em;">
+    <select id="filter_status" name="status" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Statuses</option>
-     <option value="1" tal:attributes="selected python:request.form.get(':filter:status') == '1'">Planning</option>
-     <option value="2" tal:attributes="selected python:request.form.get(':filter:status') == '2'">Ordered</option>
-     <option value="3" tal:attributes="selected python:request.form.get(':filter:status') == '3'">In Stock</option>
-     <option value="4" tal:attributes="selected python:request.form.get(':filter:status') == '4'">Deployed</option>
-     <option value="5" tal:attributes="selected python:request.form.get(':filter:status') == '5'">Active</option>
-     <option value="6" tal:attributes="selected python:request.form.get(':filter:status') == '6'">Maintenance</option>
-     <option value="7" tal:attributes="selected python:request.form.get(':filter:status') == '7'">Retired</option>
+     <option value="1">Planning</option>
+     <option value="2">Ordered</option>
+     <option value="3">In Stock</option>
+     <option value="4">Deployed</option>
+     <option value="5">Active</option>
+     <option value="6">Maintenance</option>
+     <option value="7">Retired</option>
     </select>
 
     <label for="filter_criticality">Criticality:</label>
-    <select id="filter_criticality" name=":filter:criticality" onchange="this.form.submit()" style="margin-right: 1em;">
+    <select id="filter_criticality" name="criticality" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Criticality Levels</option>
-     <option value="1" tal:attributes="selected python:request.form.get(':filter:criticality') == '1'">Very Low</option>
-     <option value="2" tal:attributes="selected python:request.form.get(':filter:criticality') == '2'">Low</option>
-     <option value="3" tal:attributes="selected python:request.form.get(':filter:criticality') == '3'">Medium</option>
-     <option value="4" tal:attributes="selected python:request.form.get(':filter:criticality') == '4'">High</option>
-     <option value="5" tal:attributes="selected python:request.form.get(':filter:criticality') == '5'">Very High</option>
+     <option value="1">Very Low</option>
+     <option value="2">Low</option>
+     <option value="3">Medium</option>
+     <option value="4">High</option>
+     <option value="5">Very High</option>
     </select>
    </div>
 
    <!-- Quick Filters and Clear Filters -->
    <div>
     <strong>Quick Filters:</strong>
-    <a href="?:filter:type=1&:filter:status=5" style="margin: 0 0.5em;">Active Servers</a>
+    <a href="?type=1&status=5" style="margin: 0 0.5em;">Active Servers</a>
     <a href="?" style="margin-left: 1em;">Clear Filters</a>
    </div>
   </form>
