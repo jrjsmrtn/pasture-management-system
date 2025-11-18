@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 **Sprint**: 6 (Technical Debt + Production Readiness)
 **Target Version**: v1.0.0
-**Status**: 🔄 In Progress (Day 1)
+**Status**: 🔄 In Progress (Day 2)
 **Start Date**: 2025-11-18
 **End Date**: TBD
 **Planned Duration**: 2 weeks
@@ -34,6 +34,7 @@ Based on Sprint 5 retrospective analysis:
 - **Completion Rate**: 36%
 
 **Day 1 Summary**: Stories TD-1 and TD-2 complete! 🎉
+**Day 2 Summary**: Story 6 infrastructure improvements complete, CI visibility issue under investigation
 
 ## Backlog Items
 
@@ -218,8 +219,8 @@ ______________________________________________________________________
 
 **Story Points**: 5
 **Priority**: High
-**Status**: 🔄 Not Started (Deferred from Sprint 5)
-**Assignee**: TBD
+**Status**: 🔄 In Progress (Day 2 - Infrastructure improvements complete, CI visibility issue under investigation)
+**Assignee**: Claude
 
 **User Story**:
 
@@ -245,13 +246,45 @@ ______________________________________________________________________
 
 **Technical Tasks**:
 
-- [ ] Implement `@search_text` parameter processing in `ci.index.html`
+- [x] Implement `@search_text` parameter processing in `ci.index.html`
 - [ ] Add text search to filterspec construction
-- [ ] Implement `@sort` parameter handling
-- [ ] Add sorting to batch results
-- [ ] Update URL generation for persistent sort
-- [ ] Update step definitions
+- [x] Implement `@sort` parameter handling
+- [x] Add sorting to batch results
+- [x] Update URL generation for persistent sort
+- [x] Update step definitions
 - [ ] Test all search + filter + sort combinations
+
+**Completed Work (Day 2 - 2025-11-18)**:
+
+**BDD Test Infrastructure Improvements**:
+
+- ✅ Added `check_for_templating_error()` helper to catch TAL errors immediately (~3s vs 30s timeout)
+- ✅ Applied template error detection to all navigation and search steps
+- ✅ Reduced Playwright timeouts: default 30s→5s, navigation 30s→10s, actions 10s→3s
+- ✅ Fixed navigation to use click() instead of goto() (preserves session cookies)
+- ✅ Scoped search button selector to CI-specific form
+
+**Template Logic Refactoring**:
+
+- ✅ Created `tracker/extensions/template_helpers.py` with Python helper functions:
+  - `sort_ci_ids()` - handles sorting with HTMLItem wrapper objects
+  - `filter_ci_ids_by_search()` - text search in name/location fields
+- ✅ Simplified `ci.index.html` template (removed complex inline Python expressions)
+- ✅ Proper handling of Roundup HTMLItem wrapper objects throughout
+
+**CI Creation Step Fixes**:
+
+- ✅ Updated to use `uv run roundup-admin` for consistent environment
+- ✅ Added explicit working directory parameter (cwd)
+- ✅ Verified CI creation works correctly (IDs 1-3 created successfully)
+
+**Known Issue (Under Investigation)**:
+
+- ⚠️ CIs created via `roundup-admin` during BDD tests aren't visible in search results
+- CIs exist in database (confirmed via roundup-admin list command)
+- CIs are visible when created manually outside BDD test context
+- Possible Roundup database caching issue in test environment
+- Next steps: Investigate alternative CI creation methods (Web UI vs CLI)
 
 **BDD Scenarios**: (from Sprint 4)
 
