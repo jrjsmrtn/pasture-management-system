@@ -111,20 +111,42 @@ ______________________________________________________________________
 ### Sprint 6: Polish & Production Release (v1.0.0)
 
 **Duration**: 2 weeks
-**Goal**: Prepare for production release
+**Goal**: Complete deferred stories and begin production readiness
 
 **Key Deliverables**:
 
-- Performance optimization
-- UI/UX polish and accessibility
-- Security hardening
-- Complete Diátaxis documentation
-- BDD demonstration materials (4 Marpit presentations)
-- Deployment packaging (scripts, containers)
+- Complete Sprint 5 deferred stories (Search/Sort, Dashboard)
+- Technical debt resolution (BDD test integration)
+- Database management automation
+- Core Diátaxis documentation
+- Test parallelization
+- Production polish foundations
 
-**Story Points**: 47
+**Story Points**: 30
 
-[📄 Sprint 6 Planning](sprint-6-planning.md)
+[📄 Sprint 6 Planning](sprint-6-planning.md) | [📊 Sprint 6 Backlog](sprint-6-backlog.md)
+
+______________________________________________________________________
+
+### Sprint 7: Email Interface & Four-Interface BDD Testing (v1.1.0)
+
+**Duration**: 2 weeks
+**Goal**: Implement email interface and complete four-interface BDD testing architecture
+
+**Key Deliverables**:
+
+- Email-based issue creation and updates
+- Email notification system
+- Greenmail/Python SMTP testing infrastructure
+- Email step definition library
+- **Four-interface BDD testing** (Web UI + CLI + REST API + Email)
+- Cross-interface BDD scenarios
+- Email security and anti-spam measures
+- Four-interface testing documentation
+
+**Story Points**: 39
+
+[📄 Sprint 7 Planning](sprint-7-planning.md)
 
 ______________________________________________________________________
 
@@ -132,14 +154,16 @@ ______________________________________________________________________
 
 ### Total Effort
 
-- **Duration**: 12 weeks (6 sprints × 2 weeks)
-- **Total Story Points**: 206
-- **Target**: v1.0.0 production release
+- **Duration**: 14 weeks (7 sprints × 2 weeks)
+- **Total Story Points**: 245 (206 for v1.0.0 + 39 for v1.1.0)
+- **v1.0.0 Target**: Sprint 6 (production release)
+- **v1.1.0 Target**: Sprint 7 (email interface + four-interface BDD testing)
 
 ### Quality Targets
 
 - **Test Coverage**: >85% throughout development
-- **BDD Scenarios**: 40+ scenarios by v1.0.0
+- **BDD Scenarios**: 40+ scenarios by v1.0.0, 65+ by v1.1.0 (with email interface)
+- **Four-Interface Testing**: Web UI + CLI + REST API + Email (complete by v1.1.0)
 - **Screenshot Resolution**: 1024x768 (English only)
 - **Documentation**: Complete Diátaxis framework
 
@@ -153,6 +177,7 @@ v0.4.0  → Sprint 3 (Change Workflows)
 v0.5.0  → Sprint 4 (CMDB BDD Specification)
 v0.6.0  → Sprint 5 (CMDB Implementation) ← current
 v1.0.0  → Sprint 6 (Production Release)
+v1.1.0  → Sprint 7 (Email Interface + Four-Interface BDD)
 ```
 
 ## Sprint Process
@@ -192,22 +217,33 @@ Each sprint follows this structure:
 
 ## BDD Testing Strategy
 
-Each sprint includes comprehensive BDD scenarios across all three interfaces:
+Each sprint includes comprehensive BDD scenarios across multiple interfaces:
 
 ### Testing Interfaces
 
 - **Web UI**: Playwright browser automation (1024x768)
-- **CLI**: Command-line interface testing
-- **API**: REST/XML-RPC API testing
+- **CLI**: Command-line interface testing (`roundup-admin`)
+- **REST API**: REST/XML-RPC API testing
+- **Email**: Email gateway testing (`roundup-mailgw`) - Sprint 7+
+
+### Four-Interface Testing (Sprint 7+)
+
+Sprint 7 completes the **four-interface BDD testing architecture**, demonstrating:
+
+- Same functionality tested across all four interfaces
+- Cross-interface scenarios (e.g., create via email, verify via web/CLI/API)
+- Notification testing across all interfaces
+- Email testing with Greenmail or Python SMTP server
 
 ### Scenario Coverage Goals
 
-- Sprint 1: 10+ scenarios
-- Sprint 2: 15+ scenarios
-- Sprint 3: 20+ scenarios
-- Sprint 4: 25+ scenarios
-- Sprint 5: 30+ scenarios
-- Sprint 6: 40+ scenarios (total)
+- Sprint 1: 10+ scenarios (Web, CLI, API)
+- Sprint 2: 15+ scenarios (Web, CLI, API)
+- Sprint 3: 20+ scenarios (Web, CLI, API)
+- Sprint 4: 25+ scenarios (Web, CLI, API)
+- Sprint 5: 30+ scenarios (Web, CLI, API)
+- Sprint 6: 40+ scenarios (Web, CLI, API)
+- Sprint 7: 65+ scenarios (Web, CLI, API, Email) - **Four-interface testing complete**
 
 ## Documentation Timeline
 
@@ -255,12 +291,16 @@ BDD demonstration presentations created throughout sprints:
    - "Writing Effective Gherkin Scenarios"
    - "Behave and Playwright Integration"
    - "BDD Testing Best Practices"
+1. **Sprint 7**:
+   - "Four-Interface BDD Testing with Roundup"
+   - "Email Testing with Greenmail and Behave"
 
 ## Current Status
 
 **Current Version**: v0.6.0 (Sprint 5 Complete)
-**Next Sprint**: Sprint 6 - Complete Deferred Stories & Polish
-**Target**: v1.0.0
+**Current Sprint**: Sprint 6 - Complete Deferred Stories & Production Readiness
+**Next Sprint**: Sprint 7 - Email Interface & Four-Interface BDD Testing
+**Targets**: v1.0.0 (Sprint 6), v1.1.0 (Sprint 7)
 
 **Sprint 5 Results**:
 
