@@ -3,6 +3,7 @@
 
 """Step definitions for CI search and filtering scenarios."""
 
+import re
 import subprocess
 
 from behave import given, then, when
@@ -200,9 +201,20 @@ def step_export_to_csv(context):
 @then("I should see {count:d} CI in the results")
 def step_verify_ci_count(context, count):
     """Verify the number of CIs displayed in results."""
-    # Count CI rows in the table (excluding header)
-    ci_rows = context.page.locator("table.list tbody tr")
-    actual_count = ci_rows.count()
+    # Look for CI links in the content - each CI has a link like ci1, ci2, etc.
+    # This is more reliable than counting table rows
+    ci_links = context.page.locator('a[href*="ci"]').filter(has_text=re.compile(r".*"))
+
+    # Filter out navigation links - only count CI item links
+    ci_item_links = []
+    for i in range(ci_links.count()):
+        link = ci_links.nth(i)
+        href = link.get_attribute("href")
+        # CI item links are like 'ci1', 'ci2', etc. (just ci + number)
+        if href and re.match(r"^ci\d+$", href):
+            ci_item_links.append(link)
+
+    actual_count = len(ci_item_links)
     assert actual_count == count, f"Expected {count} CIs in results, but found {actual_count}"
 
 
