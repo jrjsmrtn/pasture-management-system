@@ -87,25 +87,32 @@
    status_val python:request.form.getvalue('status', '');
    crit_val python:request.form.getvalue('criticality', '');
    search_val python:request.form.getvalue('@search_text', '');
+   sort_val python:request.form.getvalue('@sort', '');
    filterspec python:{};
    dummy1 python:type_val and filterspec.update({'type': type_val}) or None;
    dummy2 python:status_val and filterspec.update({'status': status_val}) or None;
    dummy3 python:crit_val and filterspec.update({'criticality': crit_val}) or None;
-   ci_ids python:db.ci.filter(None, filterspec);
-   batch python:utils.Batch(ci_ids, request.pagesize, request.startwith);
+   all_ci_ids python:db.ci.filter(None, filterspec);
+   ci_ids python:[ci_id for ci_id in all_ci_ids if not search_val or search_val.lower() in (db.ci.getnode(ci_id).name.lower() + ' ' + (db.ci.getnode(ci_id).location or '')).lower()];
+   sorted_ids python:sorted(ci_ids, key=lambda x: (db.ci.getnode(x).get(sort_val[1:] if sort_val and sort_val.startswith('-') else sort_val or 'id') or '', x), reverse=bool(sort_val and sort_val.startswith('-')));
+   batch python:utils.Batch(sorted_ids, request.pagesize, request.startwith);
    ">
-  <p tal:condition="python:not ci_ids">
+  <p tal:condition="python:not sorted_ids">
    No configuration items found. Try adjusting your search criteria or click "New Configuration Item" to create one.
   </p>
 
-  <table class="list" tal:condition="python:ci_ids">
+  <table class="list" tal:condition="python:sorted_ids" tal:define="
+    current_sort python:sort_val or 'id';
+    params_list python:[k + '=' + v for k, v in [('type', type_val), ('status', status_val), ('criticality', crit_val), ('@search_text', search_val)] if v];
+    base_params python:'&'.join(params_list);
+    ">
    <thead>
     <tr>
-     <th><a tal:attributes="href string:?@sort=id">ID</a></th>
-     <th><a tal:attributes="href string:?@sort=name">Name</a></th>
-     <th><a tal:attributes="href string:?@sort=type">Type</a></th>
-     <th><a tal:attributes="href string:?@sort=status">Status</a></th>
-     <th><a tal:attributes="href string:?@sort=criticality">Criticality</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=id">ID</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=name">Name</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=type">Type</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=status">Status</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=criticality">Criticality</a></th>
      <th>Location</th>
     </tr>
    </thead>
