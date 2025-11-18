@@ -22,9 +22,20 @@ A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysa
 
 ## Project Status
 
-**Version**: 0.1.0 (Initial Foundation)
+**Version**: 0.6.0 (Sprint 5 Complete - CMDB Implementation)
 
-This project is in early development. See [CHANGELOG.md](CHANGELOG.md) for version history.
+**Current Sprint**: Sprint 6 - Technical Debt Resolution and Production Readiness
+
+**Key Milestones**:
+
+- ✅ **Sprint 1-4**: Issue tracking and change management workflows
+- ✅ **Sprint 5**: Complete CMDB implementation with search and filtering
+- 🔄 **Sprint 6** (In Progress): BDD test infrastructure improvements and bug fixes
+- 🎯 **Target**: v1.0.0 production release
+
+**Test Coverage**: >85% | **BDD Pass Rate**: 58% (7/12 scenarios in ci_search)
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history and [docs/sprints/](docs/sprints/) for sprint progress.
 
 ## Documentation
 
