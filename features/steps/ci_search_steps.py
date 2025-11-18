@@ -119,6 +119,8 @@ def step_filter_by_type(context, ci_type):
     context.page.select_option('select[name="type"]', type_id)
     # Wait for page load after auto-submit
     context.page.wait_for_load_state("networkidle")
+    # Additional wait for table to render (Roundup TAL processing)
+    context.page.wait_for_timeout(500)
 
 
 @when('I filter by criticality "{criticality}"')
@@ -135,6 +137,8 @@ def step_filter_by_criticality(context, criticality):
 
     context.page.select_option('select[name="criticality"]', crit_id)
     context.page.wait_for_load_state("networkidle")
+    # Additional wait for table to render
+    context.page.wait_for_timeout(500)
 
 
 @when('I filter CIs by status "{status}"')
@@ -153,6 +157,8 @@ def step_filter_cis_by_status(context, status):
 
     context.page.select_option('select[name="status"]', status_id)
     context.page.wait_for_load_state("networkidle")
+    # Additional wait for table to render
+    context.page.wait_for_timeout(500)
 
 
 @when('I click quick filter "{filter_name}"')
@@ -164,21 +170,23 @@ def step_click_quick_filter(context, filter_name):
 
 
 @when('I sort by "{column}" ascending')
-@when('I sort by "{column}" descending')
-def step_sort_by_column(context, column):
-    """Sort the CI list by a specific column."""
-    # Determine if ascending or descending from the step text
-    ascending = "ascending" in context.step.name
-
-    # Click the column header to sort
-    # First click sets ascending, second click sets descending
-    context.page.click(f'th:has-text("{column}")')
+def step_sort_by_column_asc(context, column):
+    """Sort the CI list by a specific column in ascending order."""
+    # Click the sort link in the column header
+    context.page.click(f'th a:has-text("{column}")')
+    context.page.wait_for_load_state("networkidle")
     context.page.wait_for_timeout(500)
 
-    # If we want descending and it's now ascending, click again
-    if not ascending:
-        context.page.click(f'th:has-text("{column}")')
-        context.page.wait_for_timeout(500)
+
+@when('I sort by "{column}" descending')
+def step_sort_by_column_desc(context, column):
+    """Sort the CI list by a specific column in descending order."""
+    # Click twice for descending (first click = asc, second = desc)
+    context.page.click(f'th a:has-text("{column}")')
+    context.page.wait_for_timeout(300)
+    context.page.click(f'th a:has-text("{column}")')
+    context.page.wait_for_load_state("networkidle")
+    context.page.wait_for_timeout(500)
 
 
 @when('I click "Clear Filters"')
@@ -201,20 +209,11 @@ def step_export_to_csv(context):
 @then("I should see {count:d} CI in the results")
 def step_verify_ci_count(context, count):
     """Verify the number of CIs displayed in results."""
-    # Look for CI links in the content - each CI has a link like ci1, ci2, etc.
-    # This is more reliable than counting table rows
-    ci_links = context.page.locator('a[href*="ci"]').filter(has_text=re.compile(r".*"))
+    # Count CI links in the results table
+    # CI name links are in the second column of table.list tbody rows
+    ci_name_links = context.page.locator("table.list tbody tr td:nth-child(2) a")
 
-    # Filter out navigation links - only count CI item links
-    ci_item_links = []
-    for i in range(ci_links.count()):
-        link = ci_links.nth(i)
-        href = link.get_attribute("href")
-        # CI item links are like 'ci1', 'ci2', etc. (just ci + number)
-        if href and re.match(r"^ci\d+$", href):
-            ci_item_links.append(link)
-
-    actual_count = len(ci_item_links)
+    actual_count = ci_name_links.count()
     assert actual_count == count, f"Expected {count} CIs in results, but found {actual_count}"
 
 
