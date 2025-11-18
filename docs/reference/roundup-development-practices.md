@@ -1,6 +1,6 @@
 # Roundup Development Best Practices
 
-**Document Version:** 1.5
+**Document Version:** 1.6
 **Roundup Version:** 2.5.0
 **Last Updated:** 2025-11-18
 **Official Documentation:** https://www.roundup-tracker.org/docs.html
@@ -2141,6 +2141,375 @@ def step_verify_ci_exists(context, name):
     assert len(data['data']['collection']) > 0
 ```
 
+### Roundup + BDD Integration Patterns
+
+**Context:** Roundup has specific behaviors (server caching, search indexing) that require special handling in BDD test scenarios. This section documents patterns learned through implementation.
+
+**Reference:** See ADR-0002 for Behave fixture patterns and best practices.
+
+#### Server Lifecycle Management in BDD Fixtures
+
+**The Challenge:**
+
+Roundup server caches schema, configuration, and search indexes in memory. Items created via CLI while server is running may not be immediately visible through the web interface.
+
+**Solution Pattern:**
+
+Use Behave fixtures to manage database state, but let step definitions control server lifecycle:
+
+```python
+# features/environment.py
+
+@fixture
+def clean_database(context):
+    """
+    Provide clean database for each scenario.
+
+    NOTE: Does NOT start server - step definitions start server AFTER
+    creating test data to avoid caching issues.
+    """
+    tracker_dir = getattr(context, 'tracker_dir', 'tracker')
+
+    # Stop any running server
+    subprocess.run(['pkill', '-f', 'roundup-server'], capture_output=True)
+    time.sleep(2)
+
+    # Delete and reinitialize database
+    db_dir = Path(tracker_dir) / 'db'
+    if db_dir.exists():
+        shutil.rmtree(db_dir)
+
+    # Initialize with consistent tooling
+    cmd = ['uv', 'run', 'roundup-admin', '-i', tracker_dir, 'initialise']
+    process = subprocess.Popen(
+        cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    stdout, stderr = process.communicate(input="admin\nadmin\n", timeout=30)
+
+    if process.returncode != 0:
+        raise RuntimeError(f"Database init failed: {stderr}")
+
+    # Server NOT started - step definitions will start after populating data
+
+    yield context  # Scenario runs here
+
+    # Cleanup: stop server for clean state
+    subprocess.run(['pkill', '-f', 'roundup-server'], capture_output=True)
+
+def before_scenario(context, scenario):
+    """Set up clean test environment."""
+    use_fixture(clean_database, context)
+    context.ci_map = {}  # Track created items
+
+    # Only set up browser for web UI scenarios
+    if 'web-ui' in scenario.effective_tags:
+        use_fixture(browser_context, context)
+```
+
+**Why This Works:**
+
+1. **Database fixture** provides clean state but doesn't start server
+1. **Step definitions** create test data via CLI while server is stopped
+1. **Step definitions** run `reindex` command to update search indexes
+1. **Step definitions** start server after data is ready
+1. **Web UI tests** see all data without caching issues
+
+#### Test Data Creation Patterns
+
+**Pattern 1: CLI + Reindex Workflow (Recommended for BDD)**
+
+Best for: BDD scenarios testing web UI functionality with pre-existing data
+
+```python
+# features/steps/ci_search_steps.py
+
+@given('the following CIs exist')
+def step_create_multiple_cis(context):
+    """
+    Create CIs via CLI and make them visible to web interface.
+
+    CRITICAL: Must run `reindex` command after CLI creation to update
+    search indexes. Without reindex, CIs will not appear in web UI.
+    """
+    tracker_dir = 'tracker'
+
+    for row in context.table:
+        # Create CI via roundup-admin (server is stopped from fixture)
+        cmd = [
+            'uv', 'run', 'roundup-admin', '-i', tracker_dir,
+            'create', 'ci',
+            f'name={row["name"]}',
+            f'type={row["type"]}',
+            f'status={row["status"]}'
+        ]
+
+        if 'criticality' in row.headings:
+            cmd.append(f'criticality={row["criticality"]}')
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+        if result.returncode != 0:
+            raise RuntimeError(f"Failed to create CI: {result.stderr}")
+
+        # Extract CI ID from output (format: "ci1", "ci2", etc.)
+        ci_id = result.stdout.strip()
+        context.ci_map[row['name']] = ci_id
+
+    # CRITICAL: Reindex to make CLI-created items visible through web interface
+    # Without this, search will return 0 results even though CIs exist in database
+    reindex_cmd = ['uv', 'run', 'roundup-admin', '-i', tracker_dir, 'reindex', 'ci']
+    subprocess.run(reindex_cmd, capture_output=True, text=True, timeout=30)
+
+    # NOW start server - CIs will be visible
+    server_cmd = ['uv', 'run', 'roundup-server', '-p', '9080', 'pms=tracker']
+    subprocess.Popen(
+        server_cmd,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    time.sleep(3)  # Allow server to fully start
+```
+
+**Pattern 2: Web UI Creation**
+
+Best for: Testing CI creation workflows themselves
+
+```python
+@when('I create a CI via the web interface')
+def step_create_ci_via_ui(context):
+    """Create CI through web form - no reindex needed."""
+    context.page.goto(f"{context.tracker_url}/ci?@template=item")
+    context.page.fill('input[name="name"]', "test-ci")
+    context.page.select_option('select[name="type"]', label="Server")
+    context.page.click('input[type="submit"]')
+    # CI immediately visible - server created it
+```
+
+**Pattern 3: REST API Creation**
+
+Best for: Programmatic testing and API validation
+
+```python
+@when('I create a CI via REST API')
+def step_create_ci_via_api(context):
+    """Create CI via REST endpoint - no reindex needed."""
+    import requests
+    response = requests.post(
+        f'{context.tracker_url}/rest/data/ci',
+        json={'name': 'test-ci', 'type': '1', 'status': '5'},
+        auth=('admin', 'admin')
+    )
+    assert response.status_code == 201
+    # CI immediately visible - server created it
+```
+
+**Decision Matrix:**
+
+| Use Case                         | Recommended Pattern | Requires Reindex? |
+| -------------------------------- | ------------------- | ----------------- |
+| Test search/filter functionality | CLI + Reindex       | ✅ Yes            |
+| Test CI creation workflow        | Web UI              | ❌ No             |
+| Test bulk data scenarios         | CLI + Reindex       | ✅ Yes            |
+| Test API functionality           | REST API            | ❌ No             |
+| Test CI relationships            | CLI + Reindex       | ✅ Yes            |
+
+#### Common Pitfalls and Solutions
+
+**Pitfall 1: CIs Created via CLI Not Visible in Web UI**
+
+**Symptom:** Test creates CIs via `roundup-admin create`, but web UI shows "No items found"
+
+**Root Cause:** Search indexes not automatically updated for CLI-created items
+
+**Solution:**
+
+```bash
+# After creating CIs via CLI, ALWAYS run reindex
+uv run roundup-admin -i tracker reindex ci
+```
+
+**Why:** Roundup maintains search indexes separately from database. CLI operations bypass the index update mechanism that web/API operations trigger automatically.
+
+**Pitfall 2: Server Caching Old Data**
+
+**Symptom:** Changes made via CLI don't appear even after reindex
+
+**Root Cause:** Server was running when changes were made, cached old state
+
+**Solution:**
+
+```python
+# ALWAYS stop server before database operations
+subprocess.run(['pkill', '-f', 'roundup-server'])
+time.sleep(2)  # Wait for full shutdown
+
+# Make database changes
+# ... create/modify/delete items ...
+
+# Reindex if using CLI
+subprocess.run(['uv', 'run', 'roundup-admin', '-i', 'tracker', 'reindex', 'ci'])
+
+# NOW start fresh server
+subprocess.Popen(['uv', 'run', 'roundup-server', '-p', '9080', 'pms=tracker'])
+time.sleep(3)  # Wait for full startup
+```
+
+**Pitfall 3: Template Helper Functions Failing with AttributeError**
+
+**Symptom:** `AttributeError: getnode` or similar errors in template helpers
+
+**Root Cause:** Attempting to use database methods not available in TAL template context
+
+**Solution:**
+
+```python
+# ❌ WRONG - db.ci.getnode() not available in template context
+def filter_ci_ids_by_search(db, ci_ids, search_term):
+    for ci_id in ci_ids:
+        id_str = str(ci_id.id) if hasattr(ci_id, 'id') else str(ci_id)
+        node = db.ci.getnode(id_str)  # AttributeError!
+
+# ✅ CORRECT - Access fields directly from HTMLItem objects
+def filter_ci_ids_by_search(db, ci_ids, search_term):
+    for ci_id in ci_ids:
+        # ci_id is already an HTMLItem with data
+        if hasattr(ci_id, 'name') and ci_id.name:
+            if hasattr(ci_id.name, 'plain'):
+                name = ci_id.name.plain()  # Extract string value
+            else:
+                name = str(ci_id.name)
+```
+
+**See:** "Python Template Helpers" section for complete defensive patterns.
+
+**Pitfall 4: Screenshot Accumulation Between Tests**
+
+**Symptom:** Screenshots directory grows unbounded, old failures confuse debugging
+
+**Solution:**
+
+```python
+def before_scenario(context, scenario):
+    """Clean screenshots before each scenario."""
+    screenshot_dir = Path("screenshots")
+    if screenshot_dir.exists():
+        for screenshot in screenshot_dir.glob("*.png"):
+            try:
+                screenshot.unlink()
+            except Exception as e:
+                print(f"Warning: Failed to delete {screenshot}: {e}")
+```
+
+**Why:** Keeps screenshot directory manageable and ensures only current test failures are visible.
+
+**Pitfall 5: Test Failures Leave Database in Dirty State**
+
+**Symptom:** First test fails, subsequent tests fail due to unexpected data
+
+**Solution:** Use Behave fixtures with generator pattern:
+
+```python
+@fixture
+def clean_database(context):
+    setup_clean_database()
+
+    yield context  # Test runs here
+
+    # Cleanup ALWAYS runs, even on test failure
+    cleanup_database()
+```
+
+**Why:** Fixtures guarantee cleanup runs in reverse order, even when tests fail.
+
+#### Complete Working Example
+
+**Gherkin Feature:**
+
+```gherkin
+@web-ui @cmdb
+Feature: CI Search
+  Background:
+    Given the following CIs exist:
+      | name           | type | status |
+      | db-server-01   | 1    | 5      |
+      | db-server-02   | 1    | 5      |
+      | web-server-01  | 1    | 5      |
+    And I am on the CI index page
+
+  Scenario: Search CIs by name
+    When I search for "db-server"
+    Then I should see 2 CIs in the results
+    And I should see "db-server-01"
+    And I should see "db-server-02"
+```
+
+**Step Definition:**
+
+```python
+# features/steps/ci_search_steps.py
+
+@given('the following CIs exist')
+def step_create_multiple_cis(context):
+    """Create CIs via CLI with reindex."""
+    for row in context.table:
+        cmd = [
+            'uv', 'run', 'roundup-admin', '-i', 'tracker',
+            'create', 'ci',
+            f'name={row["name"]}',
+            f'type={row["type"]}',
+            f'status={row["status"]}'
+        ]
+        subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    # CRITICAL: Reindex for web visibility
+    subprocess.run(
+        ['uv', 'run', 'roundup-admin', '-i', 'tracker', 'reindex', 'ci'],
+        capture_output=True, text=True, timeout=30
+    )
+
+    # Start server
+    subprocess.Popen(
+        ['uv', 'run', 'roundup-server', '-p', '9080', 'pms=tracker'],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
+    )
+    time.sleep(3)
+
+@when('I search for "{search_term}"')
+def step_search_for_term(context, search_term):
+    """Perform search via web UI."""
+    search_box = context.page.locator('input[name="@search_text"]')
+    search_box.fill(search_term)
+    search_box.press('Enter')
+    # Playwright auto-waits for navigation
+
+@then('I should see {count:d} CIs in the results')
+def step_verify_ci_count(context, count):
+    """Verify result count."""
+    rows = context.page.locator('table.list tbody tr')
+    actual_count = rows.count()
+    assert actual_count == count, f"Expected {count} CIs, found {actual_count}"
+```
+
+**Key Takeaways:**
+
+1. ✅ **Fixtures manage infrastructure** (database, server, browser)
+1. ✅ **Step definitions manage server lifecycle** (start after data ready)
+1. ✅ **Always reindex after CLI operations** (make data visible)
+1. ✅ **Use appropriate pattern for use case** (CLI vs Web UI vs API)
+1. ✅ **Let Playwright auto-wait** (avoid manual timeouts when possible)
+
+**References:**
+
+- Server Management: See "Server Management" section
+- Database Admin Commands: See "Database Administration Commands" section
+- Template Helpers: See "Python Template Helpers" section
+- Behave Fixtures: See ADR-0002 "Behave Best Practices"
+
 ### Unit Testing with pytest
 
 **Test Detector Logic:**
@@ -2484,13 +2853,15 @@ ______________________________________________________________________
 
 ## Document History
 
-| Date       | Version | Changes                                                                                                                                                                                                                                                                                                          |
-| ---------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2025-01-17 | 1.0     | Initial comprehensive best practices document                                                                                                                                                                                                                                                                    |
-| 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices                                                                                   |
-| 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                                                                                                           |
-| 2025-11-17 | 1.3     | **Sprint 5 Lessons Learned**: Added custom action handlers section (solving web UI error handling limitation), TAL path expressions for relationship traversal, Reject vs ValueError best practices, structured logging patterns. Discoveries from production implementation providing reusable Roundup patterns |
-| 2025-11-18 | 1.4     | **Sprint 6 Day 2 Discovery**: Added Database Administration Commands section with reindex/migrate commands, documented CLI→Web visibility issue and solution, provided best practices for test data creation (Web UI vs CLI), includes complete workflow for CLI item creation with reindex                      |
+| Date       | Version | Changes                                                                                                                                                                                                                                                                                                            |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2025-01-17 | 1.0     | Initial comprehensive best practices document                                                                                                                                                                                                                                                                      |
+| 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices                                                                                     |
+| 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                                                                                                             |
+| 2025-11-17 | 1.3     | **Sprint 5 Lessons Learned**: Added custom action handlers section (solving web UI error handling limitation), TAL path expressions for relationship traversal, Reject vs ValueError best practices, structured logging patterns. Discoveries from production implementation providing reusable Roundup patterns   |
+| 2025-11-18 | 1.4     | **Sprint 6 Day 2 Discovery**: Added Database Administration Commands section with reindex/migrate commands, documented CLI→Web visibility issue and solution, provided best practices for test data creation (Web UI vs CLI), includes complete workflow for CLI item creation with reindex                        |
+| 2025-11-18 | 1.5     | **Sprint 6 Day 2 Bug Fix**: Added Python Template Helpers section documenting HTMLItem object handling in TAL templates, defensive patterns for `.plain()` method usage, explained why `db.ci.getnode()` fails in template context, fixed search functionality bug                                                 |
+| 2025-11-18 | 1.6     | **Sprint 6 Day 2 Integration**: Added comprehensive "Roundup + BDD Integration Patterns" section consolidating Roundup-specific BDD testing patterns: server lifecycle management, test data creation patterns (CLI+Reindex, Web UI, REST API), decision matrix, 5 common pitfalls with solutions, working example |
 
 ______________________________________________________________________
 
