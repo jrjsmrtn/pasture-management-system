@@ -11,6 +11,7 @@ including Playwright browser setup, screenshot capture, and database cleanup.
 import os
 import shutil
 import subprocess
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -101,9 +102,29 @@ def before_scenario(context, scenario):
     """
     Run before each scenario.
 
-    Set up a fresh browser context for each scenario to ensure isolation.
-    Only set up browser for web-ui scenarios.
+    Sets up clean test environment:
+    1. Cleans screenshots directory
+    2. Provides clean database with fresh server (via fixture)
+    3. Sets up browser context for web-ui scenarios
     """
+    # Clean screenshots directory before each scenario
+    if SCREENSHOT_DIR.exists():
+        for screenshot in SCREENSHOT_DIR.glob("*.png"):
+            try:
+                screenshot.unlink()
+            except Exception as e:
+                print(f"\nWarning: Failed to delete screenshot {screenshot}: {e}")
+
+    # Set tracker directory for database fixture
+    context.tracker_dir = "tracker"
+
+    # Use clean database fixture - provides fresh database and server
+    # This runs BEFORE any test steps to ensure clean start
+    use_fixture(clean_database, context)
+
+    # Initialize CI map for tracking created CIs
+    context.ci_map = {}
+
     # Only set up browser for web UI scenarios (check tags)
     # API and CLI scenarios don't need browser
     has_web_ui_tag = "web-ui" in scenario.effective_tags
@@ -115,9 +136,8 @@ def before_scenario(context, scenario):
     if is_web_ui:
         use_fixture(browser_context, context)
     else:
-        # CLI or API scenario - just set tracker URL and directory
+        # CLI or API scenario - just set tracker URL
         context.tracker_url = os.getenv("TRACKER_URL", DEFAULT_TRACKER_URL)
-        context.tracker_dir = "tracker"
         context.page = None  # Explicitly set to None
 
     # Store scenario name for screenshot naming
@@ -158,28 +178,45 @@ def after_step(context, step):
             print(f"\nFailed to capture screenshot: {e}")
 
 
-def _reinitialize_database(context):
+@fixture
+def clean_database(context):
     """
-    Reinitialize the tracker database to ensure test isolation.
+    Provide clean database for each scenario.
 
-    This deletes the database and recreates it from initial_data.py,
-    providing a clean state for each scenario.
+    This fixture implements proper test isolation by:
+    1. Stopping the Roundup server
+    2. Deleting the database
+    3. Reinitializing with consistent tooling (uv run)
+
+    NOTE: Does NOT start server - test steps are responsible for starting server
+    after they populate test data. This avoids the Roundup caching issue where
+    CIs created via CLI while server is running are not visible.
     """
     tracker_dir = getattr(context, "tracker_dir", "tracker")
     cleanup_enabled = os.getenv("CLEANUP_TEST_DATA", "true").lower() == "true"
 
     if not cleanup_enabled:
+        # Skip cleanup if disabled, but still yield for fixture pattern
+        yield context
         return
 
     try:
+        # Stop server before touching database
+        subprocess.run(
+            ["pkill", "-f", "roundup-server"],
+            capture_output=True,
+            timeout=5,
+        )
+        # Wait for server to fully stop
+        time.sleep(2)
+
         # Delete database files
         db_dir = Path(tracker_dir) / "db"
         if db_dir.exists():
             shutil.rmtree(db_dir)
 
-        # Reinitialize database
-        # Provide admin password twice for confirmation
-        cmd = ["roundup-admin", "-i", tracker_dir, "initialise"]
+        # Reinitialize database with uv run (consistent with CI creation)
+        cmd = ["uv", "run", "roundup-admin", "-i", tracker_dir, "initialise"]
         process = subprocess.Popen(
             cmd,
             stdin=subprocess.PIPE,
@@ -190,37 +227,49 @@ def _reinitialize_database(context):
         stdout, stderr = process.communicate(input="admin\nadmin\n", timeout=30)
 
         if process.returncode != 0:
-            print(f"\nWarning: Database reinit failed: {stderr}")
+            raise RuntimeError(f"Database init failed: {stderr}")
+
+        # DON'T start server here - test steps will start it after populating data
+
+        # Scenario runs here
+        yield context
+
+        # Cleanup after scenario
+        # Stop server for clean state
+        subprocess.run(
+            ["pkill", "-f", "roundup-server"],
+            capture_output=True,
+            timeout=5,
+        )
 
     except Exception as e:
-        # Don't fail the test if cleanup fails
-        print(f"\nWarning: Failed to reinitialize database: {e}")
+        # Log error but don't fail the test run
+        print(f"\nWarning: Database fixture failed: {e}")
+        yield context
 
 
 def after_scenario(context, scenario):
     """
     Run after each scenario.
 
-    Capture final screenshot for passed scenarios (optional)
-    and reinitialize database for test isolation.
+    Capture final screenshot for passed scenarios (optional).
+    Database cleanup is handled automatically by the clean_database fixture.
     """
-    # Reinitialize database to clean state
-    _reinitialize_database(context)
-
     # Optionally capture screenshot for passed scenarios
     if scenario.status == "passed" and os.getenv("SCREENSHOT_ON_PASS", "false").lower() == "true":
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        screenshot_name = f"{context.scenario_name}_{timestamp}_PASSED.png"
-        screenshot_path = SCREENSHOT_DIR / screenshot_name
+        if hasattr(context, "page") and context.page is not None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            screenshot_name = f"{context.scenario_name}_{timestamp}_PASSED.png"
+            screenshot_path = SCREENSHOT_DIR / screenshot_name
 
-        try:
-            context.page.screenshot(
-                path=str(screenshot_path),
-                full_page=False,
-            )
-            print(f"\nScreenshot saved: {screenshot_path}")
-        except Exception as e:
-            print(f"\nFailed to capture screenshot: {e}")
+            try:
+                context.page.screenshot(
+                    path=str(screenshot_path),
+                    full_page=False,
+                )
+                print(f"\nScreenshot saved: {screenshot_path}")
+            except Exception as e:
+                print(f"\nFailed to capture screenshot: {e}")
 
 
 def after_all(context):

@@ -11,7 +11,13 @@ from behave import given, then, when
 
 @given("the following CIs exist:")
 def step_create_multiple_cis(context):
-    """Create multiple CIs from a table."""
+    """
+    Create multiple CIs via CLI and restart server.
+
+    CRITICAL: Roundup server caches database state. CIs created via round up-admin
+    while server is running are NOT visible. Solution: stop server, create CIs, restart server.
+    """
+    import os
     import time
 
     if not hasattr(context, "ci_map"):
@@ -47,6 +53,8 @@ def step_create_multiple_cis(context):
         "Very High": "5",
     }
 
+    # NOTE: Server already stopped by clean_database fixture
+    # Create CIs via CLI (server is stopped)
     for row in context.table:
         name = row["name"]
         ci_type = row["type"]
@@ -66,30 +74,24 @@ def step_create_multiple_cis(context):
         ]
 
         # Add status field (required by auditor, default to "Active" if not specified)
-        if "status" in row.headings:
+        if "status" in row.headings and row.get("status"):
             status = row.get("status")
-            if status:
-                status_id = status_mapping.get(status, status)
-                cmd.append(f"status={status_id}")
+            status_id = status_mapping.get(status, status)
+            cmd.append(f"status={status_id}")
         else:
             # Default to "Active" status (ID 5)
             cmd.append("status=5")
 
-        if "criticality" in row.headings:
+        if "criticality" in row.headings and row.get("criticality"):
             criticality = row.get("criticality")
-            if criticality:
-                crit_id = criticality_mapping.get(criticality, criticality)
-                cmd.append(f"criticality={crit_id}")
+            crit_id = criticality_mapping.get(criticality, criticality)
+            cmd.append(f"criticality={crit_id}")
 
-        if "location" in row.headings:
+        if "location" in row.headings and row.get("location"):
             location = row.get("location")
-            if location:
-                cmd.append(f"location={location}")
+            cmd.append(f"location={location}")
 
-        # Create the CI
-        # IMPORTANT: Run from project root to ensure correct tracker directory
-        import os
-
+        # Create the CI (run from project root)
         project_root = os.getcwd()
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, cwd=project_root)
 
@@ -98,6 +100,14 @@ def step_create_multiple_cis(context):
         # Store CI ID
         ci_id = result.stdout.strip()
         context.ci_map[name] = ci_id
+
+    # CRITICAL: Restart server so it picks up the new CIs
+    subprocess.Popen(
+        ["uv", "run", "roundup-server", "-p", "9080", "pms=tracker"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    time.sleep(3)  # Wait for server startup
 
 
 @when('I search for "{search_term}"')
