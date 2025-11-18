@@ -60,12 +60,15 @@ def step_create_multiple_cis(context):
             f"type={type_id}",
         ]
 
-        # Add optional fields if present in table
+        # Add status field (required by auditor, default to "Active" if not specified)
         if "status" in row.headings:
             status = row.get("status")
             if status:
                 status_id = status_mapping.get(status, status)
                 cmd.append(f"status={status_id}")
+        else:
+            # Default to "Active" status (ID 5)
+            cmd.append("status=5")
 
         if "criticality" in row.headings:
             criticality = row.get("criticality")

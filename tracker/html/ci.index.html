@@ -15,36 +15,102 @@
 
 <tal:block tal:condition="context/is_view_ok">
 
- <!-- Display "New Configuration Item" button -->
- <div class="action-buttons">
+ <!-- Action buttons -->
+ <div class="action-buttons" style="margin-bottom: 1em;">
   <a tal:attributes="href string:ci?@template=item"
      class="btn btn-primary">New Configuration Item</a>
+  <a tal:attributes="href string:ci?@action=export_csv"
+     class="btn btn-secondary">Export to CSV</a>
  </div>
 
- <!-- Simple CI list -->
+ <!-- Search and Filter Section -->
+ <div class="search-filters" style="background: #f5f5f5; padding: 1em; margin-bottom: 1em; border-radius: 4px;">
+  <form method="GET" action="ci" style="margin: 0;">
+
+   <!-- Search box -->
+   <div style="margin-bottom: 0.5em;">
+    <label for="search_text">Search:</label>
+    <input type="text" id="search_text" name="@search_text"
+           tal:attributes="value request/form/@search_text | nothing"
+           placeholder="Search by name, location..." style="width: 300px; margin-right: 1em;">
+    <input type="submit" value="Search">
+   </div>
+
+   <!-- Filter dropdowns -->
+   <div style="margin-bottom: 0.5em;">
+    <label for="filter_type">Type:</label>
+    <select id="filter_type" name=":filter:type" onchange="this.form.submit()" style="margin-right: 1em;">
+     <option value="">All Types</option>
+     <option value="1" tal:attributes="selected python:request.form.get(':filter:type') == '1'">Server</option>
+     <option value="2" tal:attributes="selected python:request.form.get(':filter:type') == '2'">Network Device</option>
+     <option value="3" tal:attributes="selected python:request.form.get(':filter:type') == '3'">Storage</option>
+     <option value="4" tal:attributes="selected python:request.form.get(':filter:type') == '4'">Software</option>
+     <option value="5" tal:attributes="selected python:request.form.get(':filter:type') == '5'">Service</option>
+     <option value="6" tal:attributes="selected python:request.form.get(':filter:type') == '6'">Virtual Machine</option>
+    </select>
+
+    <label for="filter_status">Status:</label>
+    <select id="filter_status" name=":filter:status" onchange="this.form.submit()" style="margin-right: 1em;">
+     <option value="">All Statuses</option>
+     <option value="1" tal:attributes="selected python:request.form.get(':filter:status') == '1'">Planning</option>
+     <option value="2" tal:attributes="selected python:request.form.get(':filter:status') == '2'">Ordered</option>
+     <option value="3" tal:attributes="selected python:request.form.get(':filter:status') == '3'">In Stock</option>
+     <option value="4" tal:attributes="selected python:request.form.get(':filter:status') == '4'">Deployed</option>
+     <option value="5" tal:attributes="selected python:request.form.get(':filter:status') == '5'">Active</option>
+     <option value="6" tal:attributes="selected python:request.form.get(':filter:status') == '6'">Maintenance</option>
+     <option value="7" tal:attributes="selected python:request.form.get(':filter:status') == '7'">Retired</option>
+    </select>
+
+    <label for="filter_criticality">Criticality:</label>
+    <select id="filter_criticality" name=":filter:criticality" onchange="this.form.submit()" style="margin-right: 1em;">
+     <option value="">All Criticality Levels</option>
+     <option value="1" tal:attributes="selected python:request.form.get(':filter:criticality') == '1'">Very Low</option>
+     <option value="2" tal:attributes="selected python:request.form.get(':filter:criticality') == '2'">Low</option>
+     <option value="3" tal:attributes="selected python:request.form.get(':filter:criticality') == '3'">Medium</option>
+     <option value="4" tal:attributes="selected python:request.form.get(':filter:criticality') == '4'">High</option>
+     <option value="5" tal:attributes="selected python:request.form.get(':filter:criticality') == '5'">Very High</option>
+    </select>
+   </div>
+
+   <!-- Quick Filters and Clear Filters -->
+   <div>
+    <strong>Quick Filters:</strong>
+    <a href="?:filter:type=1&:filter:status=5" style="margin: 0 0.5em;">Active Servers</a>
+    <a href="?" style="margin-left: 1em;">Clear Filters</a>
+   </div>
+  </form>
+ </div>
+
+ <!-- CI list with sorting -->
  <tal:block tal:define="batch request/batch">
   <p tal:condition="python:batch and batch.sequence_length == 0">
-   No configuration items found. Click "New Configuration Item" to create one.
+   No configuration items found. Try adjusting your search criteria or click "New Configuration Item" to create one.
   </p>
 
   <table class="list" tal:condition="python:batch and batch.sequence_length > 0">
-   <tr>
-    <th>ID</th>
-    <th>Name</th>
-    <th>Type</th>
-    <th>Status</th>
-    <th>Criticality</th>
-   </tr>
-   <tr tal:repeat="ci batch">
-    <td tal:content="ci/id">&nbsp;</td>
-    <td>
-     <a tal:attributes="href string:ci${ci/id}"
-        tal:content="python:str(ci.name.plain()) or '[no name]'">name</a>
-    </td>
-    <td tal:content="python:ci.type.plain() or ''">&nbsp;</td>
-    <td tal:content="python:ci.status.plain() or ''">&nbsp;</td>
-    <td tal:content="python:ci.criticality.plain() or ''">&nbsp;</td>
-   </tr>
+   <thead>
+    <tr>
+     <th><a tal:attributes="href string:?@sort=id">ID</a></th>
+     <th><a tal:attributes="href string:?@sort=name">Name</a></th>
+     <th><a tal:attributes="href string:?@sort=type">Type</a></th>
+     <th><a tal:attributes="href string:?@sort=status">Status</a></th>
+     <th><a tal:attributes="href string:?@sort=criticality">Criticality</a></th>
+     <th>Location</th>
+    </tr>
+   </thead>
+   <tbody>
+    <tr tal:repeat="ci batch">
+     <td tal:content="ci/id">&nbsp;</td>
+     <td>
+      <a tal:attributes="href string:ci${ci/id}"
+         tal:content="python:str(ci.name.plain()) or '[no name]'">name</a>
+     </td>
+     <td tal:content="python:ci.type.plain() or ''">&nbsp;</td>
+     <td tal:content="python:ci.status.plain() or ''">&nbsp;</td>
+     <td tal:content="python:ci.criticality.plain() or ''">&nbsp;</td>
+     <td tal:content="python:ci.location.plain() if hasattr(ci, 'location') else ''">&nbsp;</td>
+    </tr>
+   </tbody>
   </table>
  </tal:block>
 
