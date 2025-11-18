@@ -2145,7 +2145,7 @@ def step_verify_ci_exists(context, name):
 
 **Context:** Roundup has specific behaviors (server caching, search indexing) that require special handling in BDD test scenarios. This section documents patterns learned through implementation.
 
-**Reference:** See ADR-0002 for Behave fixture patterns and best practices.
+**Reference:** See [BDD Testing Best Practices](bdd-testing-best-practices.md) for general Behave fixture patterns and Playwright best practices.
 
 #### Server Lifecycle Management in BDD Fixtures
 
@@ -2508,7 +2508,7 @@ def step_verify_ci_count(context, count):
 - Server Management: See "Server Management" section
 - Database Admin Commands: See "Database Administration Commands" section
 - Template Helpers: See "Python Template Helpers" section
-- Behave Fixtures: See ADR-0002 "Behave Best Practices"
+- Behave/Playwright: See [BDD Testing Best Practices](bdd-testing-best-practices.md)
 
 ### Unit Testing with pytest
 

@@ -386,6 +386,7 @@ if os.getenv("SCREENSHOT_ON_PASS", "false").lower() == "true":
 
 ## Related Documentation
 
+- [BDD Testing Best Practices](../reference/bdd-testing-best-practices.md) - Comprehensive Behave fixtures and Playwright best practices
 - [Roundup Development Best Practices](../reference/roundup-development-practices.md)
 - [BDD Testing Strategy](../explanation/bdd-testing-strategy.md) (planned)
 - [Playwright Configuration](../../tests/config/playwright_config.py)

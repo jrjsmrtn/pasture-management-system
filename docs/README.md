@@ -42,6 +42,8 @@ Clarification and discussion of key topics. Explanations deepen and broaden unde
 ## Quick Links
 
 - [Getting Started Tutorial](tutorials/getting-started.md) - Your first steps with PMS
+- [BDD Testing Best Practices](reference/bdd-testing-best-practices.md) - Behave and Playwright best practices
+- [Roundup Development Best Practices](reference/roundup-development-practices.md) - Roundup-specific development patterns
 - [Architecture Overview](explanation/architecture-overview.md) - Understanding the system design
 - [ITIL Concepts](explanation/itil-concepts.md) - ITIL-inspired workflow explanations
 
