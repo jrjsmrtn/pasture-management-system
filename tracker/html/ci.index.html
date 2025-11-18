@@ -82,12 +82,23 @@
  </div>
 
  <!-- CI list with sorting -->
- <tal:block tal:define="batch request/batch">
-  <p tal:condition="python:batch and batch.sequence_length == 0">
+ <tal:block tal:define="
+   type_val python:request.form.getvalue('type', '');
+   status_val python:request.form.getvalue('status', '');
+   crit_val python:request.form.getvalue('criticality', '');
+   search_val python:request.form.getvalue('@search_text', '');
+   filterspec python:{};
+   dummy1 python:type_val and filterspec.update({'type': type_val}) or None;
+   dummy2 python:status_val and filterspec.update({'status': status_val}) or None;
+   dummy3 python:crit_val and filterspec.update({'criticality': crit_val}) or None;
+   ci_ids python:db.ci.filter(None, filterspec);
+   batch python:utils.Batch(ci_ids, request.pagesize, request.startwith);
+   ">
+  <p tal:condition="python:not ci_ids">
    No configuration items found. Try adjusting your search criteria or click "New Configuration Item" to create one.
   </p>
 
-  <table class="list" tal:condition="python:batch and batch.sequence_length > 0">
+  <table class="list" tal:condition="python:ci_ids">
    <thead>
     <tr>
      <th><a tal:attributes="href string:?@sort=id">ID</a></th>
@@ -100,15 +111,15 @@
    </thead>
    <tbody>
     <tr tal:repeat="ci batch">
-     <td tal:content="ci/id">&nbsp;</td>
-     <td>
-      <a tal:attributes="href string:ci${ci/id}"
-         tal:content="python:str(ci.name.plain()) or '[no name]'">name</a>
-     </td>
-     <td tal:content="python:ci.type.plain() or ''">&nbsp;</td>
-     <td tal:content="python:ci.status.plain() or ''">&nbsp;</td>
-     <td tal:content="python:ci.criticality.plain() or ''">&nbsp;</td>
-     <td tal:content="python:ci.location.plain() if hasattr(ci, 'location') else ''">&nbsp;</td>
+      <td tal:content="ci/id">&nbsp;</td>
+      <td>
+       <a tal:attributes="href string:ci${ci/id}"
+          tal:content="python:ci.name.plain() or '[no name]'">name</a>
+      </td>
+      <td tal:content="python:ci.type.plain() or ''">&nbsp;</td>
+      <td tal:content="python:ci.status.plain() or ''">&nbsp;</td>
+      <td tal:content="python:ci.criticality.plain() or ''">&nbsp;</td>
+      <td tal:content="python:ci.location.plain() if hasattr(ci, 'location') and ci.location else ''">&nbsp;</td>
     </tr>
    </tbody>
   </table>
