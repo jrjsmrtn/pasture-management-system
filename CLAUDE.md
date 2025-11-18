@@ -100,8 +100,12 @@ pre-commit install --hook-type pre-push
 ### Roundup Server Management
 
 ```bash
-# Database initialization (for clean start or testing)
-# From project root:
+# Quick Reset (Recommended) - One command to rule them all
+./scripts/reset-test-db.sh                    # Reset DB + restart server (default password: admin)
+./scripts/reset-test-db.sh mysecret           # Use custom admin password
+./scripts/reset-test-db.sh admin --no-server  # Reset DB only, skip server restart
+
+# Manual Database initialization (for reference)
 cd tracker
 rm -rf db/*
 uv run roundup-admin -i . initialise admin   # admin password provided on command line
@@ -120,20 +124,20 @@ pkill -f "roundup-server"
 curl -s http://localhost:9080/pms/ | grep -q "Roundup" && echo "Server is running" || echo "Server is not running"
 
 # IMPORTANT: Server Management Best Practices
-# 1. Always use pkill to stop before starting a new instance
-# 2. Wait 2 seconds after pkill before starting new server
-# 3. Detectors are loaded on server startup - restart after detector changes
-# 4. Template changes are cached - restart server to see template updates
-# 5. For BDD testing: delete and reinitialize database for clean state
+# 1. Use ./scripts/reset-test-db.sh for complete database resets
+# 2. Always use pkill to stop before starting a new instance
+# 3. Wait 2 seconds after pkill before starting new server
+# 4. Detectors are loaded on server startup - restart after detector changes
+# 5. Template changes are cached - restart server to see template updates
+# 6. For BDD testing: delete and reinitialize database for clean state
 
-# Complete restart sequence (recommended)
+# Complete restart sequence (manual - use reset-test-db.sh instead)
 pkill -f "roundup-server" && sleep 2 && uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
 
 # Troubleshooting: Database corruption (e.g., "table otks already exists")
 # This happens when database schema version tracking is out of sync
-# Solution: Delete and reinitialize the database
-cd tracker && rm -rf db/* && uv run roundup-admin -i . initialise admin && cd .. && \
-pkill -f "roundup-server" && sleep 2 && uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
+# Solution: Use the reset script
+./scripts/reset-test-db.sh
 ```
 
 ### Code Quality
