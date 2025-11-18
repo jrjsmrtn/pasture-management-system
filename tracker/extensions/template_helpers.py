@@ -91,22 +91,29 @@ def filter_ci_ids_by_search(db, ci_ids, search_term):
     result = []
 
     for ci_id in ci_ids:
-        # Extract plain ID string (handles HTMLItem wrapper)
-        if hasattr(ci_id, "id"):
-            id_str = str(ci_id.id)
-        else:
-            id_str = str(ci_id)
-
         try:
-            node = db.ci.getnode(id_str)
-            # Search in name and location
-            name = (node.name or "").lower()
-            location = (node.location or "").lower()
+            # ci_id is already an HTMLItem object with the CI data
+            # Access name and location directly from the HTMLItem
+            name = ""
+            if hasattr(ci_id, "name") and ci_id.name:
+                if hasattr(ci_id.name, "plain"):
+                    name = ci_id.name.plain()
+                else:
+                    name = str(ci_id.name)
+            name = name.lower()
+
+            location = ""
+            if hasattr(ci_id, "location") and ci_id.location:
+                if hasattr(ci_id.location, "plain"):
+                    location = ci_id.location.plain()
+                else:
+                    location = str(ci_id.location)
+            location = location.lower()
 
             if search_lower in name or search_lower in location:
                 result.append(ci_id)
-        except (AttributeError, KeyError):
-            # Skip CIs we can't access
+        except (AttributeError, KeyError, Exception):
+            # Skip CIs we can't access or have errors
             continue
 
     return result

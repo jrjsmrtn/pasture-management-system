@@ -1,8 +1,8 @@
 # Roundup Development Best Practices
 
-**Document Version:** 1.2
+**Document Version:** 1.5
 **Roundup Version:** 2.5.0
-**Last Updated:** 2025-01-17
+**Last Updated:** 2025-11-18
 **Official Documentation:** https://www.roundup-tracker.org/docs.html
 **Wiki Resources:** https://wiki.roundup-tracker.org
 
@@ -1207,6 +1207,133 @@ class DebugNewAction(NewItemAction):
 - **Roundup Actions Source**: `roundup/cgi/actions.py`
 - **Roundup Client Source**: `roundup/cgi/client.py`
 
+### Python Template Helpers
+
+**Pattern Discovered** (Sprint 6, 2025-11-18):
+
+Python functions registered as template utilities can help reduce TAL complexity, but they require careful handling of Roundup's HTMLItem objects.
+
+#### Registering Custom Utilities
+
+**File Location**: `tracker/extensions/template_helpers.py`
+
+```python
+def init(instance):
+    """Register template helper functions."""
+    instance.registerUtil("sort_ci_ids", sort_ci_ids)
+    instance.registerUtil("filter_ci_ids_by_search", filter_ci_ids_by_search)
+```
+
+**Usage in Templates**:
+
+```html
+<tal:block tal:define="
+   all_ci_ids python:db.ci.filter(None, filterspec);
+   ci_ids python:utils.filter_ci_ids_by_search(db, all_ci_ids, search_val);
+   sorted_ids python:utils.sort_ci_ids(db, ci_ids, sort_val);">
+  <!-- Now use sorted_ids in repeat -->
+</tal:block>
+```
+
+#### HTMLItem Objects - Critical Understanding
+
+**What You Receive**: When TAL passes objects to Python helper functions, they are **HTMLItem wrappers**, not raw database nodes.
+
+**Key Discovery** (2025-11-18, Sprint 6):
+
+```python
+# ❌ WRONG - db.ci.getnode() does NOT exist in TAL template context!
+def filter_ci_ids_by_search(db, ci_ids, search_term):
+    for ci_id in ci_ids:
+        id_str = str(ci_id.id)
+        node = db.ci.getnode(id_str)  # AttributeError: 'getnode'
+        name = node.name
+```
+
+**Root Cause**: In TAL template context, `db` is not a full database instance - it's a template-safe wrapper. The `getnode()` method is not available.
+
+**Solution**: Access fields directly from HTMLItem objects:
+
+```python
+# ✅ CORRECT - Access fields directly from HTMLItem
+def filter_ci_ids_by_search(db, ci_ids, search_term):
+    """Filter CI IDs by search term (name or location)."""
+    if not search_term:
+        return list(ci_ids)
+
+    search_lower = search_term.lower()
+    result = []
+
+    for ci_id in ci_ids:
+        try:
+            # ci_id is already an HTMLItem object with the CI data
+            # Access fields directly using .plain() for string extraction
+            name = ""
+            if hasattr(ci_id, 'name') and ci_id.name:
+                if hasattr(ci_id.name, 'plain'):
+                    name = ci_id.name.plain()
+                else:
+                    name = str(ci_id.name)
+            name = name.lower()
+
+            location = ""
+            if hasattr(ci_id, 'location') and ci_id.location:
+                if hasattr(ci_id.location, 'plain'):
+                    location = ci_id.location.plain()
+                else:
+                    location = str(ci_id.location)
+            location = location.lower()
+
+            if search_lower in name or search_lower in location:
+                result.append(ci_id)
+        except (AttributeError, KeyError, Exception):
+            # Skip CIs we can't access or have errors
+            continue
+
+    return result
+```
+
+#### The .plain() Method
+
+**When to Use**: Roundup field objects (String, Link, etc.) are not plain Python strings. Use `.plain()` to extract string values.
+
+```python
+# Field object types and their .plain() usage
+ci_id.name.plain()           # String field → string
+ci_id.type.plain()           # Link field → ID string
+ci_id.status.name.plain()    # Link traversal → string
+```
+
+**Safe Pattern with Defensive Checks**:
+
+```python
+# Defensive field access pattern
+value = ""
+if hasattr(obj, 'field_name') and obj.field_name:
+    if hasattr(obj.field_name, 'plain'):
+        value = obj.field_name.plain()
+    else:
+        value = str(obj.field_name)
+```
+
+#### Best Practices for Template Helpers
+
+1. **Never assume database methods exist**: `db` in template context is limited
+1. **Access HTMLItem fields directly**: Use `obj.field.plain()` instead of `db.class.getnode()`
+1. **Use defensive checks**: Check `hasattr()` before accessing fields
+1. **Handle the .plain() method**: Not all fields have it, provide fallback to `str()`
+1. **Preserve input types**: Return same type as input (HTMLItem list → HTMLItem list)
+1. **Silent error handling**: Template helpers should never raise exceptions - skip problem items instead
+
+**Why This Matters**:
+
+- Avoids `AttributeError: 'getnode'` failures
+- Maintains compatibility with TAL template context restrictions
+- Provides robust error handling for missing/null fields
+- Keeps templates clean by moving complex logic to Python
+
+**Implementation Example**: See `tracker/extensions/template_helpers.py` for complete working examples.
+
 ______________________________________________________________________
 
 ## REST API Development
@@ -1649,6 +1776,120 @@ ______________________________________________________________________
 
    - Modifications to `schema.py` auto-apply on next tracker access
    - **Server restart recommended** after schema changes to ensure clean state
+
+### Database Administration Commands
+
+**Reference:** [Roundup Administration Guide - roundup-admin](https://www.roundup-tracker.org/docs/admin_guide.html)
+
+#### Reindexing
+
+The `reindex` command regenerates search indexes after CLI operations or indexer installation:
+
+```bash
+# Reindex entire class
+uv run roundup-admin -i tracker reindex ci
+
+# Reindex specific range
+uv run roundup-admin -i tracker reindex ci:1-1000
+
+# Reindex all classes
+uv run roundup-admin -i tracker reindex
+```
+
+**When to Run Reindex:**
+
+- ✅ After creating items via `roundup-admin create`
+- ✅ After installing or changing indexer engines
+- ✅ After bulk imports via `roundup-admin import`
+- ✅ When search results seem incomplete or stale
+- ✅ After schema changes affecting indexed properties
+
+#### Database Migration
+
+Run `migrate` to update database schema version before using tracker interfaces:
+
+```bash
+uv run roundup-admin -i tracker migrate
+```
+
+**When to Run Migrate:**
+
+- After upgrading Roundup to a new version
+- Before using web/CLI/mail interfaces on upgraded tracker
+- When database schema version is out of sync
+
+#### CLI→Web Visibility Issue
+
+**Problem Discovered** (Sprint 6, 2025-11-18):
+
+Items created via `roundup-admin create` may not be visible through the web interface, even after server restart. This is due to search index synchronization.
+
+**Symptoms:**
+
+- CIs created via CLI exist in database (`roundup-admin list ci` shows them)
+- Web interface shows "No configuration items found"
+- REST API may not return CLI-created items
+- Direct URL access by ID works, but items don't appear in listings
+
+**Root Cause:**
+
+- Search indexes not automatically updated when items created via CLI
+- Roundup server loads indexes on startup
+- CLI operations bypass index generation
+
+**Solution:**
+
+```bash
+# Complete workflow for CLI item creation
+# 1. Stop server
+pkill -f "roundup-server"
+sleep 2
+
+# 2. Create items via CLI
+uv run roundup-admin -i tracker create ci name=web-server-01 type=1 status=5
+
+# 3. Reindex the class (CRITICAL STEP)
+uv run roundup-admin -i tracker reindex ci
+
+# 4. Start server
+uv run roundup-server -p 9080 pms=tracker > /dev/null 2>&1 &
+```
+
+**Best Practice for Test Data:**
+
+For BDD/integration testing, consider creating test data via **Web UI** instead of CLI:
+
+```python
+# features/steps/ci_steps.py
+@given("the following CIs exist:")
+def step_create_cis_via_ui(context):
+    """Create CIs through web interface for proper indexing."""
+    for row in context.table:
+        # Navigate to CI creation form
+        context.page.goto(f"{context.base_url}/ci?@template=item")
+
+        # Fill form and submit
+        context.page.fill('input[name="name"]', row['name'])
+        context.page.select_option('select[name="type"]', row['type'])
+        context.page.click('input[type="submit"][value="Submit"]')
+
+        # Server sees changes immediately (no reindex needed)
+```
+
+**Advantages of Web UI Test Data Creation:**
+
+- ✅ Proper index generation automatically
+- ✅ Tests actual user workflow
+- ✅ No CLI→Web synchronization issues
+- ✅ Detectors and validators fire correctly
+- ✅ More realistic BDD scenarios
+
+**When CLI Creation is Appropriate:**
+
+- Bulk data imports from external systems
+- Database initialization scripts
+- Automated monitoring/alerting integrations
+- **Always followed by reindex command**
 
 ### Recommended Restart Sequence
 
@@ -2249,6 +2490,7 @@ ______________________________________________________________________
 | 2025-01-17 | 1.1     | Added wiki-sourced patterns: circular reference prevention, mixin classes, bidirectional linking, email notifications, nosy list management, automated issue creation, batch operations, regex search, security best practices                                                                                   |
 | 2025-01-17 | 1.2     | Removed personal copyright; added proper attribution to Roundup project, copyright holders, and community contributors                                                                                                                                                                                           |
 | 2025-11-17 | 1.3     | **Sprint 5 Lessons Learned**: Added custom action handlers section (solving web UI error handling limitation), TAL path expressions for relationship traversal, Reject vs ValueError best practices, structured logging patterns. Discoveries from production implementation providing reusable Roundup patterns |
+| 2025-11-18 | 1.4     | **Sprint 6 Day 2 Discovery**: Added Database Administration Commands section with reindex/migrate commands, documented CLI→Web visibility issue and solution, provided best practices for test data creation (Web UI vs CLI), includes complete workflow for CLI item creation with reindex                      |
 
 ______________________________________________________________________
 

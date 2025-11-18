@@ -44,6 +44,7 @@ See the [docs/adr/](docs/adr/) directory for complete decision history.
 - **TDD**: pytest for unit tests and implementation details
 - **Integration**: Test web UI, CLI, and API interfaces
 - Coverage target: >85%
+- **Behave Best Practices**: Follow fixture patterns documented in [ADR-0002](docs/adr/0002-adopt-development-best-practices.md#behave-best-practices) for test isolation and cleanup
 
 ### Documentation Framework
 

@@ -101,7 +101,24 @@ def step_create_multiple_cis(context):
         ci_id = result.stdout.strip()
         context.ci_map[name] = ci_id
 
-    # CRITICAL: Restart server so it picks up the new CIs
+    # CRITICAL: Reindex CI class to make CLI-created items visible through web interface
+    # Background: Search indexes are not automatically updated when items are created via CLI
+    # Solution: Run reindex command after CLI item creation (documented in Roundup best practices v1.4)
+    reindex_result = subprocess.run(
+        ["uv", "run", "roundup-admin", "-i", "tracker", "reindex", "ci"],
+        capture_output=True,
+        text=True,
+        timeout=30,
+        cwd=project_root,
+    )
+    print("\n[DEBUG] Reindex command: uv run roundup-admin -i tracker reindex ci")
+    print(f"[DEBUG] Working directory: {project_root}")
+    print(f"[DEBUG] Reindex return code: {reindex_result.returncode}")
+    print(f"[DEBUG] Reindex stdout: {reindex_result.stdout}")
+    print(f"[DEBUG] Reindex stderr: {reindex_result.stderr}")
+    assert reindex_result.returncode == 0, f"Failed to reindex CI class: {reindex_result.stderr}"
+
+    # CRITICAL: Restart server so it picks up the new CIs with updated indexes
     subprocess.Popen(
         ["uv", "run", "roundup-server", "-p", "9080", "pms=tracker"],
         stdout=subprocess.DEVNULL,
@@ -115,6 +132,10 @@ def step_search_for_term(context, search_term):
     """Enter search term in the search box."""
     from features.steps.web_ui_steps import check_for_templating_error
 
+    # DEBUG: Check how many CIs are visible BEFORE searching
+    ci_count_before = context.page.locator("table.list tbody tr").count()
+    print(f"\n[DEBUG] CIs visible BEFORE search: {ci_count_before}")
+
     # Find and fill the CI search input (not the global header search)
     context.page.fill('div.search-filters input[name="@search_text"]', search_term)
     # Submit the search form - use the button inside the search-filters div
@@ -122,6 +143,10 @@ def step_search_for_term(context, search_term):
     context.page.wait_for_load_state("networkidle")
     # Additional wait for TAL rendering
     context.page.wait_for_timeout(500)
+
+    # DEBUG: Check how many CIs are visible AFTER searching
+    ci_count_after = context.page.locator("table.list tbody tr").count()
+    print(f"[DEBUG] CIs visible AFTER search for '{search_term}': {ci_count_after}")
 
     # Check for templating errors after search
     check_for_templating_error(context.page, f"search for '{search_term}'")

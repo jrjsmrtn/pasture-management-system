@@ -34,7 +34,12 @@ Based on Sprint 5 retrospective analysis:
 - **Completion Rate**: 36%
 
 **Day 1 Summary**: Stories TD-1 and TD-2 complete! 🎉
-**Day 2 Summary**: Story 6 infrastructure improvements complete, CI visibility issue under investigation
+**Day 2 Summary**: Major breakthroughs! ✅
+
+- **CLI→Web Visibility**: Solved with `roundup-admin reindex ci` command
+- **Search Bug Fixed**: HTMLItem `.getnode()` issue resolved
+- **Documentation**: Added Python template helpers best practices (v1.5)
+- **BDD Tests**: Search scenarios now passing (7/12 in ci_search.feature)
 
 ## Backlog Items
 
