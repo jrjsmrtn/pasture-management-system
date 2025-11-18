@@ -6,7 +6,7 @@
 
 [project]
 name = "pasture-management-system"
-version = "0.5.0"
+version = "0.6.0"
 description = "Issue tracking system based on Roundup"
 readme = "README.md"
 requires-python = ">=3.9"
