@@ -37,38 +37,41 @@
    </div>
 
    <!-- Filter dropdowns -->
-   <div style="margin-bottom: 0.5em;">
+   <div style="margin-bottom: 0.5em;" tal:define="
+     type_val python:request.form.getvalue('type', '');
+     status_val python:request.form.getvalue('status', '');
+     crit_val python:request.form.getvalue('criticality', '')">
     <label for="filter_type">Type:</label>
     <select id="filter_type" name="type" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Types</option>
-     <option value="1">Server</option>
-     <option value="2">Network Device</option>
-     <option value="3">Storage</option>
-     <option value="4">Software</option>
-     <option value="5">Service</option>
-     <option value="6">Virtual Machine</option>
+     <option value="1" tal:attributes="selected python:'selected' if type_val == '1' else None">Server</option>
+     <option value="2" tal:attributes="selected python:'selected' if type_val == '2' else None">Network Device</option>
+     <option value="3" tal:attributes="selected python:'selected' if type_val == '3' else None">Storage</option>
+     <option value="4" tal:attributes="selected python:'selected' if type_val == '4' else None">Software</option>
+     <option value="5" tal:attributes="selected python:'selected' if type_val == '5' else None">Service</option>
+     <option value="6" tal:attributes="selected python:'selected' if type_val == '6' else None">Virtual Machine</option>
     </select>
 
     <label for="filter_status">Status:</label>
     <select id="filter_status" name="status" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Statuses</option>
-     <option value="1">Planning</option>
-     <option value="2">Ordered</option>
-     <option value="3">In Stock</option>
-     <option value="4">Deployed</option>
-     <option value="5">Active</option>
-     <option value="6">Maintenance</option>
-     <option value="7">Retired</option>
+     <option value="1" tal:attributes="selected python:'selected' if status_val == '1' else None">Planning</option>
+     <option value="2" tal:attributes="selected python:'selected' if status_val == '2' else None">Ordered</option>
+     <option value="3" tal:attributes="selected python:'selected' if status_val == '3' else None">In Stock</option>
+     <option value="4" tal:attributes="selected python:'selected' if status_val == '4' else None">Deployed</option>
+     <option value="5" tal:attributes="selected python:'selected' if status_val == '5' else None">Active</option>
+     <option value="6" tal:attributes="selected python:'selected' if status_val == '6' else None">Maintenance</option>
+     <option value="7" tal:attributes="selected python:'selected' if status_val == '7' else None">Retired</option>
     </select>
 
     <label for="filter_criticality">Criticality:</label>
     <select id="filter_criticality" name="criticality" onchange="this.form.submit()" style="margin-right: 1em;">
      <option value="">All Criticality Levels</option>
-     <option value="1">Very Low</option>
-     <option value="2">Low</option>
-     <option value="3">Medium</option>
-     <option value="4">High</option>
-     <option value="5">Very High</option>
+     <option value="1" tal:attributes="selected python:'selected' if crit_val == '1' else None">Very Low</option>
+     <option value="2" tal:attributes="selected python:'selected' if crit_val == '2' else None">Low</option>
+     <option value="3" tal:attributes="selected python:'selected' if crit_val == '3' else None">Medium</option>
+     <option value="4" tal:attributes="selected python:'selected' if crit_val == '4' else None">High</option>
+     <option value="5" tal:attributes="selected python:'selected' if crit_val == '5' else None">Very High</option>
     </select>
    </div>
 
