@@ -79,5 +79,5 @@ Feature: Issue Status Workflow
         "status": "closed"
       }
       """
-    Then the response status should be 409
+    Then the response status should be 405
     And the response should contain error "Invalid status transition: new -> closed"
