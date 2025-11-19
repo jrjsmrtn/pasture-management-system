@@ -119,6 +119,8 @@ jobs:
         exit 1
 
     - name: Run BDD tests
+      env:
+        CLEANUP_TEST_DATA: "false"  # Let CI manage database - don't let fixture kill server
       run: |
         uv run behave features/issue_tracking/ \
           --junit \
