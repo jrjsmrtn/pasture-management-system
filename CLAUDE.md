@@ -296,7 +296,7 @@ See ADR-0002 for complete procedures, document structures, and quality checklist
 
 ## Current Focus
 
-**Version 0.6.0** - Sprint 5 complete:
+**Version 0.6.0** - Sprint 6 in progress:
 
 **Completed Sprints**:
 
@@ -306,22 +306,25 @@ See ADR-0002 for complete procedures, document structures, and quality checklist
 - ✅ Sprint 4 (v0.5.0): CMDB BDD specification
 - ✅ Sprint 5 (v0.6.0): CMDB implementation (31/41 points, 76%)
 
-**Sprint 5 Results**:
+**Sprint 6 Progress** (Day 3 - 16/30 points, 53%):
 
-- Core CMDB functionality production-ready:
-  - CI schema with 6 types, 7 statuses, 5 criticality levels
-  - CI creation workflows (Web UI, CLI, API)
-  - CI relationships and circular dependency detection
-  - CI-Issue-Change integration
-  - CI search, filtering, and CSV export
-- Template validation automation (pre-push hooks)
-- Comprehensive backlog and retrospective documentation
-- Stories 6-7 deferred to Sprint 6 (10 points)
+- ✅ Story TD-1: BDD test integration fixed (8 points)
+  - Playwright selector issues resolved
+  - 10/11 CI search scenarios passing
+  - Comprehensive troubleshooting guide created
+- ✅ Story TD-2: Database management automation (3 points)
+  - `reset-test-db.sh` script for one-command database reset
+  - Server restart automation
+- ✅ Story 6: Search and sort backend complete (5 points)
+  - Text search by CI name and location
+  - Combined filters with dropdown state preservation
+  - Sort by name/type/status/criticality (ascending/descending)
+  - BDD scenarios: 10/11 passing (91%)
+- 🔄 Remaining: Stories 7, PR-1, PR-2 (14 points)
 
 **Next Steps**:
 
-- Sprint 6 planning: Complete deferred stories and begin production polish
-- Stories 6-7: Advanced search/sort backends and reporting dashboards
-- Address technical debt (BDD test integration, test parallelization)
-- Performance optimization and UI/UX polish
-- Target: v1.0.0 production release
+- Story 7: Advanced reporting dashboard (5 points)
+- Story PR-1: Core Diátaxis documentation (5 points)
+- Story PR-2: Test parallelization for faster feedback (4 points)
+- Target: v1.0.0 production release (Sprint 6 completion)
