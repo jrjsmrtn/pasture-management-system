@@ -43,13 +43,15 @@ Based on Sprint 5 retrospective analysis:
 - **BDD Tests**: ✅ Search functionality verified working (7/12 scenarios passing)
 - **Commit**: 340d2e8 - All changes documented and tested
 
-**Day 3 Summary**: Documentation restructuring complete! ✅
+**Day 3 Summary**: Documentation restructuring + CI sorting complete! ✅
 
 - **BDD Best Practices**: ✅ Created dedicated reference document (docs/reference/bdd-testing-best-practices.md)
 - **ADR-0002 Refactor**: ✅ Reduced from 642 → 445 lines (31% reduction) to focus on decision rationale
 - **Cross-References**: ✅ Updated 6 locations for consistent navigation
 - **AI Efficiency**: ✅ Improved single source of truth for BDD/Playwright best practices
 - **Commits**: 70977e2, eb3ae2e, 9b3d158 - 3-commit documentation restructuring strategy
+- **CI Sorting**: ✅ Full implementation with unit tests (16/16) and BDD tests (2/2) passing
+- **Technical Solution**: ✅ Hardcoded order mappings + HTMLItem wrapper handling
 
 ## Backlog Items
 
@@ -236,7 +238,7 @@ ______________________________________________________________________
 
 **Story Points**: 5
 **Priority**: High
-**Status**: 🔄 In Progress (Day 2 - Infrastructure improvements complete, CI visibility issue under investigation)
+**Status**: 🔄 In Progress (Day 3 - Sorting complete! Search implementation pending)
 **Assignee**: Claude
 
 **User Story**:
@@ -246,20 +248,21 @@ ______________________________________________________________________
 **Current State** (from Sprint 5):
 
 - ✅ UI elements present (search box, sort links)
-- ⚠️ Backend processing not implemented
+- ✅ Sorting backend fully implemented
 - ✅ Basic filtering working (type, status, criticality)
+- ⚠️ Text search backend pending
 
 **Acceptance Criteria**:
 
 - [ ] Text search on CI name, hostname, description
 - [ ] Case-insensitive search
 - [ ] Search + filter combination
-- [ ] Sort by name (A-Z, Z-A)
-- [ ] Sort by type
-- [ ] Sort by status
-- [ ] Sort by criticality
-- [ ] Persist sort preference in session/URL
-- [ ] BDD scenarios passing
+- [x] Sort by name (A-Z, Z-A)
+- [x] Sort by type
+- [x] Sort by status
+- [x] Sort by criticality
+- [x] Persist sort preference in session/URL
+- [x] BDD sorting scenarios passing (2/2)
 
 **Technical Tasks**:
 
@@ -302,6 +305,41 @@ ______________________________________________________________________
 - CIs are visible when created manually outside BDD test context
 - Possible Roundup database caching issue in test environment
 - Next steps: Investigate alternative CI creation methods (Web UI vs CLI)
+
+**Completed Work (Day 3 - 2025-11-19)**:
+
+**Sorting Implementation Complete**:
+
+- ✅ Fixed `sort_ci_ids()` to work with Roundup HTMLItem wrappers
+- ✅ Implemented hardcoded order mappings for criticality, status, and type fields
+  - Criticality: Very Low(1) → Very High(5)
+  - Status: Planning(1) → Retired(7)
+  - Type: Server(1) → Virtual Machine(6)
+- ✅ Updated `ci.index.html` to toggle between ascending/descending sort
+  - Clicking column header once: ascending sort
+  - Clicking same header twice: descending sort
+- ✅ Fixed URL generation to preserve filters while sorting
+- ✅ Created comprehensive unit tests for template helpers (16/16 passing)
+  - Sort by name, type, status, criticality (ascending + descending)
+  - HTMLItem wrapper handling
+  - Case-insensitive sorting
+  - None/empty value handling
+- ✅ Fixed BDD step definitions for sorting (2/2 scenarios passing)
+  - "Sort CIs by name" - ascending sort works
+  - "Sort CIs by criticality" - descending sort works
+
+**Technical Solution - Roundup/TAL Context Constraints**:
+
+- Root cause: `db.ci.getnode()` doesn't work in Roundup TAL template context
+- Solution: Work directly with HTMLItem wrapper objects, access fields via `.plain()` method
+- Design decision: Hardcoded order mappings acceptable since CI types/statuses are fixed enums
+- Performance: Tuple-based sorting avoids Python closure issues in TAL environment
+
+**Test Results**:
+
+- ✅ Unit tests: 16/16 passing (100%)
+- ✅ BDD sorting scenarios: 2/2 passing (100%)
+- ✅ Manual testing: All sort columns working correctly in Web UI
 
 **BDD Scenarios**: (from Sprint 4)
 
@@ -714,4 +752,4 @@ ______________________________________________________________________
 **Next Sprint**: Sprint 7 (Final Polish for v1.0.0)
 
 **Created**: 2025-11-18
-**Last Updated**: 2025-11-18
+**Last Updated**: 2025-11-19

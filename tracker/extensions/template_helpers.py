@@ -45,31 +45,75 @@ def sort_ci_ids(db, ci_ids, sort_param=None):
     if field_name == "id":
         return sorted(ci_ids, key=lambda x: int(get_id_str(x)), reverse=descending)
 
-    # Sort by field value
-    def get_sort_key(ci_id):
-        """Extract sort key from CI node."""
+    # Create sort tuples without using key function (TAL/Roundup compatibility)
+    # Build list of (sort_key, ci_id) tuples
+    # Note: ci_id objects are already _HTMLItem wrappers with all properties
+    sort_tuples = []
+
+    for ci_id in ci_ids:
         try:
-            # Extract plain ID string (handles HTMLItem wrapper)
             id_str = get_id_str(ci_id)
-            node = db.ci.getnode(id_str)
-            value = getattr(node, field_name, None)
 
-            # Handle None values (sort them last)
-            if value is None:
-                return ("~", id_str)  # '~' sorts after letters
+            # Access field directly from HTMLItem wrapper
+            value = getattr(ci_id, field_name, None)
 
-            # Handle Roundup Link/Multilink objects
-            if hasattr(value, "plain"):
-                return (str(value.plain()).lower(), id_str)
+            # For fields with ordering (criticality, status, type), use mappings
+            # This is necessary because accessing order values from HTMLItem wrappers
+            # is complex in the Roundup TAL context
+            order_mappings = {
+                "criticality": {"Very Low": 1, "Low": 2, "Medium": 3, "High": 4, "Very High": 5},
+                "status": {
+                    "Planning": 1,
+                    "Ordered": 2,
+                    "In Stock": 3,
+                    "Deployed": 4,
+                    "Active": 5,
+                    "Maintenance": 6,
+                    "Retired": 7,
+                },
+                "type": {
+                    "Server": 1,
+                    "Network Device": 2,
+                    "Storage": 3,
+                    "Software": 4,
+                    "Service": 5,
+                    "Virtual Machine": 6,
+                },
+            }
 
-            # Handle regular values
-            return (str(value).lower(), id_str)
+            # Get the sort value
+            if value is not None and hasattr(value, "plain"):
+                plain_value = value.plain()
+                # Check if this field has an order mapping
+                if field_name in order_mappings and plain_value in order_mappings[field_name]:
+                    sort_value = order_mappings[field_name][plain_value]
+                else:
+                    sort_value = plain_value
+            elif value is not None:
+                sort_value = str(value)
+            else:
+                sort_value = value
 
+            # Create sort key
+            if sort_value is None or sort_value == "":
+                sort_key = ("~", id_str)  # None/empty values sort last
+            elif isinstance(sort_value, str):
+                sort_key = (sort_value.lower(), id_str)
+            elif isinstance(sort_value, (int, float)):
+                sort_key = (sort_value, id_str)
+            else:
+                sort_key = (str(sort_value), id_str)
+
+            sort_tuples.append((sort_key, ci_id))
         except (AttributeError, KeyError):
             # If field doesn't exist, sort by CI ID
-            return (id_str, id_str)
+            sort_tuples.append((id_str, ci_id))
 
-    return sorted(ci_ids, key=get_sort_key, reverse=descending)
+    # Sort the tuples
+    sort_tuples.sort(reverse=descending)
+
+    # Extract just the CI IDs
+    return [ci_id for _, ci_id in sort_tuples]
 
 
 def filter_ci_ids_by_search(db, ci_ids, search_term):

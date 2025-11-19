@@ -285,10 +285,13 @@ def step_verify_ci_not_visible(context, ci_name):
 @then("the CIs should be displayed in order:")
 def step_verify_ci_order(context):
     """Verify CIs are displayed in the specified order."""
-    expected_order = [row[0] for row in context.table]
+    # Note: Behave treats first row as header, so we need to include it manually
+    # The table has no explicit headers, so all rows are data
+    expected_order = [context.table.headings[0]] + [row[0] for row in context.table]
 
-    # Get the actual order from the page
-    ci_names = context.page.locator("table.list tbody tr td:first-child").all_text_contents()
+    # Get the actual order from the page - name is in the 2nd column (td:nth-child(2))
+    # Read the link text within the name column
+    ci_names = context.page.locator("table.list tbody tr td:nth-child(2) a").all_text_contents()
 
     # Extract just the CI names (removing any extra whitespace)
     ci_names = [name.strip() for name in ci_names if name.strip()]

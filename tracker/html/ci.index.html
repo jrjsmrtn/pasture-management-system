@@ -93,7 +93,7 @@
    dummy2 python:status_val and filterspec.update({'status': status_val}) or None;
    dummy3 python:crit_val and filterspec.update({'criticality': crit_val}) or None;
    all_ci_ids python:db.ci.filter(None, filterspec);
-   ci_ids python:utils.filter_ci_ids_by_search(db, all_ci_ids, search_val);
+   ci_ids python:utils.filter_ci_ids_by_search(db, all_ci_ids, search_val) if search_val else all_ci_ids;
    sorted_ids python:utils.sort_ci_ids(db, ci_ids, sort_val);
    batch python:utils.Batch(sorted_ids, request.pagesize, request.startwith);
    ">
@@ -107,12 +107,18 @@
     base_params python:'&'.join(params_list);
     ">
    <thead>
-    <tr>
-     <th><a tal:attributes="href string:?${base_params}&@sort=id">ID</a></th>
-     <th><a tal:attributes="href string:?${base_params}&@sort=name">Name</a></th>
-     <th><a tal:attributes="href string:?${base_params}&@sort=type">Type</a></th>
-     <th><a tal:attributes="href string:?${base_params}&@sort=status">Status</a></th>
-     <th><a tal:attributes="href string:?${base_params}&@sort=criticality">Criticality</a></th>
+    <tr tal:define="
+      id_sort python:'-id' if current_sort == 'id' else 'id';
+      name_sort python:'-name' if current_sort == 'name' else 'name';
+      type_sort python:'-type' if current_sort == 'type' else 'type';
+      status_sort python:'-status' if current_sort == 'status' else 'status';
+      crit_sort python:'-criticality' if current_sort == 'criticality' else 'criticality';
+      ">
+     <th><a tal:attributes="href string:?${base_params}&@sort=${id_sort}">ID</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=${name_sort}">Name</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=${type_sort}">Type</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=${status_sort}">Status</a></th>
+     <th><a tal:attributes="href string:?${base_params}&@sort=${crit_sort}">Criticality</a></th>
      <th>Location</th>
     </tr>
    </thead>
