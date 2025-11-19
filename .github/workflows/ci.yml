@@ -97,9 +97,26 @@ jobs:
 
     - name: Start Roundup server
       run: |
-        uv run roundup-server -p 9080 pms=tracker &
+        # Start server with output logging
+        uv run roundup-server -p 9080 pms=tracker > roundup-server.log 2>&1 &
         echo $! > roundup.pid
-        sleep 5
+
+        # Wait for server to be ready (max 30 seconds)
+        echo "Waiting for Roundup server to start..."
+        for i in {1..30}; do
+          if curl -s -f http://localhost:9080/pms/ > /dev/null 2>&1; then
+            echo "Server is ready after $i seconds"
+            exit 0
+          fi
+          echo "Attempt $i: Server not ready yet..."
+          sleep 1
+        done
+
+        # If we get here, server didn't start
+        echo "ERROR: Server failed to start after 30 seconds"
+        echo "=== Server Log ==="
+        cat roundup-server.log
+        exit 1
 
     - name: Run BDD tests
       run: |
@@ -133,6 +150,14 @@ jobs:
       with:
         name: bdd-screenshots-py${{ matrix.python-version }}
         path: screenshots/
+        retention-days: 7
+
+    - name: Upload server logs on failure
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: roundup-server-log-py${{ matrix.python-version }}
+        path: roundup-server.log
         retention-days: 7
 
   security:
