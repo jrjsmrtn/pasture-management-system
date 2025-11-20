@@ -34,6 +34,45 @@ def step_admin_user_exists(context, email):
     context.admin_email = email
 
 
+@given('I create an issue with title "{title}" via email')
+def step_create_issue_via_email(context, title):
+    """Create an issue via email and store its ID."""
+    tracker_dir = os.getenv("TRACKER_DIR", "tracker")
+    context.tracker_dir = tracker_dir
+
+    # Compose email to create issue
+    msg = EmailMessage()
+    msg["From"] = "roundup-admin@localhost"
+    msg["To"] = "issue_tracker@localhost"
+    msg["Subject"] = title
+    msg["Date"] = datetime.now().strftime("%a, %d %b %Y %H:%M:%S %z")
+    msg.set_content(f"Creating issue: {title}")
+
+    # Send via mailgw
+    cmd = ["roundup-mailgw", tracker_dir]
+    result = subprocess.run(cmd, input=msg.as_string(), capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to create issue via email: {result.stderr}"
+
+    # Get the created issue ID
+    cmd = ["roundup-admin", "-i", tracker_dir, "list", "issue"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    issue_lines = result.stdout.strip().split("\n")
+    if issue_lines:
+        last_line = issue_lines[-1]
+        issue_id = last_line.split(":")[0].strip()
+        context.last_created_issue_id = issue_id
+
+
+@given('I note the issue ID as "{variable_name}"')
+def step_note_issue_id(context, variable_name):
+    """Store the last created issue ID in a variable for later use."""
+    if not hasattr(context, "issue_variables"):
+        context.issue_variables = {}
+    context.issue_variables[variable_name] = context.last_created_issue_id
+
+
 @given('no user exists with email "{email}"')
 def step_no_user_exists(context, email):
     """Verify that no user exists with the specified email."""
@@ -115,6 +154,12 @@ def step_compose_email(context):
     for row in context.table:
         field = row["field"]
         value = row["value"]
+
+        # Substitute variables like {work_issue} with actual issue IDs
+        if hasattr(context, "issue_variables"):
+            for var_name, var_value in context.issue_variables.items():
+                value = value.replace(f"{{{var_name}}}", f"issue{var_value}")
+
         email_data[field] = value
 
     # Create email message
@@ -290,8 +335,16 @@ def step_verify_issue_has_new_message(context, issue_id):
     """Verify the issue has received a new message."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Substitute variables
+    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
+        issue_id = context.issue_variables[issue_id]
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
     # Get the messages for this issue
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "messages", f"issue{issue_id}"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "messages", issue_id]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to get issue messages: {result.stderr}"
@@ -333,6 +386,10 @@ def step_verify_new_message_content(context, expected_text):
 def step_verify_specific_issue_status(context, issue_id, expected_status):
     """Verify a specific issue has the expected status."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Substitute variables
+    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
+        issue_id = context.issue_variables[issue_id]
 
     # Ensure issue_id has the "issue" prefix
     if not issue_id.startswith("issue"):

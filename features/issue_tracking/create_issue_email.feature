@@ -52,28 +52,30 @@ Feature: Email Gateway Integration
 
   @email
   Scenario: Update issue status via email subject
-    Given an issue exists with id "2" and status "new"
+    Given I create an issue with title "Task to work on" via email
+    And I note the issue ID as "work_issue"
     And I compose an email with:
-      | field   | value                              |
+      | field   | value                                      |
       | from    | roundup-admin@localhost                    |
-      | to      | issue_tracker@localhost            |
-      | subject | [issue2] Working on this [status=in-progress] |
-      | body    | Working on this issue now          |
+      | to      | issue_tracker@localhost                    |
+      | subject | [{work_issue}] Working on this [status=in-progress] |
+      | body    | Working on this issue now                  |
     When I send the email to the mail gateway
-    Then the issue "2" status should be "in-progress"
-    And the issue "2" should have a new message
+    Then the issue "{work_issue}" status should be "in-progress"
+    And the issue "{work_issue}" should have a new message
 
   @email
   Scenario: Email with quoted text is handled correctly
-    Given an issue exists with id "3" and title "Database slow queries"
+    Given I create an issue with title "Database slow queries" via email
+    And I note the issue ID as "db_issue"
     And I compose an email with:
-      | field   | value                                    |
-      | from    | roundup-admin@localhost                          |
-      | to      | issue_tracker@localhost                  |
-      | subject | [issue3] Database slow queries           |
+      | field   | value                                                                    |
+      | from    | roundup-admin@localhost                                                  |
+      | to      | issue_tracker@localhost                                                  |
+      | subject | [{db_issue}] Database slow queries                                       |
       | body    | I optimized the query.\n\n> Original message:\n> The database is slow |
     When I send the email to the mail gateway
-    Then the issue "3" should have a new message
+    Then the issue "{db_issue}" should have a new message
     And the new message should contain "I optimized the query"
     And the new message should contain "> Original message:"
 
