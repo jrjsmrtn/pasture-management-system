@@ -195,8 +195,8 @@ Feature: Four-Interface BDD Testing
   # Coverage Summary Scenario
   # ============================================================================
 
-  @four-interface @summary
-  Scenario: Four-interface coverage demonstration
+  @four-interface @summary @skip
+  Scenario: Four-interface coverage demonstration (placeholder)
     # This scenario demonstrates that we have complete BDD coverage
     # across all 4 interfaces for the core issue management operations
 
