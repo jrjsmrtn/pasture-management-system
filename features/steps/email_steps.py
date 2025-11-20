@@ -379,12 +379,16 @@ def step_verify_issue_has_new_message(context, issue_id):
     """Verify the issue has received a new message."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Strip curly braces if present (e.g., "{api_issue}" -> "api_issue")
+    if issue_id.startswith("{") and issue_id.endswith("}"):
+        issue_id = issue_id[1:-1]
+
     # Substitute variables
     if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
         issue_id = context.issue_variables[issue_id]
 
     # Ensure issue_id has the "issue" prefix
-    if not issue_id.startswith("issue"):
+    if not str(issue_id).startswith("issue"):
         issue_id = f"issue{issue_id}"
 
     # Get the messages for this issue
