@@ -438,6 +438,36 @@ def step_verify_specific_issue_status(context, issue_id, expected_status):
         )
 
 
+@then('the issue "{issue_id}" priority should be "{expected_priority}"')
+def step_verify_specific_issue_priority(context, issue_id, expected_priority):
+    """Verify a specific issue has the expected priority."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Substitute variables
+    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
+        issue_id = context.issue_variables[issue_id]
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Get issue priority
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "priority", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to get issue priority: {result.stderr}"
+
+    priority_id = result.stdout.strip()
+
+    # Map expected priority to ID
+    expected_priority_id = PRIORITY_MAP.get(expected_priority.lower())
+
+    if expected_priority_id:
+        assert priority_id == expected_priority_id, (
+            f"Expected priority ID '{expected_priority_id}', got '{priority_id}'"
+        )
+
+
 @then("the email should be rejected")
 def step_verify_email_rejected(context):
     """Verify the email was rejected by the mail gateway."""

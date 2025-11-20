@@ -95,6 +95,13 @@ def step_update_issue_status_web(context, status):
     if status_id:
         context.page.select_option('select[name="status"]', status_id)
 
+    # Ensure priority is set (required field) - preserve current value if present
+    priority_dropdown = context.page.locator('select[name="priority"]')
+    current_priority = priority_dropdown.input_value()
+    if not current_priority or current_priority == "":
+        # No priority set, use default "critical"
+        context.page.select_option('select[name="priority"]', PRIORITY_MAP.get("critical"))
+
 
 @when('I select priority "{priority}"')
 def step_select_priority(context, priority):
