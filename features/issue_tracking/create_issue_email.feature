@@ -43,7 +43,7 @@ Feature: Email Gateway Integration
       | field   | value                                     |
       | from    | roundup-admin@localhost                           |
       | to      | issue_tracker@localhost                   |
-      | subject | [priority=urgent] Network outage detected |
+      | subject | Network outage detected [priority=urgent] |
       | body    | All services are unreachable              |
     When I send the email to the mail gateway
     Then a new issue should be created
@@ -57,7 +57,7 @@ Feature: Email Gateway Integration
       | field   | value                              |
       | from    | roundup-admin@localhost                    |
       | to      | issue_tracker@localhost            |
-      | subject | [issue2] [status=in-progress]      |
+      | subject | [issue2] Working on this [status=in-progress] |
       | body    | Working on this issue now          |
     When I send the email to the mail gateway
     Then the issue "2" status should be "in-progress"

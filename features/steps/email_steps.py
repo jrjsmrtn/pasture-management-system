@@ -58,7 +58,7 @@ def step_issue_exists_with_title(context, issue_id, title):
     context.tracker_dir = tracker_dir
 
     # Try to get the issue
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "title"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "title", f"issue{issue_id}"]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     if result.returncode != 0:
@@ -81,7 +81,7 @@ def step_issue_exists_with_status(context, issue_id, status):
     status_id = STATUS_MAP.get(status.lower(), "1")
 
     # Try to get the issue
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "status"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "status", f"issue{issue_id}"]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     if result.returncode != 0:
@@ -99,7 +99,7 @@ def step_issue_exists_with_status(context, issue_id, status):
         assert result.returncode == 0, f"Failed to create issue: {result.stderr}"
     else:
         # Update the status
-        cmd = ["roundup-admin", "-i", tracker_dir, "set", "issue", issue_id, f"status={status_id}"]
+        cmd = ["roundup-admin", "-i", tracker_dir, "set", f"issue{issue_id}", f"status={status_id}"]
         subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     # Store issue ID for later verification
@@ -334,8 +334,12 @@ def step_verify_specific_issue_status(context, issue_id, expected_status):
     """Verify a specific issue has the expected status."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
     # Get issue status
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "status"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "status", issue_id]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to get issue status: {result.stderr}"
@@ -400,8 +404,12 @@ def step_verify_issue_assigned_to_new_user(context):
     user_id = context.created_user_id
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
     # Get issue creator
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "creator"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "creator", issue_id]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to get issue creator: {result.stderr}"
@@ -418,15 +426,21 @@ def step_verify_attachment_count(context, count):
     issue_id = context.created_issue_id
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
     # Get issue files (attachments)
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "files"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "files", issue_id]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to get issue files: {result.stderr}"
 
-    files = result.stdout.strip()
-    if files:
-        file_ids = files.split(",")
+    # Parse file IDs (format: "['1', '2']")
+    files_str = result.stdout.strip()
+    if files_str and files_str != "[]":
+        files_str = files_str.strip("[]'\"")
+        file_ids = [fid.strip().strip("'\"") for fid in files_str.split(",")]
         actual_count = len(file_ids)
     else:
         actual_count = 0
@@ -440,18 +454,25 @@ def step_verify_attachment_names(context, name1, name2):
     issue_id = context.created_issue_id
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
     # Get issue files (attachments)
-    cmd = ["roundup-admin", "-i", tracker_dir, "get", "issue", issue_id, "files"]
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "files", issue_id]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to get issue files: {result.stderr}"
 
-    file_ids = result.stdout.strip().split(",")
+    # Parse file IDs
+    files_str = result.stdout.strip()
+    files_str = files_str.strip("[]'\"")
+    file_ids = [fid.strip().strip("'\"") for fid in files_str.split(",")]
 
     # Get file names
     file_names = []
     for file_id in file_ids:
-        cmd = ["roundup-admin", "-i", tracker_dir, "get", "file", file_id.strip(), "name"]
+        cmd = ["roundup-admin", "-i", tracker_dir, "get", "name", f"file{file_id}"]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         if result.returncode == 0:
             file_names.append(result.stdout.strip())
