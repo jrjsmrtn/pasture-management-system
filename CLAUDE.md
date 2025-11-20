@@ -306,7 +306,7 @@ See ADR-0002 for complete procedures, document structures, and quality checklist
 - ✅ Sprint 4 (v0.5.0): CMDB BDD specification
 - ✅ Sprint 5 (v0.6.0): CMDB implementation (31/41 points, 76%)
 
-**Sprint 6 Progress** (Day 3 - 21/30 points, 70%):
+**Sprint 6 Progress** (Day 4 - 26/30 points, 87%):
 
 - ✅ Story TD-1: BDD test integration fixed (8 points)
   - Playwright selector issues resolved
@@ -325,10 +325,14 @@ See ADR-0002 for complete procedures, document structures, and quality checklist
   - CI breakdowns by type, status, criticality
   - Relationship and issue/change metrics
   - Responsive grid layout with color-coded charts
-- 🔄 Remaining: Stories PR-1, PR-2 (9 points)
+- ✅ Story PR-1: Core Diátaxis documentation complete (5 points)
+  - 4 new comprehensive docs (2,850 lines)
+  - Tutorials, how-tos, reference, explanation
+  - All internal links validated
+  - Production-ready documentation for v1.0.0
+- 🔄 Remaining: Story PR-2 (4 points)
 
 **Next Steps**:
 
-- Story PR-1: Core Diátaxis documentation (5 points)
 - Story PR-2: Test parallelization for faster feedback (4 points)
-- Target: v1.0.0 production release (Sprint 6 completion - 9 points remaining)
+- Target: v1.0.0 production release (Sprint 6 completion - 4 points remaining)
