@@ -24,6 +24,14 @@ from features.steps.common import PRIORITY_MAP, STATUS_MAP
 @then('I am logged in as "{username}" with password "{password}"')
 def step_login_as_user_short(context, username, password):
     """Log in to the Roundup tracker (simplified)."""
+    # Set up browser context if needed for cross-interface scenarios
+    if not hasattr(context, "page") or context.page is None:
+        from behave import use_fixture
+
+        from features.environment import browser_context
+
+        use_fixture(browser_context, context)
+
     # Call the existing web_ui_steps login function
     from features.steps.web_ui_steps import step_login_as_user
 
