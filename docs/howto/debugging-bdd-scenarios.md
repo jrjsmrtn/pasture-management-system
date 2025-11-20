@@ -414,3 +414,46 @@ If you encounter issues not covered here:
    - HTML dump
    - Selector used
    - Expected vs actual results
+
+## Known Limitations
+
+### CSV Export Download Test (v1.0.0)
+
+**Status**: Known limitation - manual test required
+
+**Scenario**: `features/cmdb/ci_search.feature:169` - Export CMDB to CSV
+
+**Issue**: Playwright download timeout after 5000ms
+
+**Root Cause**:
+
+- Playwright's `expect_download()` times out waiting for download event
+- Browser download handling inconsistent in automated testing environment
+- Functionality verified working manually
+
+**Current BDD Pass Rate**: 91% (10/11 scenarios passing)
+
+**Manual Test Procedure**:
+
+1. Start PMS server: `./scripts/reset-test-db.sh admin`
+1. Log in to web UI: `http://localhost:9080/pms/`
+1. Navigate to CMDB page
+1. Create test CIs: "db-server-01", "app-server-01"
+1. Click "Export to CSV" button
+1. Verify CSV file downloads successfully
+1. Open CSV file and verify CI data present
+
+**Expected Result**: CSV file downloads containing CI data
+
+**Actual Result** (Manual): ✅ CSV downloads successfully
+
+**Workaround for v1.0.0**: Manual testing
+
+**Future Fix** (v1.1.0):
+
+- Increase Playwright download timeout
+- Use backend CSV generation verification instead
+- Implement headless download handling
+- Add download directory configuration
+
+**Decision**: Documented as known limitation per ADR-0002 (Sprint 7, Story 4)
