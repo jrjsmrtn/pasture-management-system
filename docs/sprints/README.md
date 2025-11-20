@@ -129,7 +129,28 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-### Sprint 7: Email Interface & Four-Interface BDD Testing (v1.1.0)
+### Sprint 7: Production Release - v1.0.0 📋
+
+**Duration**: 5 days
+**Status**: Not Started
+**Goal**: Achieve production-ready v1.0.0 release
+
+**Key Deliverables**:
+
+- ⏳ Installation & deployment guides (5 points)
+- ⏳ Security audit & hardening (8 points)
+- ⏳ CONTRIBUTING.md & release docs (3 points)
+- ⏳ CSV export BDD test fix (2 points)
+- ⏳ Performance baseline & optimization (5 points)
+- ⏳ SLSA provenance implementation (3 points)
+
+**Story Points**: 26 (minimum), 38 (with stretch goals)
+
+[📊 Sprint 7 Backlog](sprint-7-backlog.md)
+
+______________________________________________________________________
+
+### Sprint 8: Email Interface & Four-Interface BDD Testing (v1.1.0)
 
 **Duration**: 2 weeks
 **Goal**: Implement email interface and complete four-interface BDD testing architecture
@@ -147,7 +168,7 @@ ______________________________________________________________________
 
 **Story Points**: 39
 
-[📄 Sprint 7 Planning](sprint-7-planning.md)
+[📄 Sprint 8 Planning](sprint-7-planning.md)
 
 ______________________________________________________________________
 
@@ -155,10 +176,10 @@ ______________________________________________________________________
 
 ### Total Effort
 
-- **Duration**: 14 weeks (7 sprints × 2 weeks)
-- **Total Story Points**: 245 (206 for v1.0.0 + 39 for v1.1.0)
-- **v1.0.0 Target**: Sprint 6 (production release)
-- **v1.1.0 Target**: Sprint 7 (email interface + four-interface BDD testing)
+- **Duration**: 15-16 weeks (8 sprints)
+- **Total Story Points**: 271 (232 for v1.0.0 + 39 for v1.1.0)
+- **v1.0.0 Target**: Sprint 7 (production release - 26 points minimum)
+- **v1.1.0 Target**: Sprint 8 (email interface + four-interface BDD testing - 39 points)
 
 ### Quality Targets
 
@@ -178,8 +199,8 @@ v0.4.0  → Sprint 3 (Change Workflows)
 v0.5.0  → Sprint 4 (CMDB BDD Specification)
 v0.6.0  → Sprint 5 (CMDB Implementation)
 v0.7.0  → Sprint 6 (Technical Debt + Production Ready) ← current
-v1.0.0  → Next Sprint (Production Release)
-v1.1.0  → Sprint 7 (Email Interface + Four-Interface BDD)
+v1.0.0  → Sprint 7 (Production Release) ← next
+v1.1.0  → Sprint 8 (Email Interface + Four-Interface BDD)
 ```
 
 ## Sprint Process
@@ -287,26 +308,24 @@ Following the Diátaxis framework:
 
 BDD demonstration presentations created throughout sprints:
 
-1. **Sprint 3**: "BDD Testing in Practice"
-1. **Sprint 6**:
-   - "Introduction to BDD"
-   - "Writing Effective Gherkin Scenarios"
-   - "Behave and Playwright Integration"
-   - "BDD Testing Best Practices"
-1. **Sprint 7**:
+1. **Sprint 3**: "BDD Testing in Practice" ✅
+1. **Sprint 7** (v1.0.0 - Optional stretch goal):
+   - "BDD Testing with Roundup" (expansion of Sprint 3 presentation)
+   - "Why BDD Testing?"
+1. **Sprint 8** (v1.1.0):
    - "Four-Interface BDD Testing with Roundup"
    - "Email Testing with Greenmail and Behave"
 
 ## Current Status
 
 **Current Version**: v0.7.0 (Sprint 6 Complete)
-**Current Sprint**: Sprint 6 Complete - Ready for v1.0.0 planning
-**Next Sprint**: v1.0.0 Release - Final production polish
-**Targets**: v1.0.0 (next sprint), v1.1.0 (Sprint 7 - Email Interface)
+**Current Sprint**: Sprint 7 - v1.0.0 Production Release
+**Next Sprint**: Sprint 8 - Email Interface (v1.1.0)
+**Targets**: v1.0.0 (Sprint 7), v1.1.0 (Sprint 8)
 
-**Sprint 6 Achievements** (Complete - 3 days):
+**Sprint 6 Achievements** (Complete - 3 days, 100%):
 
-- ✅ 30/30 story points completed (100%)
+- ✅ 30/30 story points completed
 - ✅ BDD test integration fixed - 91% pass rate (10/11 scenarios)
 - ✅ Database management automation - one-command reset script
 - ✅ CI search/sort/filter complete - 10/11 BDD scenarios passing
@@ -314,7 +333,15 @@ BDD demonstration presentations created throughout sprints:
 - ✅ Core Diátaxis documentation complete - 5 new docs (2,850 lines)
 - ✅ Test parallelization complete - 83% performance improvement
 - ✅ Technical debt reduced by 85% (21-34 points → 3-5 points)
-- **Ready for v1.0.0 production release**
+
+**Sprint 7 Plan** (v1.0.0 Production Release - 26-38 points, 5 days):
+
+- ⏳ Installation & deployment guides
+- ⏳ Security audit & hardening
+- ⏳ CONTRIBUTING.md & release documentation
+- ⏳ CSV export BDD test fix (100% pass rate)
+- ⏳ Performance baseline & optimization
+- ⏳ SLSA provenance implementation (ADR-0004)
 
 ## Sprint Documents
 

@@ -294,9 +294,135 @@ When completing stories or sprints, follow the procedures documented in:
 
 See ADR-0002 for complete procedures, document structures, and quality checklists.
 
+### Updating Project Progress Documentation
+
+When completing stories or sprints, update project progress documentation to maintain accurate context for AI collaboration.
+
+#### When to Update
+
+1. **After completing each story**:
+
+   - Update story status in `docs/sprints/sprint-N-backlog.md`
+   - Commit story completion
+
+1. **After completing each sprint**:
+
+   - Update all sprint completion files (see sequence below)
+   - Update CLAUDE.md "Current Focus" section
+   - Bump version and tag release
+
+1. **When starting a new sprint**:
+
+   - Update CLAUDE.md "Current Focus" section with new sprint plan
+   - Update `docs/sprints/README.md` current status
+
+#### Files to Update (Sprint Completion Sequence)
+
+Update files in this order for consistency:
+
+1. **`docs/sprints/sprint-N-backlog.md`** - Mark all stories complete with final points
+1. **`docs/sprints/sprint-N-retrospective.md`** - Create retrospective document
+1. **`CHANGELOG.md`** - Add `## [0.x.0] - YYYY-MM-DD` section with changes
+1. **`docs/sprints/README.md`** - Update "Current Status" and version progression
+1. **`CLAUDE.md`** - Update "Current Focus" section (see procedure below)
+1. **Version files** - Bump version in `pyproject.toml`, `__init__.py`, etc.
+1. **Git tag** - Tag release with `git tag v0.x.0`
+
+#### CLAUDE.md "Current Focus" Section Update Procedure
+
+The "Current Focus" section provides AI assistants with current project context. Update it when completing sprints:
+
+**Step 1: Update Section Header**
+
+```markdown
+**Version 0.X.0** - Sprint N (Sprint Name):
+```
+
+**Step 2: Move Completed Sprint to "Completed Sprints" List**
+
+Add the just-completed sprint to the list with achievements summary:
+
+```markdown
+- ✅ Sprint N (v0.X.0): Sprint name (XX/XX points, XX%)
+  - Key achievement 1
+  - Key achievement 2
+  - Key achievement 3
+```
+
+**Step 3: Update Current Sprint Plan**
+
+For the NEW sprint, show priorities and point breakdown:
+
+```markdown
+**Sprint N+1 Plan** (vX.X.0 Goal - XX-XX points, X days):
+
+**Critical Priority** (XX points):
+- Story 1: Description (X points)
+- Story 2: Description (X points)
+
+**High Priority** (XX points):
+- Story 3: Description (X points)
+
+**Stretch Goals** (XX points):
+- Story 4: Description (X points)
+```
+
+**Step 4: Update "Next Steps" Section**
+
+Provide immediate next actions:
+
+```markdown
+**Next Steps**:
+
+- Begin Sprint N+1 with [first story/task]
+- Target: vX.X.0 [release goal] (XX-XX points, X days)
+```
+
+#### Example "Current Focus" Section
+
+```markdown
 ## Current Focus
 
-**Version 0.6.0** - Sprint 6 in progress:
+**Version 0.7.0** - Sprint 7 (Production Release):
+
+**Completed Sprints**:
+
+- ✅ Sprint 1 (v0.2.0): Basic issue tracking with Roundup tracker
+- ✅ Sprint 2 (v0.3.0): Issue lifecycle and change management foundation
+- ✅ Sprint 6 (v0.7.0): Technical debt resolution & production readiness (30/30 points, 100%)
+  - BDD test integration fixed - 91% pass rate
+  - Database management automation
+  - Core Diátaxis documentation (5 new docs)
+  - Test parallelization - 83% improvement
+
+**Sprint 7 Plan** (v1.0.0 Production Release - 26-38 points, 5 days):
+
+**Critical Priority** (16 points):
+- Story 1: Installation & deployment guides (5 points)
+- Story 2: Security audit & hardening (8 points)
+
+**High Priority** (10 points):
+- Story 3: Performance baseline (5 points)
+
+**Next Steps**:
+
+- Begin Sprint 7 with installation & deployment documentation
+- Target: v1.0.0 production release (26-38 points, 5 days)
+```
+
+#### Quick Reference: Files That Reference Current Sprint/Version
+
+When updating versions, check these files for consistency:
+
+- `CLAUDE.md` - "Current Focus" section
+- `docs/sprints/README.md` - "Current Status" section
+- `CHANGELOG.md` - Latest version entry
+- `pyproject.toml` - `version = "0.x.0"` (line 9)
+- `README.md` - Version badges/references (if present)
+
+## Current Focus
+
+**Version 0.7.0** - Sprint 7 (Production Release):
 
 **Completed Sprints**:
 
@@ -305,34 +431,36 @@ See ADR-0002 for complete procedures, document structures, and quality checklist
 - ✅ Sprint 3 (v0.4.0): Complete change management workflows
 - ✅ Sprint 4 (v0.5.0): CMDB BDD specification
 - ✅ Sprint 5 (v0.6.0): CMDB implementation (31/41 points, 76%)
+- ✅ Sprint 6 (v0.7.0): Technical debt resolution & production readiness (30/30 points, 100%)
+  - BDD test integration fixed - 91% pass rate (10/11 scenarios)
+  - Database management automation - one-command reset script
+  - CI search/sort/filter complete with BDD coverage
+  - CMDB dashboard with visual statistics
+  - Core Diátaxis documentation (5 new docs, 2,850 lines)
+  - Test parallelization - 83% performance improvement
+  - Technical debt reduced by 85% (21-34 points → 3-5 points)
 
-**Sprint 6 Progress** (Day 4 - 26/30 points, 87%):
+**Sprint 7 Plan** (v1.0.0 Production Release - 26-38 points, 5 days):
 
-- ✅ Story TD-1: BDD test integration fixed (8 points)
-  - Playwright selector issues resolved
-  - 10/11 CI search scenarios passing
-  - Comprehensive troubleshooting guide created
-- ✅ Story TD-2: Database management automation (3 points)
-  - `reset-test-db.sh` script for one-command database reset
-  - Server restart automation
-- ✅ Story 6: Search and sort backend complete (5 points)
-  - Text search by CI name and location
-  - Combined filters with dropdown state preservation
-  - Sort by name/type/status/criticality (ascending/descending)
-  - BDD scenarios: 10/11 passing (91%)
-- ✅ Story 7: CMDB dashboard complete (5 points)
-  - Visual dashboard with statistics and charts
-  - CI breakdowns by type, status, criticality
-  - Relationship and issue/change metrics
-  - Responsive grid layout with color-coded charts
-- ✅ Story PR-1: Core Diátaxis documentation complete (5 points)
-  - 4 new comprehensive docs (2,850 lines)
-  - Tutorials, how-tos, reference, explanation
-  - All internal links validated
-  - Production-ready documentation for v1.0.0
-- 🔄 Remaining: Story PR-2 (4 points)
+**Critical Priority** (16 points):
+
+- Story 1: Installation & deployment guides (5 points)
+- Story 2: Security audit & hardening (8 points)
+- Story 3: CONTRIBUTING.md & release documentation (3 points)
+
+**High Priority** (10 points):
+
+- Story 4: CSV export BDD test fix (2 points)
+- Story 5: Performance baseline & optimization (5 points)
+- Story 6: SLSA provenance implementation (3 points)
+
+**Stretch Goals** (12 points):
+
+- Story 7: BDD demonstration materials (5 points)
+- Story 8: UI/UX polish (5 points)
+- Story 9: Template helper integration tests (2 points)
 
 **Next Steps**:
 
-- Story PR-2: Test parallelization for faster feedback (4 points)
-- Target: v1.0.0 production release (Sprint 6 completion - 4 points remaining)
+- Begin Sprint 7 with installation & deployment documentation
+- Target: v1.0.0 production release (26-38 points, 5 days)
