@@ -5,6 +5,11 @@ SPDX-License-Identifier: MIT
 
 # Pasture Management System (PMS)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![BDD Testing](https://img.shields.io/badge/BDD-Behave%20%2B%20Playwright-green.svg)](https://behave.readthedocs.io/)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+
 A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysadmins, built on the Roundup Issue Tracker toolkit.
 
 ## Dual Project Objectives
@@ -22,18 +27,19 @@ A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysa
 
 ## Project Status
 
-**Version**: 0.6.0 (Sprint 5 Complete - CMDB Implementation)
+**Version**: 1.0.0 (Production Release)
 
-**Current Sprint**: Sprint 6 - Technical Debt Resolution and Production Readiness
+**Status**: Production-ready
 
 **Key Milestones**:
 
 - ✅ **Sprint 1-4**: Issue tracking and change management workflows
 - ✅ **Sprint 5**: Complete CMDB implementation with search and filtering
-- 🔄 **Sprint 6** (In Progress): BDD test infrastructure improvements and bug fixes
-- 🎯 **Target**: v1.0.0 production release
+- ✅ **Sprint 6**: Technical debt resolution and production readiness
+- ✅ **Sprint 7**: Production release with comprehensive documentation
+- 🎯 **Next**: v1.1.0 email interface (Sprint 8)
 
-**Test Coverage**: >85% | **BDD Pass Rate**: 58% (7/12 scenarios in ci_search)
+**Test Coverage**: >85% | **BDD Pass Rate**: 91% (10/11 scenarios)
 
 See [CHANGELOG.md](CHANGELOG.md) for detailed version history and [docs/sprints/](docs/sprints/) for sprint progress.
 
@@ -60,18 +66,30 @@ See [docs/README.md](docs/README.md) for complete documentation index.
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/yourusername/pasture-management-system.git
 cd pasture-management-system
 
 # Set up Python virtual environment
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies (when available)
-pip install -r requirements.txt
+# Install dependencies
+uv pip install -r requirements.txt
 
-# See documentation for detailed setup
+# Install development dependencies (optional)
+uv pip install -e ".[dev]"
+
+# Install Playwright browsers
+playwright install chromium
+
+# Initialize database and start server
+./scripts/reset-test-db.sh admin
+
+# Access web UI
+open http://localhost:9080/pms/
 ```
+
+For detailed installation instructions, see the [Installation Guide](docs/howto/installation-guide.md).
 
 ## Development
 
@@ -86,11 +104,29 @@ This project follows professional development practices:
 
 Architecture documentation using C4 DSL is available in [docs/architecture/](docs/architecture/).
 
-For a high-level overview, see [Architecture Explanation](docs/explanation/architecture-overview.md).
+For a high-level overview, see [Architecture Overview](docs/explanation/architecture-overview.md).
+
+## Installation & Deployment
+
+- **[Installation Guide](docs/howto/installation-guide.md)**: Set up PMS in your environment (20-30 minutes)
+- **[Deployment Guide](docs/howto/deployment-guide.md)**: Production deployment with reverse proxy, SSL, and monitoring
+- **[Administration Guide](docs/howto/administration-guide.md)**: System administration and maintenance
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! This project serves as both a functional tool and a BDD demonstration.
+
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: Contribution guidelines
+- **[Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/)**: Community standards
+- **[GitHub Issues](https://github.com/yourusername/pasture-management-system/issues)**: Report bugs or request features
+- **[GitHub Discussions](https://github.com/yourusername/pasture-management-system/discussions)**: Ask questions
+
+We especially welcome:
+
+- Bug reports and fixes
+- BDD scenario contributions
+- Documentation improvements
+- Feature implementations
 
 ## License
 
@@ -98,6 +134,24 @@ MIT License - see [LICENSE](LICENSE) file for details
 
 Copyright (c) 2025 Georges Martin <jrjsmrtn@gmail.com>
 
-## Contact
+## Release Information
 
-[To be determined]
+**Current Version**: 1.0.0 (Production Release)
+
+**Release Date**: 2025-11-20
+
+**What's New in v1.0.0**:
+
+- ✅ Complete issue tracking, change management, and CMDB functionality
+- ✅ Comprehensive production documentation (installation, deployment, administration)
+- ✅ 91% BDD test pass rate with Behave and Playwright
+- ✅ Security hardening and production-ready configuration
+- ✅ Performance baselines and optimization guidelines
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
+
+## Support
+
+- **Documentation**: [docs/](docs/)
+- **GitHub Issues**: [Report bugs](https://github.com/yourusername/pasture-management-system/issues)
+- **GitHub Discussions**: [Ask questions](https://github.com/yourusername/pasture-management-system/discussions)
