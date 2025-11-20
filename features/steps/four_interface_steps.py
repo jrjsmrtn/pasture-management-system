@@ -55,8 +55,21 @@ def step_fill_issue_form(context):
 @when("I submit the form")
 def step_submit_form(context):
     """Submit the current form."""
-    context.page.click('input[type="submit"]')
+    import re
+
+    # Use submit_button for issue creation (Roundup has multiple submit buttons)
+    submit_button = context.page.locator('input[name="submit_button"]').first
+    submit_button.click()
     context.page.wait_for_load_state("networkidle")
+
+    # Extract issue ID from URL after successful creation
+    # URL format: http://localhost:9080/pms/issue1?@ok_message=...
+    page_url = context.page.url
+    match = re.search(r"/issue(\d+)", page_url)
+    if match:
+        issue_id = match.group(1)
+        context.created_issue_id = issue_id
+        context.last_created_issue_id = issue_id
 
 
 @then('I should see "{text}" on the page')

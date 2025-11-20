@@ -51,14 +51,38 @@ def check_for_templating_error(page, step_description=""):
 @given("the Roundup tracker is running")
 @given('the Roundup tracker is running at "{url}"')
 def step_tracker_running(context, url=None):
-    """Verify the Roundup tracker is accessible."""
+    """Start the Roundup tracker if needed and verify it's accessible."""
+    import subprocess
+    import time
+
     # Use provided URL or default from context (configured in environment.py)
     tracker_url = url if url else getattr(context, "tracker_url", DEFAULT_TRACKER_URL)
 
     # Store the URL in context
     context.tracker_url = tracker_url
 
-    # For Web UI scenarios, verify access; for CLI/API, just store URL
+    # Start server if not running (needed for Web UI and API scenarios)
+    # Check if server is responding
+    import requests
+
+    try:
+        response = requests.get(tracker_url, timeout=2)
+        server_running = response.status_code == 200
+    except requests.exceptions.RequestException:
+        server_running = False
+
+    if not server_running:
+        # Start the server
+        tracker_dir = getattr(context, "tracker_dir", "tracker")
+        subprocess.Popen(
+            ["uv", "run", "roundup-server", "-p", "9080", f"pms={tracker_dir}"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        # Wait for server to start
+        time.sleep(3)
+
+    # For Web UI scenarios, verify access via browser
     try:
         page = getattr(context, "page", None)
         if page is not None:
