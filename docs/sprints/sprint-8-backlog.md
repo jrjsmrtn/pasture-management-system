@@ -9,7 +9,7 @@
 ## Sprint Progress
 
 **Status**: 🔄 IN PROGRESS
-**Completed Points**: 6/26 (23%)
+**Completed Points**: 8/26 (31%)
 **Days Elapsed**: 1
 
 ## Stories
@@ -59,9 +59,9 @@
 
 ______________________________________________________________________
 
-### 📋 Story 2: Email Notification System (8 points) - **NOT STARTED**
+### 📋 Story 2: Email Notification System (8 points) - **25% COMPLETE**
 
-**Status**: ⏳ PENDING
+**Status**: 🔄 IN PROGRESS (2/8 points earned)
 
 **As a** user
 **I want** email notifications when issues are updated
@@ -69,22 +69,39 @@ ______________________________________________________________________
 
 **Acceptance Criteria**:
 
-- [ ] Nosy list configuration working
-- [ ] Email notifications sent on issue creation
-- [ ] Email notifications sent on issue updates
-- [ ] Email notifications sent on status changes
-- [ ] Email notifications include issue link
-- [ ] BDD scenarios for notifications
-- [ ] Test via debug log (`/tmp/roundup-mail-debug.log`)
+- ✅ Nosy list configuration working
+- ✅ Email notifications sent on issue creation
+- ⏳ Email notifications sent on issue updates (WIP)
+- ⏳ Email notifications sent on status changes (WIP)
+- ✅ Email notifications include issue link
+- ✅ BDD scenarios for notifications (8 scenarios created)
+- ✅ Test via debug log (`/tmp/roundup-mail-debug.log`)
 
-**Technical Tasks**:
+**Completed**:
 
-- Configure nosy list behavior
-- Test notification triggers
-- Verify email content and formatting
-- BDD scenarios for notification events
+- ✅ BDD feature file with 8 scenarios
+- ✅ 20+ step definitions for notification testing
+- ✅ Debug log verification working
+- ✅ Smoke test passing (issue creation notification)
+- ✅ Multiple recipients test passing
+- ✅ Config: `messages_to_author = new` for testing
 
-**Points**: 8
+**Remaining**:
+
+- ⏳ Fix issue update notification scenario
+- ⏳ Fix status/priority change notification scenarios
+- ⏳ Fix notification metadata scenario
+- ⏳ Complete nosy list auto-configuration test
+
+**Commits**:
+
+- `2ddeb05` - Email notification BDD scenarios and step definitions
+
+**Points Earned**: 2/8 (25%)
+
+**Test Status**: 2/8 scenarios passing (25%)
+
+**Reason for Partial Credit**: Core notification infrastructure complete, basic notifications working, advanced scenarios need fixes for message/nosy list management.
 
 ______________________________________________________________________
 
@@ -210,24 +227,24 @@ ______________________________________________________________________
 
 | Priority                   | Points | Status     |
 | -------------------------- | ------ | ---------- |
-| **Critical** (Stories 1-2) | 16     | 6/16 (38%) |
+| **Critical** (Stories 1-2) | 16     | 8/16 (50%) |
 | **High** (Stories 3-5)     | 15     | 0/15 (0%)  |
 | **Stretch** (Stories 6-8)  | 13     | 0/13 (0%)  |
-| **Total**                  | 44     | 6/44 (14%) |
+| **Total**                  | 44     | 8/44 (18%) |
 
 ### Velocity Tracking
 
 - **Planned**: 26-32 points (high priority)
-- **Completed**: 6 points
-- **Remaining**: 20-26 points
+- **Completed**: 8 points
+- **Remaining**: 18-24 points
 - **Days Elapsed**: 1 day
 - **Projected Velocity**: TBD
 
 ### Story Completion
 
 - ✅ Complete: 0/8 (0%)
-- 🔄 In Progress: 1/8 (13%)
-- ⏳ Not Started: 7/8 (87%)
+- 🔄 In Progress: 2/8 (25%)
+- ⏳ Not Started: 6/8 (75%)
 
 ## Key Decisions
 
