@@ -101,8 +101,33 @@ def step_issue_exists_with_title(context, issue_id, title):
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     if result.returncode != 0:
-        # Issue doesn't exist, create it
-        cmd = ["roundup-admin", "-i", tracker_dir, "create", "issue", f"title={title}"]
+        # Issue doesn't exist, create it with an initial message
+        # Create message first
+        msg_cmd = [
+            "roundup-admin",
+            "-i",
+            tracker_dir,
+            "create",
+            "msg",
+            f"content=Initial issue: {title}",
+            "author=1",
+        ]
+        msg_result = subprocess.run(msg_cmd, capture_output=True, text=True, timeout=30)
+        assert msg_result.returncode == 0, f"Failed to create message: {msg_result.stderr}"
+
+        message_id = msg_result.stdout.strip()
+
+        # Create issue with the message and default status
+        cmd = [
+            "roundup-admin",
+            "-i",
+            tracker_dir,
+            "create",
+            "issue",
+            f"title={title}",
+            f"messages={message_id}",
+            "status=1",  # Default to "new" status
+        ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         assert result.returncode == 0, f"Failed to create issue: {result.stderr}"
 
@@ -610,7 +635,7 @@ def step_create_issue_via_cli(context, title):
 
     message_id = msg_result.stdout.strip()
 
-    # Create issue via roundup-admin with the message
+    # Create issue via roundup-admin with the message and default status
     cmd = [
         "roundup-admin",
         "-i",
@@ -619,6 +644,7 @@ def step_create_issue_via_cli(context, title):
         "issue",
         f"title={title}",
         f"messages={message_id}",
+        "status=1",  # Default to "new" status
     ]
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
@@ -713,6 +739,42 @@ def step_update_issue_status(context, issue_id, status):
 
     assert result.returncode == 0, f"Failed to update issue status: {result.stderr}"
 
+    # Add a message to trigger notification (status changes alone don't trigger notifications)
+    msg_cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "msg",
+        f"content=Status changed to {status}",
+        "author=1",
+    ]
+    msg_result = subprocess.run(msg_cmd, capture_output=True, text=True, timeout=30)
+
+    assert msg_result.returncode == 0, f"Failed to create message: {msg_result.stderr}"
+
+    message_id = msg_result.stdout.strip()
+
+    # Get existing messages
+    get_cmd = ["roundup-admin", "-i", tracker_dir, "get", "messages", issue_id]
+    get_result = subprocess.run(get_cmd, capture_output=True, text=True, timeout=30)
+
+    # Parse and update messages list
+    messages_str = get_result.stdout.strip()
+    if messages_str and messages_str != "[]":
+        messages_str = messages_str.strip("[]").replace("'", "").replace('"', "")
+        existing_ids = [mid.strip() for mid in messages_str.split(",") if mid.strip()]
+        existing_ids.append(message_id)
+        messages_list = ",".join(existing_ids)
+    else:
+        messages_list = message_id
+
+    # Add message to issue
+    set_cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"messages={messages_list}"]
+    set_result = subprocess.run(set_cmd, capture_output=True, text=True, timeout=30)
+
+    assert set_result.returncode == 0, f"Failed to add message to issue: {set_result.stderr}"
+
 
 @when('I update issue "{issue_id}" priority to "{priority}"')
 def step_update_issue_priority(context, issue_id, priority):
@@ -733,6 +795,42 @@ def step_update_issue_priority(context, issue_id, priority):
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     assert result.returncode == 0, f"Failed to update issue priority: {result.stderr}"
+
+    # Add a message to trigger notification (priority changes alone don't trigger notifications)
+    msg_cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "msg",
+        f"content=Priority changed to {priority}",
+        "author=1",
+    ]
+    msg_result = subprocess.run(msg_cmd, capture_output=True, text=True, timeout=30)
+
+    assert msg_result.returncode == 0, f"Failed to create message: {msg_result.stderr}"
+
+    message_id = msg_result.stdout.strip()
+
+    # Get existing messages
+    get_cmd = ["roundup-admin", "-i", tracker_dir, "get", "messages", issue_id]
+    get_result = subprocess.run(get_cmd, capture_output=True, text=True, timeout=30)
+
+    # Parse and update messages list
+    messages_str = get_result.stdout.strip()
+    if messages_str and messages_str != "[]":
+        messages_str = messages_str.strip("[]").replace("'", "").replace('"', "")
+        existing_ids = [mid.strip() for mid in messages_str.split(",") if mid.strip()]
+        existing_ids.append(message_id)
+        messages_list = ",".join(existing_ids)
+    else:
+        messages_list = message_id
+
+    # Add message to issue
+    set_cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"messages={messages_list}"]
+    set_result = subprocess.run(set_cmd, capture_output=True, text=True, timeout=30)
+
+    assert set_result.returncode == 0, f"Failed to add message to issue: {set_result.stderr}"
 
 
 @then("an email notification should have been sent")
