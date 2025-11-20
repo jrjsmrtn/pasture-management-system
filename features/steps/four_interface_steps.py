@@ -341,11 +341,22 @@ def step_update_issue_via_api(context, issue_id):
     parsed = urlparse(context.tracker_url)
     base_url = f"{parsed.scheme}://{parsed.netloc}"
 
+    # First, GET the issue to retrieve the ETag for If-Match header
+    get_response = requests.get(
+        f"{api_url}/issue/{issue_id}",
+        auth=HTTPBasicAuth("admin", "admin"),
+        timeout=30,
+    )
+
+    # Extract ETag from response headers
+    etag = get_response.headers.get("ETag", "")
+
     headers = {
         "Content-Type": "application/json",
         "X-Requested-With": "XMLHttpRequest",
         "Origin": base_url,
         "Referer": context.tracker_url,
+        "If-Match": etag,  # Required for PATCH operations
     }
 
     # Make PATCH request
