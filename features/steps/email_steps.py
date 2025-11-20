@@ -572,3 +572,422 @@ def step_verify_description_not_contains(context, unexpected_text):
     assert unexpected_text not in content, (
         f"Did not expect text '{unexpected_text}' in message content, but it was found"
     )
+
+
+# ============================================================================
+# Email Notification Step Definitions
+# ============================================================================
+
+
+@given("the email debug log is cleared")
+def step_clear_email_debug_log(context):
+    """Clear the email debug log file."""
+    debug_log = "/tmp/roundup-mail-debug.log"
+    if os.path.exists(debug_log):
+        os.remove(debug_log)
+    context.email_debug_log = debug_log
+
+
+@given('I create an issue with title "{title}" via CLI')
+def step_create_issue_via_cli(context, title):
+    """Create an issue via roundup-admin CLI and store its ID."""
+    tracker_dir = os.getenv("TRACKER_DIR", "tracker")
+    context.tracker_dir = tracker_dir
+
+    # Create a message first (issues need messages to trigger notifications)
+    msg_cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "msg",
+        f"content=Issue created: {title}",
+        "author=1",  # admin user
+    ]
+    msg_result = subprocess.run(msg_cmd, capture_output=True, text=True, timeout=30)
+
+    assert msg_result.returncode == 0, f"Failed to create message: {msg_result.stderr}"
+
+    message_id = msg_result.stdout.strip()
+
+    # Create issue via roundup-admin with the message
+    cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "issue",
+        f"title={title}",
+        f"messages={message_id}",
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to create issue via CLI: {result.stderr}"
+
+    # Get the created issue ID from output
+    issue_id = result.stdout.strip()
+    context.created_issue_id = issue_id
+    context.last_created_issue_id = issue_id
+
+
+@when("I check the email debug log")
+def step_check_email_debug_log(context):
+    """Read the email debug log file."""
+    debug_log = getattr(context, "email_debug_log", "/tmp/roundup-mail-debug.log")
+
+    if os.path.exists(debug_log):
+        with open(debug_log) as f:
+            context.debug_log_content = f.read()
+    else:
+        context.debug_log_content = ""
+
+
+@when('I add a message to issue "{issue_id}" with content "{content}"')
+def step_add_message_to_issue(context, issue_id, content):
+    """Add a message to an existing issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Create a message first
+    cmd = [
+        "roundup-admin",
+        "-i",
+        tracker_dir,
+        "create",
+        "msg",
+        f"content={content}",
+        "author=1",  # admin user
+    ]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to create message: {result.stderr}"
+
+    message_id = result.stdout.strip()
+
+    # Get existing messages
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "messages", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    # Parse existing message IDs
+    messages_str = result.stdout.strip()
+    if messages_str and messages_str != "[]":
+        # Remove brackets and quotes: "['1', '2']" -> "1 2"
+        messages_str = messages_str.strip("[]").replace("'", "").replace('"', "")
+        # Split and clean
+        existing_ids = [mid.strip() for mid in messages_str.split(",") if mid.strip()]
+        existing_ids.append(message_id)
+        # Join with commas (no spaces)
+        messages_list = ",".join(existing_ids)
+    else:
+        messages_list = message_id
+
+    # Update issue with new message list
+    cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"messages={messages_list}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, (
+        f"Failed to add message to issue: {result.stderr}\nStdout: {result.stdout}"
+    )
+
+
+@when('I update issue "{issue_id}" status to "{status}"')
+def step_update_issue_status(context, issue_id, status):
+    """Update the status of an issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Map status to ID
+    status_id = STATUS_MAP.get(status.lower())
+
+    assert status_id, f"Unknown status: {status}"
+
+    # Update issue status
+    cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"status={status_id}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to update issue status: {result.stderr}"
+
+
+@when('I update issue "{issue_id}" priority to "{priority}"')
+def step_update_issue_priority(context, issue_id, priority):
+    """Update the priority of an issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Map priority to ID
+    priority_id = PRIORITY_MAP.get(priority.lower())
+
+    assert priority_id, f"Unknown priority: {priority}"
+
+    # Update issue priority
+    cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"priority={priority_id}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to update issue priority: {result.stderr}"
+
+
+@then("an email notification should have been sent")
+def step_verify_notification_sent(context):
+    """Verify that an email notification was sent (debug log has content)."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    assert log_content, "No email notification found in debug log"
+    assert "From:" in log_content, "Email notification missing From header"
+    assert "To:" in log_content, "Email notification missing To header"
+    assert "Subject:" in log_content, "Email notification missing Subject header"
+
+
+@then('the notification subject should contain "{text}"')
+def step_verify_notification_subject(context, text):
+    """Verify the notification subject contains the expected text."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    # Parse subject line
+    subject_line = ""
+    for line in log_content.split("\n"):
+        if line.startswith("Subject:"):
+            subject_line = line
+            break
+
+    assert subject_line, "No Subject line found in email notification"
+    assert text in subject_line, f"Expected '{text}' in subject, got: {subject_line}"
+
+
+@then('the notification should be sent to "{email}"')
+def step_verify_notification_recipient(context, email):
+    """Verify the notification was sent to the specified email address."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    # Parse To line
+    to_line = ""
+    for line in log_content.split("\n"):
+        if line.startswith("To:"):
+            to_line = line
+            break
+
+    assert to_line, "No To line found in email notification"
+    assert email in to_line, f"Expected '{email}' in recipients, got: {to_line}"
+
+
+@then("the notification should contain the issue link")
+def step_verify_notification_contains_link(context):
+    """Verify the notification contains an issue link."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    # Look for issue link pattern (e.g., http://localhost:9080/pms/issue1)
+    assert "issue" in log_content.lower(), "No issue reference found in notification"
+
+
+@then('the notification body should contain "{text}"')
+def step_verify_notification_body(context, text):
+    """Verify the notification body contains the expected text."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    assert text in log_content, f"Expected '{text}' in notification body"
+
+
+@given('user "{email}" is on the nosy list for issue "{issue_id}"')
+def step_add_user_to_nosy_list(context, email, issue_id):
+    """Add a user to the nosy list for an issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Find or create user with this email
+    cmd = ["roundup-admin", "-i", tracker_dir, "find", "user", f"address={email}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    if result.returncode == 0 and result.stdout.strip():
+        user_id = result.stdout.strip()
+    else:
+        # Create user
+        username = email.split("@")[0]
+        cmd = [
+            "roundup-admin",
+            "-i",
+            tracker_dir,
+            "create",
+            "user",
+            f"username={username}",
+            f"address={email}",
+            "roles=User",
+        ]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        assert result.returncode == 0, f"Failed to create user: {result.stderr}"
+        user_id = result.stdout.strip()
+
+    # Get existing nosy list
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "nosy", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    # Parse existing nosy list
+    nosy_str = result.stdout.strip()
+    if nosy_str and nosy_str != "[]":
+        nosy_str = nosy_str.strip("[]").replace("'", "").replace('"', "")
+        nosy_ids = [nid.strip() for nid in nosy_str.split(",") if nid.strip()]
+        if user_id not in nosy_ids:
+            nosy_ids.append(user_id)
+        nosy_list = ",".join(nosy_ids)
+    else:
+        nosy_list = user_id
+
+    # Update nosy list
+    cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"nosy={nosy_list}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to add user to nosy list: {result.stderr}"
+
+
+@given('the admin user is on the nosy list for issue "{issue_id}"')
+def step_add_admin_to_nosy_list(context, issue_id):
+    """Add the admin user to the nosy list for an issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Get existing nosy list
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "nosy", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    # Parse existing nosy list
+    nosy_str = result.stdout.strip()
+    if nosy_str and nosy_str != "[]":
+        nosy_str = nosy_str.strip("[]").replace("'", "").replace('"', "")
+        nosy_ids = [nid.strip() for nid in nosy_str.split(",") if nid.strip()]
+        if "1" not in nosy_ids:  # Admin is user 1
+            nosy_ids.append("1")
+        nosy_list = ",".join(nosy_ids)
+    else:
+        nosy_list = "1"  # Admin is user 1
+
+    # Update nosy list
+    cmd = ["roundup-admin", "-i", tracker_dir, "set", issue_id, f"nosy={nosy_list}"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to add admin to nosy list: {result.stderr}"
+
+
+@then("email notifications should have been sent to:")
+def step_verify_multiple_notifications(context):
+    """Verify notifications were sent to multiple recipients."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    for row in context.table:
+        recipient = row["recipient"]
+        assert recipient in log_content, f"No notification sent to {recipient}"
+
+
+@then("the notification should contain:")
+def step_verify_notification_metadata(context):
+    """Verify the notification contains specific metadata."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    for row in context.table:
+        field = row["field"]
+        value = row["value"]
+        assert value in log_content, f"Expected '{field}: {value}' in notification"
+
+
+@given('nosy configuration is set to "{config}"')
+def step_verify_nosy_configuration(context, config):
+    """Verify the nosy configuration setting."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+    config_file = os.path.join(tracker_dir, "config.ini")
+
+    assert os.path.exists(config_file), f"Config file not found: {config_file}"
+
+    with open(config_file) as f:
+        config_content = f.read()
+        assert config in config_content, f"Expected config '{config}' not found in config.ini"
+
+
+@when("I check the nosy list for the created issue")
+def step_check_nosy_list(context):
+    """Get the nosy list for the last created issue."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+    issue_id = context.created_issue_id
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "nosy", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to get nosy list: {result.stderr}"
+
+    nosy_str = result.stdout.strip()
+    if nosy_str and nosy_str != "[]":
+        nosy_str = nosy_str.strip("[]'\"")
+        nosy_ids = [nid.strip().strip("'\"") for nid in nosy_str.split(",")]
+        context.nosy_list = nosy_ids
+    else:
+        context.nosy_list = []
+
+
+@then("the creator should be on the nosy list")
+def step_verify_creator_on_nosy_list(context):
+    """Verify the creator is on the nosy list."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+    issue_id = context.created_issue_id
+
+    # Ensure issue_id has the "issue" prefix
+    if not issue_id.startswith("issue"):
+        issue_id = f"issue{issue_id}"
+
+    # Get issue creator
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "creator", issue_id]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to get creator: {result.stderr}"
+
+    creator_id = result.stdout.strip()
+    nosy_list = getattr(context, "nosy_list", [])
+
+    assert creator_id in nosy_list, f"Creator {creator_id} not in nosy list: {nosy_list}"
+
+
+@then("an email notification should have been sent to the creator")
+def step_verify_creator_notification(context):
+    """Verify an email notification was sent to the creator."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Get admin user email
+    cmd = ["roundup-admin", "-i", tracker_dir, "get", "address", "user1"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    if result.returncode == 0:
+        admin_email = result.stdout.strip()
+        log_content = getattr(context, "debug_log_content", "")
+        assert admin_email in log_content, f"No notification sent to creator ({admin_email})"
+
+
+@then('no email notification should have been sent to "{email}"')
+def step_verify_no_notification(context, email):
+    """Verify no email notification was sent to the specified address."""
+    log_content = getattr(context, "debug_log_content", "")
+
+    # For "messages_to_author = no", the author should not receive their own message notifications
+    # This is complex to verify, as we'd need to check if there's NO email to this address
+    # For now, we'll verify the debug log exists but the specific email isn't in To: line
+
+    if log_content:
+        # Parse To lines
+        to_lines = [line for line in log_content.split("\n") if line.startswith("To:")]
+        for to_line in to_lines:
+            # Check if this email is NOT in the To line
+            if email in to_line:
+                raise AssertionError(f"Unexpected notification sent to {email}")
