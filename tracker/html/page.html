@@ -125,6 +125,7 @@ status_notresolved string:-1,1,2,3,4,5,6,7;
   <p class="classblock"
        tal:condition="python:request.user.hasPermission('View', 'ci')">
    <b i18n:translate="">CMDB</b><br>
+   <a href="home?@template=dashboard" i18n:translate="">Dashboard</a><br>
    <span tal:condition="python:request.user.hasPermission('Create', 'ci')">
     <a href="ci?@template=item" i18n:translate="">New Configuration Item</a><br>
    </span>
