@@ -34,7 +34,6 @@ class ExportCSVAction(Action):
                 "Status",
                 "Criticality",
                 "Location",
-                "Hostname",
                 "IP Address",
                 "Description",
             ]
@@ -57,7 +56,6 @@ class ExportCSVAction(Action):
                     ci_status,
                     ci_criticality,
                     ci.location or "",
-                    ci.hostname or "",
                     ci.ip_address or "",
                     ci.description or "",
                 ]
