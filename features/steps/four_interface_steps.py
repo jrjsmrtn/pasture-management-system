@@ -20,6 +20,8 @@ from features.steps.common import PRIORITY_MAP, STATUS_MAP
 
 
 @given('I am logged in as "{username}" with password "{password}"')
+@when('I am logged in as "{username}" with password "{password}"')
+@then('I am logged in as "{username}" with password "{password}"')
 def step_login_as_user_short(context, username, password):
     """Log in to the Roundup tracker (simplified)."""
     # Call the existing web_ui_steps login function
@@ -103,6 +105,7 @@ def step_select_priority(context, priority):
 
 
 @when("I navigate to the issues list")
+@then("I navigate to the issues list")
 def step_navigate_to_issues_list(context):
     """Navigate to the issues list page."""
     context.page.goto(f"{context.tracker_url}issue?@template=index")
@@ -382,6 +385,7 @@ def step_issue_created_in_database(context):
 
 
 @when('I note the created issue ID as "{variable_name}"')
+@then('I note the created issue ID as "{variable_name}"')
 def step_note_created_issue_id(context, variable_name):
     """Store the created issue ID in a variable."""
     if not hasattr(context, "issue_variables"):
@@ -396,6 +400,7 @@ def step_note_created_issue_id(context, variable_name):
 
 
 @when("I navigate to the last created issue")
+@then("I navigate to the last created issue")
 def step_navigate_to_last_issue(context):
     """Navigate to the last created issue in web UI."""
     issue_id = context.last_created_issue_id

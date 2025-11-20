@@ -172,6 +172,7 @@ def step_issue_exists_with_status(context, issue_id, status):
 
 
 @given("I compose an email with:")
+@when("I compose an email with:")
 def step_compose_email(context):
     """Compose an email message from the table data."""
     email_data = {}
