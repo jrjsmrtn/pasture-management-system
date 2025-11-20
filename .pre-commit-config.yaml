@@ -60,14 +60,15 @@ repos:
           - mdformat-tables
 
   # Stage 2: Comprehensive checks on pre-push (1-3min acceptable)
-  # Python security checks (pre-push) - disabled for test code
-  # BDD test files legitimately use assert and subprocess
-  # - repo: https://github.com/astral-sh/ruff-pre-commit
-  #   rev: v0.8.4
-  #   hooks:
-  #     - id: ruff
-  #       args: [--select, S, --fix]  # Security rules
-  #       stages: [pre-push]
+  # Python security - dependency vulnerability scanning
+  - repo: local
+    hooks:
+      - id: pip-audit
+        name: pip-audit (dependency vulnerability scan)
+        entry: uv run pip-audit
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
 
   # Python type checking (pre-push) - using uv-installed version
   # Note: Configured to warn but not block (like CI)
