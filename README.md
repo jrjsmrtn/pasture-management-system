@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![BDD Testing](https://img.shields.io/badge/BDD-Behave%20%2B%20Playwright-green.svg)](https://behave.readthedocs.io/)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![SLSA 3](https://img.shields.io/badge/SLSA-3-green.svg)](https://slsa.dev/)
 
 A lightweight ITIL-inspired issue/change/CMDB management system for Homelab Sysadmins, built on the Roundup Issue Tracker toolkit.
 
@@ -111,6 +112,28 @@ For a high-level overview, see [Architecture Overview](docs/explanation/architec
 - **[Installation Guide](docs/howto/installation-guide.md)**: Set up PMS in your environment (20-30 minutes)
 - **[Deployment Guide](docs/howto/deployment-guide.md)**: Production deployment with reverse proxy, SSL, and monitoring
 - **[Administration Guide](docs/howto/administration-guide.md)**: System administration and maintenance
+
+## Security
+
+PMS implements comprehensive security practices for production deployment:
+
+- **SLSA Level 3**: All releases include cryptographically signed provenance attestations
+- **Release Verification**: [Verifying Releases Guide](docs/howto/verifying-releases.md) - How to verify release authenticity
+- **Security Audit**: Zero critical/high/medium vulnerabilities (see [Security Considerations](docs/reference/security-considerations.md))
+- **Best Practices**: CSRF protection, XSS prevention, SQL injection prevention, rate limiting
+
+**Verify releases** before production deployment:
+
+```bash
+# GitHub automatically validates SLSA provenance (look for "Verified" badge)
+# Or manually verify with slsa-verifier:
+slsa-verifier verify-artifact \
+  --provenance-path pasture-management-system-v1.0.0.tar.gz.intoto.jsonl \
+  --source-uri github.com/jrjsmrtn/pasture-management-system \
+  pasture-management-system-v1.0.0.tar.gz
+```
+
+See [docs/howto/verifying-releases.md](docs/howto/verifying-releases.md) for complete verification instructions.
 
 ## Contributing
 
