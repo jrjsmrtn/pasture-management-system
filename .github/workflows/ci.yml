@@ -57,12 +57,13 @@ jobs:
         retention-days: 30
 
   test:
-    name: BDD Tests (Python ${{ matrix.python-version }})
+    name: BDD Tests (Python ${{ matrix.python-version }}, ${{ matrix.feature-set }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.9', '3.10', '3.11']
+        feature-set: ['issue_tracking', 'change_mgmt', 'cmdb']
 
     steps:
     - uses: actions/checkout@v4
@@ -122,7 +123,7 @@ jobs:
       env:
         CLEANUP_TEST_DATA: "false"  # Let CI manage database - don't let fixture kill server
       run: |
-        uv run behave features/issue_tracking/ \
+        uv run behave features/${{ matrix.feature-set }}/ \
           --junit \
           --junit-directory reports \
           --format=pretty \
