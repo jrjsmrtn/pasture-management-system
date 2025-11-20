@@ -117,7 +117,7 @@ def step_issue_exists_with_title(context, issue_id, title):
 
         message_id = msg_result.stdout.strip()
 
-        # Create issue with the message and default status
+        # Create issue with the message, default status, and default priority
         cmd = [
             "roundup-admin",
             "-i",
@@ -127,6 +127,7 @@ def step_issue_exists_with_title(context, issue_id, title):
             f"title={title}",
             f"messages={message_id}",
             "status=1",  # Default to "new" status
+            "priority=3",  # Default to "urgent" priority
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         assert result.returncode == 0, f"Failed to create issue: {result.stderr}"
@@ -149,7 +150,22 @@ def step_issue_exists_with_status(context, issue_id, status):
     result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
 
     if result.returncode != 0:
-        # Issue doesn't exist, create it
+        # Issue doesn't exist, create it with message and priority
+        # Create message first
+        msg_cmd = [
+            "roundup-admin",
+            "-i",
+            tracker_dir,
+            "create",
+            "msg",
+            f"content=Initial issue: Test Issue {issue_id}",
+            "author=1",
+        ]
+        msg_result = subprocess.run(msg_cmd, capture_output=True, text=True, timeout=30)
+        assert msg_result.returncode == 0, f"Failed to create message: {msg_result.stderr}"
+        message_id = msg_result.stdout.strip()
+
+        # Create issue with message, status, and priority
         cmd = [
             "roundup-admin",
             "-i",
@@ -158,6 +174,8 @@ def step_issue_exists_with_status(context, issue_id, status):
             "issue",
             f"title=Test Issue {issue_id}",
             f"status={status_id}",
+            f"messages={message_id}",
+            "priority=3",  # Default to "urgent" priority
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         assert result.returncode == 0, f"Failed to create issue: {result.stderr}"
