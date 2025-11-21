@@ -378,7 +378,14 @@ def step_verify_issue_description(context, expected_text):
     assert result.returncode == 0, f"Failed to get message content: {result.stderr}"
 
     content = result.stdout.strip()
-    assert expected_text in content, (
+
+    # Normalize whitespace for comparison (handles HTML conversion newlines)
+    import re
+
+    normalized_content = re.sub(r"\s+", " ", content)
+    normalized_expected = re.sub(r"\s+", " ", expected_text)
+
+    assert normalized_expected in normalized_content, (
         f"Expected text '{expected_text}' not found in message content: {content}"
     )
 
@@ -422,13 +429,10 @@ def step_verify_issue_has_new_message(context, issue_id):
     """Verify the issue has received a new message."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
-    # Strip curly braces if present (e.g., "{api_issue}" -> "api_issue")
-    if issue_id.startswith("{") and issue_id.endswith("}"):
-        issue_id = issue_id[1:-1]
-
-    # Substitute variables
-    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
-        issue_id = context.issue_variables[issue_id]
+    # Substitute variables (strip curly braces if present)
+    variable_name = issue_id.strip("{}")
+    if hasattr(context, "issue_variables") and variable_name in context.issue_variables:
+        issue_id = context.issue_variables[variable_name]
 
     # Ensure issue_id has the "issue" prefix
     if not str(issue_id).startswith("issue"):
@@ -478,9 +482,10 @@ def step_verify_specific_issue_status(context, issue_id, expected_status):
     """Verify a specific issue has the expected status."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
-    # Substitute variables
-    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
-        issue_id = context.issue_variables[issue_id]
+    # Substitute variables (strip curly braces if present)
+    variable_name = issue_id.strip("{}")
+    if hasattr(context, "issue_variables") and variable_name in context.issue_variables:
+        issue_id = context.issue_variables[variable_name]
 
     # Ensure issue_id has the "issue" prefix
     if not issue_id.startswith("issue"):
@@ -488,9 +493,14 @@ def step_verify_specific_issue_status(context, issue_id, expected_status):
 
     # Get issue status
     cmd = ["roundup-admin", "-i", tracker_dir, "get", "status", issue_id]
-    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30, cwd=os.getcwd())
 
-    assert result.returncode == 0, f"Failed to get issue status: {result.stderr}"
+    assert result.returncode == 0, (
+        f"Failed to get issue status: {result.stderr}\n"
+        f"Command: {' '.join(cmd)}\n"
+        f"Stdout: {result.stdout}\n"
+        f"CWD: {os.getcwd()}"
+    )
 
     status_id = result.stdout.strip()
 
@@ -499,7 +509,7 @@ def step_verify_specific_issue_status(context, issue_id, expected_status):
 
     if expected_status_id:
         assert status_id == expected_status_id, (
-            f"Expected status ID '{expected_status_id}', got '{status_id}'"
+            f"Expected status ID '{expected_status_id}' ({expected_status}), got '{status_id}'"
         )
 
 
@@ -508,9 +518,10 @@ def step_verify_specific_issue_priority(context, issue_id, expected_priority):
     """Verify a specific issue has the expected priority."""
     tracker_dir = getattr(context, "tracker_dir", "tracker")
 
-    # Substitute variables
-    if hasattr(context, "issue_variables") and issue_id in context.issue_variables:
-        issue_id = context.issue_variables[issue_id]
+    # Substitute variables (strip curly braces if present)
+    variable_name = issue_id.strip("{}")
+    if hasattr(context, "issue_variables") and variable_name in context.issue_variables:
+        issue_id = context.issue_variables[variable_name]
 
     # Ensure issue_id has the "issue" prefix
     if not issue_id.startswith("issue"):
