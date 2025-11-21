@@ -79,8 +79,8 @@ Feature: Email Gateway Integration
     And the new message should contain "I optimized the query"
     And the new message should contain "> Original message:"
 
-  @email @validation
-  Scenario: Email from unknown user creates new user
+  @email @validation @security
+  Scenario: Email from unknown user is silently rejected for security
     Given no user exists with email "newuser@localhost"
     And I compose an email with:
       | field   | value                          |
@@ -89,27 +89,27 @@ Feature: Email Gateway Integration
       | subject | Request: Add monitoring tool   |
       | body    | Please add Prometheus monitoring |
     When I send the email to the mail gateway
-    Then a new user should be created with email "newuser@localhost"
-    And a new issue should be created
-    And the issue should be assigned to the new user
+    Then no user should be created with email "newuser@localhost"
+    And no issue should be created
+    # Note: Silent rejection (no error response) prevents email enumeration attacks
 
-  @email @validation
-  Scenario: Email with invalid issue ID is rejected
+  @email @validation @security
+  Scenario: Email with invalid issue ID is silently rejected for security
     Given I compose an email with:
-      | field   | value                              |
-      | from    | roundup-admin@localhost                    |
-      | to      | issue_tracker@localhost            |
-      | subject | [issue99999] Non-existent issue    |
-      | body    | This issue does not exist          |
+      | field   | value                           |
+      | from    | roundup-admin@localhost         |
+      | to      | issue_tracker@localhost         |
+      | subject | [issue99999] Non-existent issue |
+      | body    | This issue does not exist       |
     When I send the email to the mail gateway
-    Then the email should be rejected
-    And the sender should receive an error notification
+    Then no issue should be created
+    # Note: Silent rejection prevents issue ID enumeration attacks
 
   @email
   Scenario: Email with multiple attachments
     Given I compose an email with:
       | field       | value                              |
-      | from        | admin@localhost                    |
+      | from        | roundup-admin@localhost            |
       | to          | issue_tracker@localhost            |
       | subject     | Firewall configuration issue       |
       | body        | See attached logs and config files |

@@ -349,6 +349,23 @@ def step_new_issue_created(context):
         raise AssertionError("No issues found in database")
 
 
+@then("no issue should be created")
+def step_no_issue_created(context):
+    """Verify that no issue was created (security test)."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+    cmd = ["roundup-admin", "-i", tracker_dir, "list", "issue"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to list issues: {result.stderr}"
+
+    # Should have no issues (empty output)
+    issue_count = len([line for line in result.stdout.strip().split("\n") if line.strip()])
+    assert issue_count == 0, (
+        f"Expected no issues to be created, but found {issue_count} issue(s): "
+        f"{result.stdout.strip()}"
+    )
+
+
 @then('the issue description should contain "{expected_text}"')
 def step_verify_issue_description(context, expected_text):
     """Verify the issue description contains the expected text."""
@@ -584,6 +601,40 @@ def step_verify_new_user_created(context, email):
 
     # Store user ID
     context.created_user_id = result.stdout.strip()
+
+
+@then('no user should be created with email "{email}"')
+def step_verify_no_user_created(context, email):
+    """Verify that no user was created with the specified email (security test)."""
+    tracker_dir = getattr(context, "tracker_dir", "tracker")
+
+    # Get all users
+    cmd = ["roundup-admin", "-i", tracker_dir, "list", "user"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+    assert result.returncode == 0, f"Failed to list users: {result.stderr}"
+
+    # Parse user IDs from list output
+    user_ids = []
+    for line in result.stdout.strip().split("\n"):
+        if line.strip():
+            user_id = line.split(":")[0].strip()
+            user_ids.append(f"user{user_id}")
+
+    # Check addresses of all users
+    if user_ids:
+        cmd = ["roundup-admin", "-i", tracker_dir, "get", "address"] + user_ids
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+        assert result.returncode == 0, f"Failed to get user addresses: {result.stderr}"
+
+        # Check if the email appears in any address
+        addresses = result.stdout.strip().split("\n")
+        for addr in addresses:
+            if addr.strip() == email:
+                raise AssertionError(
+                    f"Expected no user with email {email}, but found user with that address"
+                )
 
 
 @then("the issue should be assigned to the new user")
