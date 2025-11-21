@@ -92,7 +92,7 @@ def step_no_user_exists(context, email):
 
 @given('an issue exists with id "{issue_id}" and title "{title}"')
 def step_issue_exists_with_title(context, issue_id, title):
-    """Verify or create an issue with the specified ID and title."""
+    """Verify or create an issue with the specified ID and title (CI-compatible)."""
     tracker_dir = os.getenv("TRACKER_DIR", "tracker")
     context.tracker_dir = tracker_dir
 
@@ -131,6 +131,22 @@ def step_issue_exists_with_title(context, issue_id, title):
         ]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
         assert result.returncode == 0, f"Failed to create issue: {result.stderr}"
+    else:
+        # Issue exists - update title if it doesn't match (CI compatibility)
+        existing_title = result.stdout.strip()
+        if existing_title != title:
+            update_cmd = [
+                "roundup-admin",
+                "-i",
+                tracker_dir,
+                "set",
+                f"issue{issue_id}",
+                f"title={title}",
+            ]
+            update_result = subprocess.run(update_cmd, capture_output=True, text=True, timeout=30)
+            assert update_result.returncode == 0, (
+                f"Failed to update issue title: {update_result.stderr}"
+            )
 
     # Store issue ID for later verification
     context.existing_issue_id = issue_id
