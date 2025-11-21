@@ -103,10 +103,27 @@ def step_verify_issue_count(context, count):
 
 @then('I should see issue "{title}"')
 def step_verify_issue_in_list(context, title):
-    """Verify a specific issue appears in the list."""
+    """Verify a specific issue appears in the list (CI-compatible)."""
+    # Wait for page to be fully loaded
+    context.page.wait_for_load_state("networkidle")
+
     # Look for a link containing the title
     issue_link = context.page.locator(f'a:has-text("{title}")')
-    expect(issue_link.first).to_be_visible()
+
+    # Check if issue exists in DOM (may not be visible if paginated/scrolled)
+    count = issue_link.count()
+    if count == 0:
+        # Issue not found - try scrolling and waiting
+        context.page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+        context.page.wait_for_timeout(500)  # Wait for any lazy loading
+        count = issue_link.count()
+
+    assert count > 0, (
+        f"Issue '{title}' not found on page. Available issues: {context.page.content()[:500]}"
+    )
+
+    # For web UI scenarios, verify first match is visible
+    expect(issue_link.first).to_be_visible(timeout=10000)  # Increased timeout for CI
 
 
 @when('I click on the issue "{title}"')
