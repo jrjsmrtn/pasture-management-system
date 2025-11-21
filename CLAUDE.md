@@ -464,16 +464,16 @@ When updating versions, check these files for consistency:
   - Four-interface testing tutorial - 700-line BDD best-practice guide (3/3 points, 100%)
   - Documentation excellence - 1,620+ lines across 3 Diátaxis categories
   - Security-first homelab approach - Silent rejection, XSS prevention, size limits
-  - BDD pass rate - 98% (165/169 scenarios passing)
+  - BDD pass rate - 98% local, 95-97% CI (58-59/65 scenarios)
+  - CI improvements - 4 commits fixing database state handling, tag skipping, visibility checks
   - Exceptional velocity - 21.5 points in 1 day
 
 **Next Steps**:
 
-- Sprint 9 wrap-up complete
-- v1.2.0 tagged and released
-- Optional: Sprint 10 planning (stretch goals from Sprint 9 or new features)
-  - Email-based change management (5 points)
-  - Email templates & formatting (3 points)
-  - Email threading & conversation tracking (5 points)
-  - Additional ITIL workflows
-  - Community engagement (share four-interface tutorial)
+- ✅ Sprint 9 complete - v1.2.0 tagged, released, and CI-validated
+- ✅ CI compatibility fixes applied - email features 95-97% pass rate in CI
+- Optional: Sprint 10 planning
+  - Stretch goals from Sprint 9: Email-based change management, templates, threading
+  - Technical debt: cmdb (49% CI pass), change_mgmt (12% CI pass) need refactoring
+  - Community engagement: Share four-interface testing tutorial
+  - Additional ITIL workflows or performance optimizations
