@@ -147,11 +147,17 @@ def before_scenario(context, scenario):
     Run before each scenario.
 
     Sets up clean test environment:
-    1. Cleans screenshots directory
-    2. Provides clean database with fresh server (via fixture)
-    3. Sets up browser context for web-ui scenarios
-    4. Clears GreenMail mailbox if enabled
+    1. Checks for @skip and @manual tags to skip scenarios
+    2. Cleans screenshots directory
+    3. Provides clean database with fresh server (via fixture)
+    4. Sets up browser context for web-ui scenarios
+    5. Clears GreenMail mailbox if enabled
     """
+    # Skip scenarios with @skip or @manual tags
+    if "skip" in scenario.effective_tags or "manual" in scenario.effective_tags:
+        scenario.skip("Scenario tagged with @skip or @manual")
+        return
+
     # Clean screenshots directory before each scenario
     if SCREENSHOT_DIR.exists():
         for screenshot in SCREENSHOT_DIR.glob("*.png"):
