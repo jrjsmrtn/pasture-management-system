@@ -266,12 +266,13 @@ def step_send_email_to_gateway(context):
     email_test_mode = os.getenv("EMAIL_TEST_MODE", "pipe").lower()
 
     if email_test_mode == "greenmail":
-        # GreenMail mode: Send via SMTP
+        # GreenMail mode: Hybrid approach (SMTP + mailgw)
+        # Send via SMTP to test delivery, then process via mailgw to create issue
         if not hasattr(context, "greenmail_client"):
             raise RuntimeError("GreenMail mode enabled but client not available")
 
         try:
-            # Send email via SMTP to GreenMail
+            # Step 1: Send email via SMTP to GreenMail (tests SMTP delivery)
             context.greenmail_client.send_raw_email(context.email_message)
 
             # Wait a bit for email to be processed by GreenMail
@@ -279,10 +280,18 @@ def step_send_email_to_gateway(context):
 
             time.sleep(0.5)
 
-            # For GreenMail mode, mark as success (SMTP accepted)
-            context.mailgw_exit_code = 0
-            context.mailgw_stdout = "Email sent via GreenMail SMTP"
-            context.mailgw_stderr = ""
+            # Step 2: Also process via roundup-mailgw (creates issue in Roundup)
+            # This hybrid approach validates SMTP delivery + issue creation
+            cmd = ["roundup-mailgw", tracker_dir]
+            result = subprocess.run(
+                cmd, input=context.email_message, capture_output=True, text=True, timeout=30
+            )
+
+            # Store result from mailgw
+            context.mailgw_result = result
+            context.mailgw_exit_code = result.returncode
+            context.mailgw_stdout = result.stdout.strip()
+            context.mailgw_stderr = result.stderr.strip()
 
         except Exception as e:
             # Store error for assertion

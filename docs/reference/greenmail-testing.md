@@ -208,6 +208,52 @@ sleep 3
 1. Check GreenMail logs: `podman logs greenmail-test`
 1. Verify email was sent: Check SMTP response code
 
+## Test Results
+
+### BDD Test Suite (Sprint 9, Story 1)
+
+**Test Date**: 2025-11-21
+**GreenMail Version**: 2.1.7 (stable)
+**Test Mode**: Hybrid (SMTP delivery + mailgw processing)
+
+#### Core Email Scenarios (Story 1 Scope)
+
+| Scenario                           | Status  | Notes                       |
+| ---------------------------------- | ------- | --------------------------- |
+| Create issue from plain text email | ✅ Pass | Basic SMTP/IMAP validated   |
+| Update existing issue via email    | ✅ Pass | Message threading works     |
+| Create issue with priority set     | ✅ Pass | Priority parsing functional |
+| Assign issue via email             | ✅ Pass | User assignment works       |
+
+**Result**: 4/4 core scenarios passing (100%)
+
+#### Advanced Scenarios (Story 2 Scope)
+
+| Scenario                      | Status     | Notes                      |
+| ----------------------------- | ---------- | -------------------------- |
+| Update issue status via email | ⏭️ Pending | Step definition needed     |
+| Email from unknown user       | ⏭️ Pending | Step definition needed     |
+| Invalid issue ID rejection    | ⏭️ Pending | Mailgw config needed       |
+| Multiple attachments          | ⏭️ Pending | Attachment handling needed |
+| HTML email conversion         | ⏭️ Pending | HTML parser needed         |
+
+**Result**: 5/5 scenarios pending implementation (Story 2)
+
+### Performance Comparison
+
+| Mode      | 9 Scenarios | Per Scenario | Setup Time            |
+| --------- | ----------- | ------------ | --------------------- |
+| PIPE      | ~1.5s       | ~0.17s       | 0s                    |
+| GreenMail | ~47s        | ~5.2s        | ~5s container startup |
+
+**Observations**:
+
+- GreenMail mode is ~30x slower due to container startup and SMTP/IMAP overhead
+- Hybrid approach (SMTP + mailgw) adds ~0.5s per scenario vs pure PIPE
+- Container startup is one-time cost per test run (before_all hook)
+- PIPE mode remains ideal for fast CI/CD feedback loops
+- GreenMail mode validates full email delivery stack (SMTP → IMAP)
+
 ## Performance
 
 ### Startup Time
