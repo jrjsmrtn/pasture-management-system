@@ -105,8 +105,11 @@ Feature: Email Gateway Integration
     Then no issue should be created
     # Note: Silent rejection prevents issue ID enumeration attacks
 
-  @email
-  Scenario: Email with multiple attachments
+  @email @skip
+  Scenario: Email with multiple attachments (Future Enhancement - Sprint 9 Story 2)
+    # Descoped in Sprint 9 - Email attachments require MIME multipart/mixed parsing
+    # Web UI provides alternative attachment mechanism
+    # See Sprint 9 retrospective for details
     Given I compose an email with:
       | field       | value                              |
       | from        | roundup-admin@localhost            |

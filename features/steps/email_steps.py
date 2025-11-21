@@ -263,6 +263,15 @@ def step_send_email_to_gateway(context):
     tracker_dir = os.getenv("TRACKER_DIR", "tracker")
     context.tracker_dir = tracker_dir
 
+    # Track initial issue count for security tests (CI compatibility)
+    # This allows "no issue should be created" to work when db has existing issues
+    cmd = ["roundup-admin", "-i", tracker_dir, "list", "issue"]
+    result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+    if result.returncode == 0:
+        context.initial_issue_count = len(
+            [line for line in result.stdout.strip().split("\n") if line.strip()]
+        )
+
     email_test_mode = os.getenv("EMAIL_TEST_MODE", "pipe").lower()
 
     if email_test_mode == "greenmail":
@@ -358,12 +367,23 @@ def step_no_issue_created(context):
 
     assert result.returncode == 0, f"Failed to list issues: {result.stderr}"
 
-    # Should have no issues (empty output)
-    issue_count = len([line for line in result.stdout.strip().split("\n") if line.strip()])
-    assert issue_count == 0, (
-        f"Expected no issues to be created, but found {issue_count} issue(s): "
-        f"{result.stdout.strip()}"
-    )
+    # Count current issues
+    current_count = len([line for line in result.stdout.strip().split("\n") if line.strip()])
+
+    # Check if we tracked the initial count (for CI where db has existing issues)
+    if hasattr(context, "initial_issue_count"):
+        # Verify count hasn't changed
+        assert current_count == context.initial_issue_count, (
+            f"Expected no new issues to be created. "
+            f"Initial count: {context.initial_issue_count}, current count: {current_count}"
+        )
+    else:
+        # Legacy behavior for backwards compatibility (local single-feature runs)
+        # Should have no issues (empty output)
+        assert current_count == 0, (
+            f"Expected no issues to be created, but found {current_count} issue(s): "
+            f"{result.stdout.strip()}"
+        )
 
 
 @then('the issue description should contain "{expected_text}"')
