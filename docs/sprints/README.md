@@ -184,6 +184,42 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
+### Sprint 9: Advanced Email Features & GreenMail Integration (v1.2.0) 🟢
+
+**Duration**: 2 weeks (Nov 21 - Dec 5, 2025)
+**Status**: IN PROGRESS (0/26 points, 0%)
+**Goal**: Complete email gateway advanced features and GreenMail integration
+**Achievement**: TBD
+
+**Key Deliverables**:
+
+- 📋 GreenMail integration (8 points) - Comprehensive email testing
+  - IMAP/SMTP verification, mailbox state assertions
+  - Both PIPE mode and GreenMail tests available
+- 📋 Email advanced features (8 points) - Attachments, HTML, status updates
+  - BeautifulSoup4 HTML conversion
+  - Unknown user auto-creation with security policy
+  - Invalid issue ID error handling
+- 📋 Complete email notification system (2 points) - 100% coverage
+  - Message author notification control
+  - Nosy list auto-adds creator
+- 📋 Email security & anti-spam (5 points) - Security controls
+  - Whitelist/blacklist, rate limiting, attachment size limits
+- 📋 Four-interface testing tutorial (3 points) - BDD documentation
+
+**Stretch Goals** (13 points):
+
+- Email-based change management (5 points)
+- Email templates & formatting (3 points)
+- Email threading & conversation tracking (5 points)
+
+**Story Points**: 0/26 started (target: 26 high priority, 39 total)
+**Velocity**: TBD
+
+[📄 Sprint 9 Plan](sprint-9-plan.md) | [📊 Sprint 9 Backlog](sprint-9-backlog.md)
+
+______________________________________________________________________
+
 ## Development Metrics
 
 ### Total Effort
@@ -212,7 +248,8 @@ v0.5.0  → Sprint 4 (CMDB BDD Specification)
 v0.6.0  → Sprint 5 (CMDB Implementation)
 v0.7.0  → Sprint 6 (Technical Debt + Production Ready)
 v1.0.0  → Sprint 7 (Production Release) 🎉
-v1.1.0  → Sprint 8 (Email Interface + Four-Interface BDD + Load Testing) ← current 🎉
+v1.1.0  → Sprint 8 (Email Interface + Four-Interface BDD + Load Testing) 🎉
+v1.2.0  → Sprint 9 (Advanced Email Features + GreenMail Integration) ← current 🟢
 ```
 
 ## Sprint Process
@@ -330,32 +367,41 @@ BDD demonstration presentations created throughout sprints:
 
 ## Current Status
 
-**Current Version**: v1.1.0 🎉 (**EMAIL INTERFACE OPERATIONAL**)
-**Current Sprint**: Sprint 8 COMPLETE ✅
-**Progress**: 27/26 points (104%) - Day 1 completion
-**Status**: **v1.1.0 PRODUCTION READY** with email interface and performance validated
+**Current Version**: v1.2.0 (IN DEVELOPMENT) 🟢
+**Current Sprint**: Sprint 9 IN PROGRESS
+**Progress**: 0/26 points (0%) - Day 1 planning complete
+**Status**: **Sprint 9 STARTED** - Advanced email features & GreenMail integration
 
-**Sprint 8 Completion Summary**:
+**Sprint 9 Focus**:
+
+**Critical Priority** (18 points):
+
+- 📋 Story 1: GreenMail integration for comprehensive email testing (8 points)
+- 📋 Story 2: Email advanced features (attachments, HTML, status updates) (8 points)
+- 📋 Story 3: Complete email notification system (2 points)
+
+**High Priority** (8 points):
+
+- 📋 Story 4: Email security & anti-spam controls (5 points)
+- 📋 Story 5: Four-interface testing tutorial (3 points)
+
+**Stretch Goals** (13 points):
+
+- 📋 Story 6: Email-based change management (5 points)
+- 📋 Story 7: Email templates & formatting (3 points)
+- 📋 Story 8: Email threading & conversation tracking (5 points)
+
+**Previous Sprint Summary (Sprint 8 - v1.1.0)**:
 
 **Delivered** (27 points - 104% of target):
 
 - ✅ Four-interface BDD testing (8 points) - 15/15 scenarios passing (100%)
-  - Complete test coverage: Web UI, CLI, API, Email
-  - Cross-interface verification with variable substitution
-  - First project demonstrating complete four-interface BDD coverage
-- ✅ Load testing & performance baseline (5 points) - 7/7 scenarios passing (100%)
-  - All targets exceeded by 14-53x
-  - API: 42.96 ops/sec, Search: 55.41 ops/sec, CLI: 16.36 ops/sec, Email: 18.20 ops/sec
-  - 100% success rate, no failures/locks/race conditions
-  - System validated as production-ready for 1-50 users
+- ✅ Load testing & performance baseline (5 points) - All targets exceeded 14-53x
 - ✅ Email gateway integration (6/8 points) - Core functionality complete
-  - PIPE mode testing, create/update issues via email
-  - Advanced features deferred to Sprint 9
 - ✅ Email notification system (6/8 points) - 6/8 scenarios passing
-  - Core notifications working
 - ✅ CSV export BDD test fix (2 points) - 100% passing
 
-**v1.1.0 Production Status**:
+**Current Production Status (v1.1.0)**:
 
 - **Functional**: Issue tracking, change management, CMDB complete + Email interface operational
 - **Interfaces**: Web UI, CLI, API, Email (4 interfaces fully tested)

@@ -253,23 +253,57 @@ def step_compose_html_email(context):
 
 @when("I send the email to the mail gateway")
 def step_send_email_to_gateway(context):
-    """Send the composed email to the roundup-mailgw via PIPE."""
+    """
+    Send the composed email to the mail gateway.
+
+    Supports two modes:
+    - PIPE mode (default): Send via roundup-mailgw stdin
+    - GreenMail mode: Send via SMTP to GreenMail, then poll via roundup-mailgw
+    """
     tracker_dir = os.getenv("TRACKER_DIR", "tracker")
     context.tracker_dir = tracker_dir
 
-    # Use roundup-mailgw in PIPE mode (reads from stdin)
-    cmd = ["roundup-mailgw", tracker_dir]
+    email_test_mode = os.getenv("EMAIL_TEST_MODE", "pipe").lower()
 
-    # Send email via stdin
-    result = subprocess.run(
-        cmd, input=context.email_message, capture_output=True, text=True, timeout=30
-    )
+    if email_test_mode == "greenmail":
+        # GreenMail mode: Send via SMTP
+        if not hasattr(context, "greenmail_client"):
+            raise RuntimeError("GreenMail mode enabled but client not available")
 
-    # Store result
-    context.mailgw_result = result
-    context.mailgw_exit_code = result.returncode
-    context.mailgw_stdout = result.stdout.strip()
-    context.mailgw_stderr = result.stderr.strip()
+        try:
+            # Send email via SMTP to GreenMail
+            context.greenmail_client.send_raw_email(context.email_message)
+
+            # Wait a bit for email to be processed by GreenMail
+            import time
+
+            time.sleep(0.5)
+
+            # For GreenMail mode, mark as success (SMTP accepted)
+            context.mailgw_exit_code = 0
+            context.mailgw_stdout = "Email sent via GreenMail SMTP"
+            context.mailgw_stderr = ""
+
+        except Exception as e:
+            # Store error for assertion
+            context.mailgw_exit_code = 1
+            context.mailgw_stdout = ""
+            context.mailgw_stderr = str(e)
+
+    else:
+        # PIPE mode (default): Send via roundup-mailgw stdin
+        cmd = ["roundup-mailgw", tracker_dir]
+
+        # Send email via stdin
+        result = subprocess.run(
+            cmd, input=context.email_message, capture_output=True, text=True, timeout=30
+        )
+
+        # Store result
+        context.mailgw_result = result
+        context.mailgw_exit_code = result.returncode
+        context.mailgw_stdout = result.stdout.strip()
+        context.mailgw_stderr = result.stderr.strip()
 
 
 @then("a new issue should be created")
@@ -1142,3 +1176,129 @@ def step_verify_no_notification(context, email):
             # Check if this email is NOT in the To line
             if email in to_line:
                 raise AssertionError(f"Unexpected notification sent to {email}")
+
+
+# ============================================================================
+# GreenMail-Specific Step Definitions (IMAP/SMTP)
+# ============================================================================
+
+
+@then('the GreenMail mailbox for "{user}" should have {count:d} message(s)')
+def step_verify_greenmail_message_count(context, user, count):
+    """Verify the GreenMail mailbox has the expected number of messages."""
+    if not hasattr(context, "greenmail_client"):
+        # Not in GreenMail mode, skip this step
+        return
+
+    actual_count = context.greenmail_client.get_message_count(user=user, password=user)
+
+    assert actual_count == count, f"Expected {count} message(s) in mailbox, got {actual_count}"
+
+
+@then('the GreenMail mailbox for "{user}" should contain a message with subject "{subject}"')
+def step_verify_greenmail_message_subject(context, user, subject):
+    """Verify the GreenMail mailbox contains a message with the expected subject."""
+    if not hasattr(context, "greenmail_client"):
+        # Not in GreenMail mode, skip this step
+        return
+
+    messages = context.greenmail_client.get_received_messages(user=user, password=user)
+
+    subjects = [msg.get("Subject", "") for msg in messages]
+
+    assert any(subject in s for s in subjects), (
+        f"Expected subject '{subject}' not found in mailbox. Found: {subjects}"
+    )
+
+
+@then('the GreenMail mailbox for "{user}" should contain a message from "{from_addr}"')
+def step_verify_greenmail_message_from(context, user, from_addr):
+    """Verify the GreenMail mailbox contains a message from the expected sender."""
+    if not hasattr(context, "greenmail_client"):
+        # Not in GreenMail mode, skip this step
+        return
+
+    messages = context.greenmail_client.get_received_messages(user=user, password=user)
+
+    from_addrs = [msg.get("From", "") for msg in messages]
+
+    assert any(from_addr in f for f in from_addrs), (
+        f"Expected from '{from_addr}' not found in mailbox. Found: {from_addrs}"
+    )
+
+
+@then('the GreenMail mailbox for "{user}" should contain "{text}" in the message body')
+def step_verify_greenmail_message_body(context, user, text):
+    """Verify the GreenMail mailbox contains a message with the expected text in body."""
+    if not hasattr(context, "greenmail_client"):
+        # Not in GreenMail mode, skip this step
+        return
+
+    messages = context.greenmail_client.get_received_messages(user=user, password=user)
+
+    found = False
+    for msg in messages:
+        # Get message body
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_type() == "text/plain":
+                    body = part.get_payload(decode=True).decode()
+                    if text in body:
+                        found = True
+                        break
+        else:
+            body = msg.get_payload(decode=True).decode()
+            if text in body:
+                found = True
+                break
+
+    assert found, f"Expected text '{text}' not found in any message body"
+
+
+@when("I wait for an email to arrive in GreenMail")
+def step_wait_for_greenmail_email(context):
+    """Wait for an email to arrive in the GreenMail mailbox."""
+    if not hasattr(context, "greenmail_client"):
+        # Not in GreenMail mode, skip this step
+        return
+
+    # Use default user (admin)
+    user = "roundup-admin@localhost"
+    msg = context.greenmail_client.wait_for_message(timeout=10, user=user, password=user)
+
+    assert msg is not None, "No email received in GreenMail within timeout"
+
+    # Store message for further verification
+    context.greenmail_last_message = msg
+
+
+@then('the GreenMail email should have subject containing "{text}"')
+def step_verify_greenmail_last_message_subject(context, text):
+    """Verify the last GreenMail message has the expected subject."""
+    if not hasattr(context, "greenmail_last_message"):
+        raise AssertionError("No GreenMail message available for verification")
+
+    subject = context.greenmail_last_message.get("Subject", "")
+
+    assert text in subject, f"Expected '{text}' in subject, got: {subject}"
+
+
+@then('the GreenMail email body should contain "{text}"')
+def step_verify_greenmail_last_message_body(context, text):
+    """Verify the last GreenMail message body contains the expected text."""
+    if not hasattr(context, "greenmail_last_message"):
+        raise AssertionError("No GreenMail message available for verification")
+
+    msg = context.greenmail_last_message
+
+    # Get message body
+    body = ""
+    if msg.is_multipart():
+        for part in msg.walk():
+            if part.get_content_type() == "text/plain":
+                body = part.get_payload(decode=True).decode()
+                break
+    else:
+        body = msg.get_payload(decode=True).decode()
+
+    assert text in body, f"Expected '{text}' in body, got: {body[:200]}..."

@@ -1,147 +1,101 @@
-# Sprint 9 Plan: GreenMail Integration & Advanced Email Features
+<!--
+SPDX-FileCopyrightText: 2025 Georges Martin <jrjsmrtn@gmail.com>
+SPDX-License-Identifier: MIT
+-->
 
-**Sprint Goal**: Enhance email testing with GreenMail integration and implement advanced email gateway features
+# Sprint 9 Plan: Advanced Email Features & GreenMail Integration
+
+**Sprint Goal**: Complete email gateway advanced features with GreenMail integration testing and comprehensive email notification system.
 
 **Target Version**: v1.2.0
-**Duration**: 2 weeks
-**Points**: 26-34 (estimated)
+**Duration**: 2 weeks (Nov 21 - Dec 5, 2025)
+**Total Points**: 26-39 (high priority: 26, stretch: 39)
 
-## Context
+## Sprint Context
 
-Sprint 8 established basic email gateway functionality using PIPE mode testing (stdin → roundup-mailgw). This validates mailgw business logic but doesn't test actual SMTP/IMAP integration. Sprint 9 will add GreenMail-based integration tests and complete advanced email features.
+**Building on Sprint 8 achievements**:
 
-## Sprint Goals
+- ✅ Core email gateway working (PIPE mode, create/update issues)
+- ✅ Email notifications functional (6/8 scenarios passing)
+- ✅ Four-interface BDD testing architecture (15/15 scenarios passing)
+- ✅ Load testing validated system for 1-50 users
 
-### Primary Objectives
+**Sprint 8 deferred items**:
 
-1. **GreenMail Integration Testing** - Test real SMTP/IMAP/POP3 email flows
-1. **Advanced Email Features** - Complete remaining email gateway scenarios
-1. **Production Email Configuration** - Document and test production setup
+- Email gateway advanced features (8/12 scenarios remaining)
+- Email notification edge cases (2/8 scenarios remaining)
+- GreenMail integration for comprehensive email testing
+- Email security & anti-spam controls
+- Email-based change management
 
-### Success Criteria
+## Sprint Objectives
 
-- ✅ GreenMail test suite operational (docker-compose based)
-- ✅ All 12 email gateway BDD scenarios passing
-- ✅ Email polling (IMAP/POP3) tested with GreenMail
-- ✅ SMTP delivery tested with GreenMail
-- ✅ Production deployment guide complete
+1. **Complete email gateway functionality** (100% BDD coverage)
+1. **Implement GreenMail integration** for real email testing
+1. **Add email security controls** (anti-spam, rate limiting)
+1. **Document four-interface testing** (tutorial guide)
+1. **Stretch**: Email-based change management workflows
 
-## Stories
+## User Stories
 
-### **Story 1**: GreenMail Test Infrastructure (8 points)
+### Critical Priority (18 points)
+
+#### Story 1: GreenMail Integration (8 points)
 
 **As a** developer
-**I want** GreenMail-based integration tests
-**So that** I can test real email server interactions
+**I want** comprehensive email integration tests using GreenMail
+**So that** I can test full email workflows including IMAP/SMTP
 
 **Acceptance Criteria**:
 
-- [ ] docker-compose.yml configures GreenMail (SMTP/IMAP/POP3)
-- [ ] Python GreenMail client library implemented
-- [ ] Integration test suite structure created (`tests/integration/`)
-- [ ] CI/CD runs GreenMail tests (optional, manual trigger)
-- [ ] Documentation: "Running Integration Tests"
+- [ ] GreenMail server integration in BDD environment setup
+- [ ] IMAP mailbox verification step definitions
+- [ ] SMTP sending verification step definitions
+- [ ] Email gateway scenarios migrated to GreenMail (12/12 passing)
+- [ ] Documentation: GreenMail testing guide
+- [ ] Both PIPE mode and GreenMail tests available (optional modes)
 
-**Technical Tasks**:
+**Technical Notes**:
 
-```yaml
-# docker-compose.greenmail.yml
-services:
-  greenmail:
-    image: greenmail/standalone:latest
-    ports:
-      - "3025:3025"  # SMTP
-      - "3110:3110"  # POP3
-      - "3143:3143"  # IMAP
-```
+- Use Docker/Podman container for GreenMail server
+- Start/stop GreenMail in Behave environment.py hooks
+- Keep PIPE mode tests as fast fallback option
+- GreenMail enables testing: IMAP polling, SMTP sending, mailbox state
 
-```python
-# tests/integration/greenmail_client.py
-class GreenMailClient:
-    def send_email(...)
-    def get_received_messages(...)
-    def clear_mailbox(...)
-```
+**Implementation Tasks**:
 
-### **Story 2**: Email Polling Integration Tests (5 points)
+- [ ] Add GreenMail dependency to requirements.txt
+- [ ] Create GreenMail container configuration (docker-compose.yml)
+- [ ] Update environment.py with GreenMail lifecycle hooks
+- [ ] Write IMAP/SMTP step definitions
+- [ ] Migrate email gateway scenarios to use GreenMail
+- [ ] Add GreenMail vs PIPE mode documentation
 
-**As a** sysadmin
-**I want** to test IMAP/POP3 polling
-**So that** I know the mail gateway retrieves emails correctly
+**Story Points**: 8
 
-**Acceptance Criteria**:
+______________________________________________________________________
 
-- [ ] Test: Poll IMAP mailbox and create issues
-- [ ] Test: Poll POP3 mailbox and create issues
-- [ ] Test: Handle authentication failures
-- [ ] Test: Process multiple messages in one poll
-- [ ] Test: Mark messages as read after processing
-
-**BDD Scenarios** (GreenMail-based):
-
-```gherkin
-@integration @greenmail
-Scenario: Poll IMAP and create issues
-  Given GreenMail has 5 unread messages
-  When I run roundup-mailgw with IMAP configuration
-  Then 5 issues should be created
-  And the IMAP mailbox should be empty
-
-@integration @greenmail
-Scenario: Handle IMAP authentication failure
-  Given GreenMail rejects the credentials
-  When I run roundup-mailgw with IMAP configuration
-  Then the command should fail gracefully
-  And an error should be logged
-```
-
-### **Story 3**: SMTP Delivery Integration Tests (5 points)
+#### Story 2: Email Advanced Features (8 points)
 
 **As a** user
-**I want** to test outgoing email notifications
-**So that** I know notifications are delivered correctly
+**I want** advanced email features (attachments, HTML, status updates)
+**So that** I can interact with issues naturally via email
 
 **Acceptance Criteria**:
 
-- [ ] Test: Send notification via SMTP to GreenMail
-- [ ] Test: Verify email content and formatting
-- [ ] Test: Handle SMTP connection failures
-- [ ] Test: Test TLS/authentication
-- [ ] Test: Multiple recipients (nosy list)
+- [ ] Email attachments preserved when creating/updating issues
+- [ ] HTML email conversion to plain text (BeautifulSoup4)
+- [ ] Status updates via email (e.g., "[issue123] [status:resolved]")
+- [ ] Unknown user auto-creation with configurable security policy
+- [ ] Invalid issue ID rejection with helpful error messages
+- [ ] BDD scenarios: 8/12 remaining scenarios passing (100% total)
 
-**BDD Scenarios**:
+**Technical Notes**:
 
-```gherkin
-@integration @greenmail
-Scenario: Send notification via SMTP
-  Given GreenMail SMTP server is running
-  When an issue is created
-  Then a notification should be sent to GreenMail
-  And the email should contain the issue title
-
-@integration @greenmail
-Scenario: Handle SMTP connection failure
-  Given GreenMail SMTP server is stopped
-  When an issue is created
-  Then the notification should fail
-  And the error should be logged
-```
-
-### **Story 4**: Advanced Email Gateway Features (8 points)
-
-**As a** user
-**I want** advanced email features working
-**So that** I can use the full email interface
-
-**Acceptance Criteria**:
-
-- [ ] Status update via email subject working
-- [ ] Property updates (assignedto, priority) via email
-- [ ] Email attachments processed correctly
-- [ ] HTML email conversion functional
-- [ ] Unknown user auto-creation working
-- [ ] Invalid issue ID error handling
-- [ ] Quoted text handling verified
+- BeautifulSoup4 for HTML to plain text conversion
+- Attachment handling via Roundup's msg attachments
+- Status updates require detector configuration investigation
+- Unknown user creation needs security review (whitelist/blacklist)
 
 **Remaining BDD Scenarios** (from Sprint 8):
 
@@ -152,153 +106,360 @@ Scenario: Handle SMTP connection failure
 1. ❌ Email with multiple attachments
 1. ❌ HTML email is converted to plain text
 
-**Configuration Required**:
+**Implementation Tasks**:
 
-```ini
-# tracker/config.ini
-[mailgw]
-# Enable HTML conversion
-convert_htmltotext = beautifulsoup
+- [ ] Add BeautifulSoup4 dependency
+- [ ] Implement HTML to text conversion in mailgw detector
+- [ ] Add attachment handling to issue creation/update
+- [ ] Implement status update parsing from email subject/body
+- [ ] Add unknown user handling with security policy
+- [ ] Add invalid issue ID error handling
+- [ ] Update email gateway BDD scenarios (100% passing)
 
-# Auto-create users from email
-# (Requires security review)
-```
+**Story Points**: 8
 
-### **Story 5**: Production Email Configuration (5 points)
+______________________________________________________________________
 
-**As a** sysadmin
-**I want** production email setup documented
-**So that** I can deploy PMS with real email
+#### Story 3: Complete Email Notification System (2 points)
 
-**Acceptance Criteria**:
-
-- [ ] Document: Configure SMTP for outgoing mail
-- [ ] Document: Configure IMAP/POP3 polling
-- [ ] Document: Set up email aliases (Postfix/sendmail)
-- [ ] Document: Security considerations (SPF, DKIM, spam)
-- [ ] Document: Troubleshooting email issues
-
-**Documentation Structure**:
-
-```
-docs/howto/
-├── configure-outgoing-email.md
-├── configure-incoming-email.md
-├── setup-email-aliases.md
-└── troubleshoot-email.md
-```
-
-### **Story 6**: Email Security & Anti-Spam (5 points) - Stretch Goal
-
-**As a** sysadmin
-**I want** spam protection
-**So that** my tracker isn't abused
+**As a** user
+**I want** complete email notification coverage
+**So that** I receive notifications according to my preferences
 
 **Acceptance Criteria**:
 
-- [ ] Document: Rate limiting configuration
-- [ ] Document: Sender whitelist/blacklist
-- [ ] Document: Attachment size limits
-- [ ] Test: Reject emails from non-users (configurable)
-- [ ] Test: Reject oversized attachments
+- [ ] Message author notification control (messages_to_author config)
+- [ ] Nosy list auto-adds issue creator
+- [ ] BDD scenarios: 2/8 remaining scenarios passing (100% total)
+- [ ] Configuration guide: Email notification preferences
 
-## Technical Architecture
+**Technical Notes**:
 
-### Test Structure
+- Requires config.ini changes for messages_to_author testing
+- Nosy list auto-add may need detector implementation
 
-```
-tests/
-├── unit/                  # pytest unit tests
-├── bdd/                   # Behave BDD tests (PIPE mode)
-│   ├── features/
-│   └── steps/
-└── integration/           # GreenMail integration tests
-    ├── conftest.py       # pytest fixtures
-    ├── greenmail_client.py
-    ├── test_email_polling.py
-    ├── test_smtp_delivery.py
-    └── docker-compose.yml
-```
+**Remaining BDD Scenarios** (from Sprint 8):
 
-### Running Tests
+- ⏳ Message author not notified (messages_to_author = no) - requires config change
+- ⏳ Nosy list auto-adds creator - missing step definition (minor feature)
 
-```bash
-# Fast BDD tests (always run in CI)
-behave
+**Implementation Tasks**:
 
-# Unit tests
-pytest tests/unit/
+- [ ] Add messages_to_author = no test scenario
+- [ ] Implement nosy list auto-add detector (if missing)
+- [ ] Update email notification BDD scenarios (100% passing)
+- [ ] Document notification configuration options
 
-# Integration tests (manual/pre-release)
-docker-compose -f tests/integration/docker-compose.yml up -d
-pytest tests/integration/
-docker-compose -f tests/integration/docker-compose.yml down
-```
+**Story Points**: 2
 
-## Story Point Breakdown
+______________________________________________________________________
 
-| Story                       | Points    | Priority |
-| --------------------------- | --------- | -------- |
-| 1. GreenMail Infrastructure | 8         | Critical |
-| 2. Email Polling Tests      | 5         | High     |
-| 3. SMTP Delivery Tests      | 5         | High     |
-| 4. Advanced Features        | 8         | High     |
-| 5. Production Documentation | 5         | Medium   |
-| 6. Security & Anti-Spam     | 5         | Stretch  |
-| **Total**                   | **26-36** |          |
+### High Priority (8 points)
+
+#### Story 4: Email Security & Anti-Spam (5 points)
+
+**As a** sysadmin
+**I want** email security controls
+**So that** I can prevent spam and abuse
+
+**Acceptance Criteria**:
+
+- [ ] Sender whitelist/blacklist configuration
+- [ ] Attachment size limits enforced
+- [ ] Rate limiting per sender
+- [ ] Suspicious email detection (spam keywords, patterns)
+- [ ] BDD scenarios for security controls (8 scenarios)
+- [ ] Documentation: Email security hardening guide
+
+**Technical Notes**:
+
+- Implement as mailgw detector/auditor
+- Use Roundup's permission system for whitelists
+- Log blocked emails for audit trail
+
+**Implementation Tasks**:
+
+- [ ] Implement sender whitelist/blacklist
+- [ ] Add attachment size limit checks
+- [ ] Implement rate limiting (Redis/file-based counter)
+- [ ] Add spam keyword detection
+- [ ] Write security BDD scenarios
+- [ ] Document email security configuration
+
+**Story Points**: 5
+
+______________________________________________________________________
+
+#### Story 5: Four-Interface Testing Tutorial (3 points)
+
+**As a** BDD practitioner
+**I want** a comprehensive four-interface testing tutorial
+**So that** I can apply these patterns to my projects
+
+**Acceptance Criteria**:
+
+- [ ] Tutorial: Four-interface BDD testing guide
+- [ ] Code examples for each interface (Web, CLI, API, Email)
+- [ ] Cross-interface verification examples
+- [ ] Variable substitution patterns documented
+- [ ] Troubleshooting guide for common issues
+
+**Technical Notes**:
+
+- Based on Sprint 8's four_interface_testing.feature
+- Include Playwright, API, CLI, Email step definition patterns
+- Explain design decisions and tradeoffs
+
+**Implementation Tasks**:
+
+- [ ] Write tutorial introduction and objectives
+- [ ] Document each interface testing approach
+- [ ] Explain cross-interface verification patterns
+- [ ] Add troubleshooting section
+- [ ] Review and polish for public release
+
+**Story Points**: 3
+
+______________________________________________________________________
+
+### Stretch Goals (13 points)
+
+#### Story 6: Email-Based Change Management (5 points)
+
+**As a** user
+**I want** to manage changes via email
+**So that** I can work with change workflows without the web UI
+
+**Acceptance Criteria**:
+
+- [ ] Create changes via email
+- [ ] Update changes via email
+- [ ] Link changes to issues via email
+- [ ] Change approval via email reply
+- [ ] BDD scenarios for email-based change workflows (6 scenarios)
+
+**Story Points**: 5
+
+______________________________________________________________________
+
+#### Story 7: Email Templates & Formatting (3 points)
+
+**As a** sysadmin
+**I want** customizable email notification templates
+**So that** I can brand and format notifications for my organization
+
+**Acceptance Criteria**:
+
+- [ ] Customizable notification templates (Jinja2/template strings)
+- [ ] HTML email formatting option
+- [ ] Email signature configuration
+- [ ] Template variables documented (issue, user, change, etc.)
+- [ ] BDD scenarios for template rendering (4 scenarios)
+
+**Story Points**: 3
+
+______________________________________________________________________
+
+#### Story 8: Email Threading & Conversation Tracking (5 points)
+
+**As a** user
+**I want** email threading and conversation tracking
+**So that** I can follow issue discussions in my email client
+
+**Acceptance Criteria**:
+
+- [ ] Email threading headers (In-Reply-To, References)
+- [ ] Conversation tracking in issue messages
+- [ ] Reply-to correct issue even without [issueN] in subject
+- [ ] BDD scenarios for email threading (5 scenarios)
+
+**Story Points**: 5
+
+______________________________________________________________________
+
+## Sprint Metrics
+
+### Point Distribution
+
+| Priority           | Points | Stories |
+| ------------------ | ------ | ------- |
+| **Critical** (1-3) | 18     | 3       |
+| **High** (4-5)     | 8      | 2       |
+| **Stretch** (6-8)  | 13     | 3       |
+| **Total**          | 39     | 8       |
+
+### Velocity Planning
+
+- **High Priority Target**: 26 points (Stories 1-5)
+- **Stretch Target**: 39 points (all stories)
+- **Historical Velocity**: 27 points/day (Sprint 8, exceptional)
+- **Conservative Estimate**: 15-20 points/week
+- **Optimistic Estimate**: 26-39 points in 2 weeks
 
 ## Dependencies
 
 ### External
 
-- **Docker** - For GreenMail container
-- **GreenMail** - Email server for testing
-- **BeautifulSoup4** - For HTML email conversion (optional)
+- **GreenMail**: Docker/Podman container (greenmail/standalone:latest)
+- **BeautifulSoup4**: HTML parsing library
+- **Redis** (optional): For distributed rate limiting
 
-### Configuration
+### Internal
 
-- Roundup mailgw configuration review
-- Security review for user auto-creation
+- ✅ BDD test framework (Behave + Playwright)
+- ✅ Roundup mailgw (included)
+- ✅ Four-interface testing infrastructure
+- ✅ Email gateway PIPE mode implementation
 
 ## Risks & Mitigation
 
-| Risk                                     | Impact | Mitigation                                         |
-| ---------------------------------------- | ------ | -------------------------------------------------- |
-| GreenMail adds test complexity           | Medium | Make integration tests optional, document clearly  |
-| Docker not available in all environments | Medium | Provide skip instructions, keep PIPE tests primary |
-| HTML conversion requires dependencies    | Low    | Make optional, document alternatives               |
-| User auto-creation security risk         | High   | Require explicit configuration, document risks     |
+| Risk                                | Impact | Probability | Mitigation                                                 |
+| ----------------------------------- | ------ | ----------- | ---------------------------------------------------------- |
+| GreenMail integration complexity    | High   | Medium      | Keep PIPE mode as fallback; make GreenMail optional        |
+| Email security over-engineering     | Medium | Low         | Start with simple whitelist/size limits; iterate           |
+| BeautifulSoup4 parsing edge cases   | Medium | Medium      | Test with varied email clients; graceful fallback          |
+| Unknown user auto-creation security | High   | Low         | Require explicit whitelist; document security implications |
+| Rate limiting state management      | Low    | Low         | Use simple file-based counter; Redis optional              |
 
-## Success Metrics
+## Success Criteria
 
-- **Test Coverage**: >90% for email features
-- **Test Speed**: Integration tests \<2 min total
-- **BDD Scenarios**: 12/12 passing (100%)
-- **Documentation**: 4 new how-to guides
-- **CI/CD**: GreenMail tests passing (optional)
+**Must Have** (Sprint Success):
 
-## Out of Scope
+- ✅ GreenMail integration complete (Story 1: 8 points)
+- ✅ Email advanced features working (Story 2: 8 points)
+- ✅ Email notifications 100% complete (Story 3: 2 points)
+- ✅ Email security basics (Story 4: 5 points)
+- ✅ Documentation: 26+ points delivered
 
+**Nice to Have** (Stretch Goals):
+
+- 🎯 Email-based change management (Story 6: 5 points)
+- 🎯 Email templates (Story 7: 3 points)
+- 🎯 Email threading (Story 8: 5 points)
+
+**Quality Gates**:
+
+- All high-priority BDD scenarios passing (100%)
+- Email security audit passed (no critical vulnerabilities)
+- Documentation complete (tutorial + reference)
+- Code coverage >85%
+
+## Technical Approach
+
+### GreenMail Integration Architecture
+
+```
+BDD Test Environment
+├── GreenMail Container (Docker/Podman)
+│   ├── SMTP Server (port 3025)
+│   ├── IMAP Server (port 3143)
+│   └── POP3 Server (port 3110)
+├── Roundup Server (port 9080)
+│   └── mailgw detector (connects to GreenMail SMTP)
+└── Behave Step Definitions
+    ├── SMTP sending steps
+    ├── IMAP verification steps
+    └── Mailbox state assertions
+```
+
+### Email Advanced Features Flow
+
+```
+Email Gateway Processing
+1. Receive email (PIPE mode or IMAP poll)
+2. Parse headers (From, Subject, To)
+3. Extract issue ID ([issueN] or Reply-To)
+4. Convert HTML to plain text (BeautifulSoup4)
+5. Process attachments
+6. Parse commands (status, priority, nosy)
+7. Authenticate sender (whitelist/blacklist)
+8. Create/update issue
+9. Trigger notifications
+```
+
+## Documentation Deliverables
+
+### Tutorials
+
+- [ ] Four-interface BDD testing guide (Story 5)
+- [ ] Email gateway advanced features tutorial
+
+### How-To Guides
+
+- [ ] GreenMail testing setup
+- [ ] Email security configuration
+- [ ] Email template customization
+- [ ] Configure outgoing email (SMTP)
+- [ ] Configure incoming email (IMAP/POP3)
+
+### Reference
+
+- [ ] Email gateway configuration reference
+- [ ] Email security controls reference
+- [ ] GreenMail API reference
+
+## Out of Scope (Future Sprints)
+
+- Email dashboard (analytics, delivery rates)
+- Email scheduling/delayed sending
+- Email digest mode (batch notifications)
+- Multi-language email notifications
+- Email-based reporting
+- Email API (programmatic sending)
 - Web-based email interface (webmail)
-- Email threading/conversation tracking
-- Email templates customization
-- Multi-language email content
 - Calendar invites (.ics files)
 
-## Next Sprint Preview
+## Sprint Timeline
 
-**Sprint 10** (v1.3.0) - Mobile & API Enhancements:
+### Week 1 (Nov 21-27)
 
+- **Days 1-2**: Story 1 - GreenMail integration (8 points)
+- **Days 3-4**: Story 2 - Email advanced features (8 points)
+- **Day 5**: Story 3 - Complete notifications (2 points)
+
+### Week 2 (Nov 28 - Dec 5)
+
+- **Days 1-2**: Story 4 - Email security (5 points)
+- **Day 3**: Story 5 - Four-interface tutorial (3 points)
+- **Days 4-5**: Stretch goals (Stories 6-8) or polish
+
+## Definition of Done
+
+**Story Completion**:
+
+- [ ] All acceptance criteria met
+- [ ] BDD scenarios passing (100% for story scope)
+- [ ] Code reviewed and formatted (ruff)
+- [ ] Type checking passed (mypy)
+- [ ] Documentation updated (Diátaxis framework)
+- [ ] Commit message follows convention
+
+**Sprint Completion**:
+
+- [ ] High priority stories complete (26 points minimum)
+- [ ] Sprint backlog updated with final metrics
+- [ ] Sprint retrospective written
+- [ ] CHANGELOG.md updated with v1.2.0 section
+- [ ] Version bumped to 1.2.0
+- [ ] Git tag created (v1.2.0)
+- [ ] CLAUDE.md updated with Sprint 10 preview
+
+## Next Sprint Preview (Sprint 10)
+
+**Potential Focus Areas**:
+
+- Advanced CMDB features (relationship mapping, dependency tracking)
+- Reporting & analytics dashboards
+- Integration APIs (webhooks, external tools)
+- Multi-language support
+- Email digest mode
 - Mobile-responsive web UI
-- REST API rate limiting
-- API authentication (JWT)
+- REST API enhancements (rate limiting, JWT authentication)
 - API documentation (OpenAPI/Swagger)
 
 ______________________________________________________________________
 
-**Notes**:
-
-- GreenMail tests are **optional** - PIPE mode tests remain primary
-- Focus on production deployment readiness
-- Security review required before user auto-creation
-- Integration tests run manually or in pre-release pipeline
+**Document Version**: 2.0
+**Date**: 2025-11-21
+**Status**: 🟢 Ready to Start
+**Previous Version**: 1.0 (created during Sprint 8 planning)

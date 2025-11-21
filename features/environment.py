@@ -5,7 +5,8 @@
 Behave environment configuration for PMS BDD testing.
 
 This module sets up the testing environment for Behave scenarios,
-including Playwright browser setup, screenshot capture, and database cleanup.
+including Playwright browser setup, screenshot capture, database cleanup,
+and optional GreenMail email server.
 """
 
 import os
@@ -24,6 +25,7 @@ from tests.config.playwright_config import (
     get_context_options,
     get_launch_options,
 )
+from tests.utils.greenmail_client import GreenMailClient, GreenMailContainer
 
 
 # Screenshot directory
@@ -84,18 +86,60 @@ def browser_context(context):
     context.context.close()
 
 
+@fixture
+def greenmail_server(context):
+    """
+    Set up GreenMail email server for email testing.
+
+    This fixture starts a GreenMail container that will be shared
+    across all scenarios that need email testing.
+    """
+    # Check if GreenMail mode is enabled
+    use_greenmail = os.getenv("EMAIL_TEST_MODE", "pipe").lower() == "greenmail"
+
+    if not use_greenmail:
+        yield context
+        return
+
+    # Start GreenMail container
+    context.greenmail_container = GreenMailContainer(container_name="greenmail-bdd")
+
+    print("\n[GreenMail] Starting email server...")
+    if not context.greenmail_container.start():
+        raise RuntimeError("Failed to start GreenMail container")
+
+    # Wait for GreenMail to be ready
+    if not context.greenmail_container.wait_for_ready(timeout=30):
+        context.greenmail_container.stop()
+        raise RuntimeError("GreenMail container did not become ready")
+
+    print("[GreenMail] Email server ready")
+
+    # Create GreenMail client
+    context.greenmail_client = GreenMailClient()
+
+    yield context
+
+    # Stop GreenMail container
+    print("\n[GreenMail] Stopping email server...")
+    context.greenmail_container.stop()
+
+
 def before_all(context):
     """
     Run before all tests.
 
-    Set up the Playwright browser instance that will be reused
-    across all scenarios for better performance.
+    Set up the Playwright browser instance and optional GreenMail server
+    that will be reused across all scenarios for better performance.
     """
     use_fixture(playwright_browser, context)
 
     # Set up reporting directory
     context.report_dir = Path("reports")
     context.report_dir.mkdir(exist_ok=True)
+
+    # Set up GreenMail server if enabled
+    use_fixture(greenmail_server, context)
 
 
 def before_scenario(context, scenario):
@@ -106,6 +150,7 @@ def before_scenario(context, scenario):
     1. Cleans screenshots directory
     2. Provides clean database with fresh server (via fixture)
     3. Sets up browser context for web-ui scenarios
+    4. Clears GreenMail mailbox if enabled
     """
     # Clean screenshots directory before each scenario
     if SCREENSHOT_DIR.exists():
@@ -124,6 +169,13 @@ def before_scenario(context, scenario):
 
     # Initialize CI map for tracking created CIs
     context.ci_map = {}
+
+    # Clear GreenMail mailbox if enabled
+    if hasattr(context, "greenmail_client"):
+        try:
+            context.greenmail_client.clear_mailbox()
+        except Exception as e:
+            print(f"\nWarning: Failed to clear GreenMail mailbox: {e}")
 
     # Only set up browser for web UI scenarios (check tags)
     # API and CLI scenarios don't need browser
