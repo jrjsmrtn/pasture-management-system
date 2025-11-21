@@ -772,6 +772,7 @@ def step_clear_email_debug_log(context):
 
 
 @given('I create an issue with title "{title}" via CLI')
+@when('I create an issue with title "{title}" via CLI')
 def step_create_issue_via_cli(context, title):
     """Create an issue via roundup-admin CLI and store its ID."""
     tracker_dir = os.getenv("TRACKER_DIR", "tracker")
